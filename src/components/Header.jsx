@@ -1,7 +1,11 @@
 import React from "react";
-
+import headerImage from "../assets/Group 57.png";
 function Header() {
-  return <div>Header</div>;
+  return (
+    <div className="bg-[#0E2258] w-full pt-2 pb-2 pl-24">
+      <img src={headerImage} alt="" />
+    </div>
+  );
 }
 
 export default Header;
