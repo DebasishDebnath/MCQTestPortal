@@ -5,6 +5,7 @@ function RegisterPage() {
   return (
     <div>
       <Header />
+      Register page
     </div>
   );
 }
