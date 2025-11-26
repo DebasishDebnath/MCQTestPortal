@@ -155,7 +155,7 @@ export default function RegisterPage() {
               <p className="text-slate-600 text-sm">
                 Already Registered?{" "}
                 <a
-                  href="/user/login"
+                  href="/login"
                   className="text-blue-600 hover:text-blue-700 font-semibold"
                 >
                   Login

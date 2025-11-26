@@ -11,7 +11,7 @@ import SystemCompatibility from "./Page/user/SystemCompatibility";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route path="/user" element={<UserLayout />}>
+      <Route path="/" element={<UserLayout />}>
         <Route index element={<LoginPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />

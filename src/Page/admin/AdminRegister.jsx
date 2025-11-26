@@ -44,12 +44,15 @@ export default function RegisterPage() {
         }}
       >
         {/* Left Section */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12">
-          <div>
-            <h1 className="text-5xl font-bold mb-4 leading-tight">
-              Welcome to <br /> Super Admin MCQ Test Platform
+        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between items center p-18">
+          <div className=" items-center p-20">
+            <h1 className="text-6xl font-bold mb-4 leading-tight poppins-regular">
+              Welcome to 
             </h1>
-            <p>with Proctoring and full screen mode</p>
+            <h1 className="text-6xl font-bold mb-4 leading-tight poppins-bold mt-10">
+              Super Admin MCQ Test Platform
+            </h1>
+            <p className="poppins-medium mt-9 text-base">with Proctoring and full screen mode</p>
           </div>
 
           <footer className="text-sm text-slate-300 mt-6">

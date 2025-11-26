@@ -49,12 +49,15 @@ export default function LoginPage() {
                 }}
             >
                 {/* Left Section */}
-                <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12">
-                    <div>
-                        <h1 className="text-5xl font-bold mb-4 leading-tight">
-                            Welcome to <br /> MCQ Test Platform
+                <div className="hidden lg:flex lg:w-1/2 flex-col justify-between items center p-18">
+                    <div className=" items-center p-20">
+                        <h1 className="text-6xl font-bold mb-4 leading-tight poppins-regular">
+                            Welcome to
                         </h1>
-                        <p>with Proctoring and full screen mode</p>
+                        <h1 className="text-6xl font-bold mb-4 leading-tight poppins-bold mt-10">
+                            MCQ Test Platform
+                        </h1>
+                        <p className="poppins-medium mt-9 text-base">with Proctoring and full screen mode</p>
                     </div>
 
                     <footer className="text-sm text-slate-300 mt-6">
@@ -126,7 +129,7 @@ export default function LoginPage() {
                             <p className="text-slate-600 text-sm">
                                 Don't have an account?{" "}
                                 <a
-                                    href="/user/register"
+                                    href="/register"
                                     className="text-blue-600 hover:text-blue-700 font-semibold"
                                 >
                                     Register
