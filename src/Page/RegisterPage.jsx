@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Header from "../components/Header.jsx";
 import { useHttp } from "../hooks/useHttp.jsx"; // Import the hook
 
 export default function RegisterPage() {
@@ -36,7 +35,6 @@ export default function RegisterPage() {
 
   return (
     <>
-      <Header />
 
       {/* Full Page Background */}
       <div
