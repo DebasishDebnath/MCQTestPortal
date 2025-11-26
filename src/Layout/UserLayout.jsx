@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Header from "../components/user/Header";
 
-function RootLayout() {
+function UserLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -13,4 +13,4 @@ function RootLayout() {
   );
 }
 
-export default RootLayout;
+export default UserLayout;
