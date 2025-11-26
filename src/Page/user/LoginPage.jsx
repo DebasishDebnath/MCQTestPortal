@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHttp } from "../hooks/useHttp.jsx"; // Import the hook
+import { useHttp } from "../../hooks/useHttp.jsx"; // Import the hook
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({
@@ -36,7 +36,7 @@ export default function LoginPage() {
             <div
                 className="min-h-screen flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white"
                 style={{
-                    backgroundImage: "url(./regbg.png)",
+                    backgroundImage: "url(/regbg.png)",
                 }}
             >
                 {/* Left Section */}

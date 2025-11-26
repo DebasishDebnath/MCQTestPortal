@@ -1,15 +1,23 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route } from "react-router-dom";
-import RootLayout from "./Layout/MainLayout";
-import LoginPage from "./Page/LoginPage";
-import RegisterPage from "./Page/RegisterPage";
+import UserLayout from "./Layout/UserLayout";
+import AdminLayout from "./Layout/AdminLayout";
+import LoginPage from "./Page/user/LoginPage";
+import RegisterPage from "./Page/user/RegisterPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<RootLayout />}>
-      <Route index element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-    </Route>
+    <>
+      <Route path="/user" element={<UserLayout />}>
+        <Route index element={<LoginPage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+      </Route>
+
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<div>Admin Dashboard</div>} />
+      </Route>
+    </>
   )
 );
 
