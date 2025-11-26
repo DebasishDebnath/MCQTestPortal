@@ -82,12 +82,12 @@ export default function Instruction() {
       </div>
 
       {/* ===== FOOTER ===== */}
-      <p className="text-sm text-slate-300 poppins mt-10 text-center">
+      <p className="text-sm text-slate-300 poppins absolute bottom-8 left-8">
         © IEM-UEM Group. All Rights Reserved.
       </p>
 
       {/* ===== HELP BUTTON ===== */}
-      <button className="text-sm text-slate-300 poppins absolute top-8 right-8 text-center">
+      <button className="text-sm text-slate-300 poppins absolute bottom-8 right-8 text-center">
         Need Help?
       </button>
     </div>

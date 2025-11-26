@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useHttp } from "../../hooks/useHttp.jsx";
 import { useNavigate } from "react-router-dom";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { MdEmail } from "react-icons/md";
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({
@@ -82,8 +84,8 @@ export default function LoginPage() {
 
                             {/* Email */}
                             <div>
-                                <label className="block text-sm font-semibold mb-2">
-                                    Email <span className="text-red-500">*</span>
+                                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2 ">
+                                    Email <MdEmail className="w-4 h-4" />
                                 </label>
                                 <input
                                     type="email"
@@ -98,8 +100,8 @@ export default function LoginPage() {
 
                             {/* Password */}
                             <div>
-                                <label className="block text-sm font-semibold mb-2">
-                                    Password <span className="text-red-500">*</span>
+                                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2 ">
+                                    Password <RiLockPasswordFill className="w-4 h-4" />
                                 </label>
                                 <input
                                     type="password"
@@ -117,7 +119,7 @@ export default function LoginPage() {
                                 className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-full transition-colors mt-8"
                                 disabled={loading}
                             >
-                                {loading ? "Registering..." : "Register Now"}
+                                {loading ? "Logging in..." : " Login"}
                             </button>
                             {error && (
                                 <div className="text-red-500 text-sm mt-2">{error}</div>
