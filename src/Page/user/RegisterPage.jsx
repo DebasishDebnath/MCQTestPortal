@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import { useHttp } from "../../hooks/useHttp.jsx"; // Import the hook
+import { User } from "lucide-react";
+import { FaUser } from "react-icons/fa";
+import { MdLocalPhone } from "react-icons/md";
+import { MdEmail } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -70,14 +75,14 @@ export default function RegisterPage() {
           </div>
 
           {/* Card */}
-          <div className="w-full max-w-xl bg-white text-slate-900 rounded-3xl shadow-xl p-8">
+          <div className="w-full max-w-xl bg-white text-slate-900 rounded-3xl shadow-xl p-5">
             <h2 className="text-3xl font-bold mb-8">Register</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Name <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                 Name <FaUser  className="w-4 h-4" />
                 </label>
                 <input
                   type="text"
@@ -85,15 +90,15 @@ export default function RegisterPage() {
                   placeholder="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                   required
                 />
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Phone <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2 ">
+                  Phone <MdLocalPhone className="w-5 h-5" />
                 </label>
                 <input
                   type="tel"
@@ -101,15 +106,15 @@ export default function RegisterPage() {
                   placeholder="phone number"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                   required
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Email <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                  Email <MdEmail className="w-5 h-5" />
                 </label>
                 <input
                   type="email"
@@ -117,15 +122,15 @@ export default function RegisterPage() {
                   placeholder="email address"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                   required
                 />
               </div>
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Password <span className="text-red-500">*</span>
+                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                  Password <RiLockPasswordFill className="w-5 h-5" />
                 </label>
                 <input
                   type="password"
@@ -133,7 +138,7 @@ export default function RegisterPage() {
                   placeholder="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                   required
                 />
               </div>
