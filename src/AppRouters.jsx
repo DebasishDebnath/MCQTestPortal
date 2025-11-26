@@ -4,7 +4,8 @@ import UserLayout from "./Layout/UserLayout";
 import AdminLayout from "./Layout/AdminLayout";
 import LoginPage from "./Page/user/LoginPage";
 import RegisterPage from "./Page/user/RegisterPage";
-
+import AdminLogin from "./Page/admin/AdminLogin";
+import AdminRegister from "./Page/admin/AdminRegister";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -16,6 +17,8 @@ const router = createBrowserRouter(
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<div>Admin Dashboard</div>} />
+        <Route path="login" element={<AdminLogin />} />
+        <Route path="register" element={<AdminRegister />} />
       </Route>
     </>
   )
