@@ -1,13 +1,16 @@
-import React, { useState } from "react";
-import { useHttp } from "../../hooks/useHttp.jsx"; // Import the hook
+import React, { useState, useEffect } from "react";
+import { useHttp } from "../../hooks/useHttp.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({
         phone: "",
         password: "",
+        email: "",
     });
 
     const { post, loading, error } = useHttp();
+    const navigate = useNavigate(); // Initialize navigate
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -19,14 +22,20 @@ export default function LoginPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Map formData to API body
         const body = {
             password: formData.password,
             email: formData.email,
         };
         const result = await post("/api/users/login", body);
         console.log("API response:", result);
-        // Optionally handle success/error here
+        if (result && result.success) {
+            // Request fullscreen
+            if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+            }
+            // Redirect to system compatibility page
+            navigate("/user/system-compatibility");
+        }
     };
 
     return (
@@ -117,7 +126,7 @@ export default function LoginPage() {
                             <p className="text-slate-600 text-sm">
                                 Don't have an account?{" "}
                                 <a
-                                    href="/register"
+                                    href="/user/register"
                                     className="text-blue-600 hover:text-blue-700 font-semibold"
                                 >
                                     Register
