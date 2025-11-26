@@ -44,12 +44,15 @@ export default function RegisterPage() {
         }}
       >
         {/* Left Section */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12">
-          <div>
-            <h1 className="text-5xl font-bold mb-4 leading-tight">
-              Welcome to <br /> MCQ Test Platform
+        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between items center p-18">
+          <div className=" items-center p-20">
+            <h1 className="text-6xl font-bold mb-4 leading-tight poppins-regular">
+              Welcome to 
             </h1>
-            <p>with Proctoring and full screen mode</p>
+            <h1 className="text-6xl font-bold mb-4 leading-tight poppins-bold mt-10">
+              MCQ Test Platform
+            </h1>
+            <p className="poppins-medium mt-9 text-base">with Proctoring and full screen mode</p>
           </div>
 
           <footer className="text-sm text-slate-300 mt-6">
@@ -58,9 +61,9 @@ export default function RegisterPage() {
         </div>
 
         {/* Right Section */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
+        <div className="w-full lg:w-1/2 flex items-center justify-center  relative">
           {/* Help Button */}
-          <div className="absolute top-8 right-8">
+          <div className="absolute bottom-8 right-8">
             <button className="text-sm text-slate-200 hover:text-white font-medium">
               Need Help?
             </button>
@@ -152,7 +155,7 @@ export default function RegisterPage() {
               <p className="text-slate-600 text-sm">
                 Already Registered?{" "}
                 <a
-                  href="/login"
+                  href="/user/login"
                   className="text-blue-600 hover:text-blue-700 font-semibold"
                 >
                   Login

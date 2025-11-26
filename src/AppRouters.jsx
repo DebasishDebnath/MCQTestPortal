@@ -7,6 +7,7 @@ import RegisterPage from "./Page/user/RegisterPage";
 import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Instruction from "./Page/user/Instruction";
+import SystemCompatibility from "./Page/user/SystemCompatibility";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -15,7 +16,7 @@ const router = createBrowserRouter(
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="instruction" element={<Instruction />} />
-        <Route path="system-compatibility" element={<SystemComatibility />} />
+        <Route path="system-compatibility" element={<SystemCompatibility />} />
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>
