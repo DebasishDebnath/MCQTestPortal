@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useHttp } from "../../hooks/useHttp.jsx";
 import { useNavigate } from "react-router-dom";
 import { RiLockPasswordFill } from "react-icons/ri";
+import { MdEmail } from "react-icons/md";
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({
@@ -84,7 +85,7 @@ export default function LoginPage() {
                             {/* Email */}
                             <div>
                                 <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2 ">
-                                    Email <span className="text-red-500">*</span>
+                                    Email <MdEmail className="w-4 h-4" />
                                 </label>
                                 <input
                                     type="email"
