@@ -6,6 +6,7 @@ import LoginPage from "./Page/user/LoginPage";
 import RegisterPage from "./Page/user/RegisterPage";
 import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
+import Instruction from "./Page/user/Instruction";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -13,6 +14,8 @@ const router = createBrowserRouter(
         <Route index element={<LoginPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="instruction" element={<Instruction />} />
+        <Route path="system-compatibility" element={<SystemComatibility />} />
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>
