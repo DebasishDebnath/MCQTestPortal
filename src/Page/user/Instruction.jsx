@@ -58,10 +58,10 @@ export default function Instruction() {
         </ul>
 
         {/* ===== CHECKBOX ===== */}
-        <div className="bg-blue-50 poppins p-5 rounded-xl mt-8 flex items-center gap-3">
+        <div className="bg-blue-50 poppins p-5 rounded-xl mt-8 flex items-center gap-3 ">
           <input
             type="checkbox"
-            className="w-5 h-5"
+            className="w-5 h-5 cursor-pointer"
             checked={checked}
             onChange={() => setChecked(!checked)}
           />
@@ -74,7 +74,7 @@ export default function Instruction() {
         <div className="flex justify-center mt-10">
           <button
             onClick={handleStart}
-            className="bg-blue-theme text-white poppins px-10 py-1.5 rounded-full text-lg font-semibold hover:bg-blue-900 transition"
+            className="bg-blue-theme text-white poppins px-10 py-1.5 rounded-full text-lg font-semibold hover:bg-blue-900 transition cursor-pointer"
           >
             Start Test
           </button>
