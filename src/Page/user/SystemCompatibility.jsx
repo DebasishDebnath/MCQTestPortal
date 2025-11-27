@@ -187,7 +187,7 @@ const StatusIcon = ({ status }) => {
             {/* Proceed Button */}
             <button
               disabled={loading || !(cameraOk && micOk && networkOk)}
-              className={`mt-10 w-full py-3 text-white rounded-xl poppins-semibold transition ${
+              className={`mt-10 w-full py-3 text-white rounded-xl poppins-semibold transition cursor-pointer ${
                 cameraOk && micOk && networkOk
                   ? "bg-[#0a1a44] hover:bg-[#081536]"
                   : "bg-gray-400 cursor-not-allowed"
