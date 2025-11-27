@@ -74,7 +74,7 @@ export default function Instruction() {
         <div className="flex justify-center mt-10">
           <button
             onClick={handleStart}
-            className="bg-[#0E2258] text-white poppins px-10 py-1.5 rounded-full text-lg font-semibold hover:bg-blue-900 transition"
+            className="bg-blue-theme text-white poppins px-10 py-1.5 rounded-full text-lg font-semibold hover:bg-blue-900 transition"
           >
             Start Test
           </button>
