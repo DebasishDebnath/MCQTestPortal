@@ -87,7 +87,7 @@ export default function Instruction() {
       </p>
 
       {/* ===== HELP BUTTON ===== */}
-      <button className="text-sm text-slate-300 poppins absolute bottom-8 right-8 text-center">
+      <button className="text-sm text-slate-200 absolute bottom-8 right-8">
         Need Help?
       </button>
     </div>

@@ -70,8 +70,8 @@ export default function LoginPage() {
                 {/* Right Section */}
                 <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
                     {/* Help Button */}
-                    <div className="absolute top-8 right-8">
-                        <button className="text-sm text-slate-200 hover:text-white font-medium">
+                    <div className="absolute bottom-8 right-8">
+                        <button className="text-sm text-slate-200 hover:text-white ">
                             Need Help?
                         </button>
                     </div>
