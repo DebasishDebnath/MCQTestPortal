@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHttp } from "../../hooks/useHttp.jsx";
 import { useNavigate } from "react-router-dom";
 import { RiLockPasswordFill } from "react-icons/ri";
@@ -10,11 +10,16 @@ export default function LoginPage() {
     password: "",
     email: "",
   });
-
-  const [showPassword, setShowPassword] = useState(false); // 👈 Added
-
+  const [showPassword, setShowPassword] = useState(false); 
   const { post, loading, error } = useHttp();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (localStorage.getItem("userToken")) {
+      navigate("/system-compatibility");
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
