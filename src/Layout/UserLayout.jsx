@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import Header from "../components/user/Header";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 function UserLayout() {
   return (
@@ -9,6 +10,7 @@ function UserLayout() {
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }

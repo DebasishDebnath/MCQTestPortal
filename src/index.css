@@ -1,8 +1,22 @@
 @import "tailwindcss";
 
+.poppins {
+  font-family: "Poppins", sans-serif;
+}
 
+.poppins-italic {
+  font-family: "Poppins", sans-serif;
+  font-style: italic;
+}
 
-.poppins-thin {
+.bg-blue-theme {
+  background-color: #0E2258;
+}
+
+.text-blue-theme {
+  color: #0E2258;
+
+/* .poppins-thin {
   font-family: "Poppins", sans-serif;
   font-weight: 100;
   font-style: normal;
@@ -108,4 +122,4 @@
   font-family: "Poppins", sans-serif;
   font-weight: 900;
   font-style: italic;
-}
+} */

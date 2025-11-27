@@ -97,7 +97,7 @@ const StatusIcon = ({ status }) => {
     <>
       {/* Full Page Background */}
       <div
-        className=" h-full h-screen overflow-hidden flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white"
+        className=" h-full overflow-hidden flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white"
         style={{ backgroundImage: "url(/regbg.png)" }}
       >
         {/* Left Section */}
