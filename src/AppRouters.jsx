@@ -17,6 +17,7 @@ function ProtectedRoute() {
   return isLoggedIn() ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
+import SubmissionSuccess from "./Page/user/SubmissionSuccess";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -29,6 +30,7 @@ const router = createBrowserRouter(
           <Route path="instruction" element={<Instruction />} />
           <Route path="system-compatibility" element={<SystemCompatibility />} />
         </Route>
+        <Route path="success" element={<SubmissionSuccess />} />
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>
