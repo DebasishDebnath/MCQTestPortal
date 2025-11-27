@@ -50,25 +50,16 @@ function SystemCompatibility() {
   }
 
   useEffect(() => {
-    setLoading(true); // Start loading immediately when page loads
+    setLoading(true);
 
     async function runChecks() {
       await checkCamera();
       await checkMic();
       await checkNetwork();
-      setLoading(false); // Stop loading after all checks
+      setLoading(false);
     }
 
-    // Only run checks if in fullscreen
-    if (document.fullscreenElement) {
-      runChecks();
-    } else {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().then(runChecks);
-      } else {
-        runChecks();
-      }
-    }
+    runChecks();
   }, []);
 
   const handleProceed = () =>{
