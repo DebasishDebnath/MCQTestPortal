@@ -36,7 +36,7 @@ export default function LoginPage() {
                 await document.documentElement.requestFullscreen();
             }
             // Redirect to system compatibility page
-            navigate("/user/system-compatibility");
+            navigate("/system-compatibility");
         }
     };
 
