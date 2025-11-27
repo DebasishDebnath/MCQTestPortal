@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useHttp } from "../../hooks/useHttp.jsx"; // Import the hook
+import { MdEmail } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({
@@ -73,8 +75,8 @@ export default function LoginPage() {
 
                             {/* Email */}
                             <div>
-                                <label className="block text-sm font-semibold mb-2">
-                                    Email <span className="text-red-500">*</span>
+                                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2 ">
+                                    Email <MdEmail />
                                 </label>
                                 <input
                                     type="email"
@@ -89,8 +91,8 @@ export default function LoginPage() {
 
                             {/* Password */}
                             <div>
-                                <label className="block text-sm font-semibold mb-2">
-                                    Password <span className="text-red-500">*</span>
+                                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2 ">
+                                    Password <RiLockPasswordFill />
                                 </label>
                                 <input
                                     type="password"
