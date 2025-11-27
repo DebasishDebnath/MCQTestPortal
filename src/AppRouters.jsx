@@ -8,6 +8,7 @@ import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Instruction from "./Page/user/Instruction";
 import SystemCompatibility from "./Page/user/SystemCompatibility";
+import TestQuestion from "./Page/user/TestQuestion";
 import RouteErrorPopup from "./Component/RouteErrorPopup";
 
 // Simple auth check (replace with your logic)
@@ -30,6 +31,7 @@ const router = createBrowserRouter(
         <Route element={<ProtectedRoute />}>
           <Route path="instruction" element={<Instruction />} />
           <Route path="system-compatibility" element={<SystemCompatibility />} />
+          <Route path="test/:testid" element={<TestQuestion />} />
         </Route>
         <Route path="success" element={<SubmissionSuccess />} />
       </Route>

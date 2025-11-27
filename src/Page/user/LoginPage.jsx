@@ -49,98 +49,96 @@ export default function LoginPage() {
   };
 
   return (
-    <>
-      <div
-        className="h-full flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white w-full pb-10 poppins"
-        style={{
-          backgroundImage: "url(/regbg.png)",
-        }}
-      >
-        <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
-          {/* Left Section */}
-          <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start">
-            <h1 className="text-5xl font-medium leading-tight">Welcome to</h1>
-            <h1 className="text-6xl font-semibold">MCQ Test Platform</h1>
-            <p className="text-lg">with Proctoring and full screen mode</p>
-          </div>
+    <div
+      className="h-full flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white w-full pb-10 poppins"
+      style={{
+        backgroundImage: "url(/regbg.png)",
+      }}
+    >
+      <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
+        {/* Left Section */}
+        <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start">
+          <h1 className="text-5xl font-medium leading-tight">Welcome to</h1>
+          <h1 className="text-6xl font-semibold">MCQ Test Platform</h1>
+          <p className="text-lg">with Proctoring and full screen mode</p>
+        </div>
 
-          {/* Right Section */}
-          <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
-            <div className="w-full max-w-2xl bg-white text-slate-900 rounded-3xl shadow-xl p-10">
-              <h2 className="text-3xl font-semibold mb-8 mt-4">Login</h2>
+        {/* Right Section */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
+          <div className="w-full max-w-2xl bg-white text-slate-900 rounded-3xl shadow-xl p-10">
+            <h2 className="text-3xl font-semibold mb-8 mt-4">Login</h2>
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div>
-                  <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
-                    Email <MdEmail className="w-4 h-4" />
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="email address"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div>
+                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                  Email <MdEmail className="w-4 h-4" />
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="email address"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
                                     focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                  Password <RiLockPasswordFill className="w-4 h-4" />
+                </label>
+
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 pr-12 rounded-full border-2 border-slate-200 
+                                        focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                     required
                   />
-                </div>
 
-                <div>
-                  <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
-                    Password <RiLockPasswordFill className="w-4 h-4" />
-                  </label>
-
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      placeholder="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 pr-12 rounded-full border-2 border-slate-200 
-                                        focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
-                      required
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800"
-                    >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-full transition-colors mt-6"
-                  disabled={loading}
-                >
-                  {loading ? "Logging in..." : "Login"}
-                </button>
-
-                {error && (
-                  <div className="text-red-500 text-sm mt-2">{error}</div>
-                )}
-              </form>
-
-              <div className="text-center mt-6">
-                <p className="text-slate-600 text-sm">
-                  Don't have an account?{" "}
-                  <a
-                    href="/register"
-                    className="text-blue-600 hover:text-blue-700 font-semibold"
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800"
                   >
-                    Register
-                  </a>
-                </p>
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
               </div>
+
+              <button
+                type="submit"
+                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-full transition-colors mt-6"
+                disabled={loading}
+              >
+                {loading ? "Logging in..." : "Login"}
+              </button>
+
+              {error && (
+                <div className="text-red-500 text-sm mt-2">{error}</div>
+              )}
+            </form>
+
+            <div className="text-center mt-6">
+              <p className="text-slate-600 text-sm">
+                Don't have an account?{" "}
+                <a
+                  href="/register"
+                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                >
+                  Register
+                </a>
+              </p>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
