@@ -53,20 +53,10 @@ export default function RegisterPage() {
               with Proctoring and full screen mode
             </p>
           </div>
-
-          <footer className="text-sm text-slate-300 mt-6">
-            © IEM - UEM Group. All Rights Reserved.
-          </footer>
         </div>
 
         {/* Right Section */}
         <div className="w-full lg:w-1/2 flex items-center justify-center relative">
-          {/* Help Button */}
-          <div className="absolute bottom-8 right-8">
-            <button className="text-sm text-slate-200 hover:text-white">
-              Need Help?
-            </button>
-          </div>
 
           {/* Card */}
           <div className="w-full max-w-xl bg-white text-slate-900 rounded-3xl shadow-xl p-5">

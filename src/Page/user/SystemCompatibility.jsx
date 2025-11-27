@@ -137,19 +137,11 @@ const StatusIcon = ({ status }) => {
               </div>
             </div>
           </div>
-          <footer className="text-sm text-slate-300 ">
-            © IEM - UEM Group. All Rights Reserved.
-          </footer>
+
         </div>
 
         {/* Right Section */}
         <div className="w-full lg:w-1/2 flex items-center justify-center h-full">
-          {/* Help Button */}
-          <div className="absolute bottom-8 right-8 z-10">
-            <button className="text-sm text-slate-200 hover:text-white font-medium">
-              Need Help?
-            </button>
-          </div>
 
           {/* Card */}
           <div className="w-full max-w-xl bg-white text-[#09163A] rounded-3xl shadow-xl p-8 flex flex-col justify-center">
