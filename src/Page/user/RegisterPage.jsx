@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { useHttp } from "../../hooks/useHttp.jsx"; // Import the hook
-import { User } from "lucide-react";
+import { useHttp } from "../../hooks/useHttp.jsx";
 import { FaUser } from "react-icons/fa";
-import { MdLocalPhone } from "react-icons/md";
-import { MdEmail } from "react-icons/md";
+import { MdLocalPhone, MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -14,50 +13,45 @@ export default function RegisterPage() {
     password: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
   const { post, loading, error } = useHttp();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Map formData to API body
     const body = {
       name: formData.name,
       email: formData.email,
       password: formData.password,
       phoneNumber: formData.phone,
     };
+
     const result = await post("/api/users/register", body);
     console.log("API response:", result);
-    // Optionally handle success/error here
   };
 
   return (
     <>
-
-      {/* Full Page Background */}
       <div
-        className=" h-full flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white"
-        style={{
-          backgroundImage: "url(/regbg.png)",
-        }}
+        className="h-full flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white"
+        style={{ backgroundImage: "url(/regbg.png)" }}
       >
         {/* Left Section */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between items center p-18">
-          <div className=" items-center p-20">
+        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between items-center p-18">
+          <div className="items-center p-20">
             <h1 className="text-6xl font-bold mb-4 leading-tight poppins-regular">
-              Welcome to 
+              Welcome to
             </h1>
-            <h1 className="text-6xl font-bold mb-4 leading-tight poppins-bold mt-10">
+            <h1 className="text-6xl font-bold leading-tight poppins-bold mt-10">
               MCQ Test Platform
             </h1>
-            <p className="poppins-medium mt-9 text-base">with Proctoring and full screen mode</p>
+            <p className="poppins-medium mt-9 text-base">
+              with Proctoring and full screen mode
+            </p>
           </div>
 
           <footer className="text-sm text-slate-300 mt-6">
@@ -66,10 +60,10 @@ export default function RegisterPage() {
         </div>
 
         {/* Right Section */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center  relative">
+        <div className="w-full lg:w-1/2 flex items-center justify-center relative">
           {/* Help Button */}
           <div className="absolute bottom-8 right-8">
-            <button className="text-sm text-slate-200 hover:text-white ">
+            <button className="text-sm text-slate-200 hover:text-white">
               Need Help?
             </button>
           </div>
@@ -82,7 +76,7 @@ export default function RegisterPage() {
               {/* Name */}
               <div>
                 <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
-                 Name <FaUser  className="w-4 h-4" />
+                  Name <FaUser className="w-4 h-4" />
                 </label>
                 <input
                   type="text"
@@ -90,14 +84,15 @@ export default function RegisterPage() {
                   placeholder="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
+                  focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                   required
                 />
               </div>
 
               {/* Phone */}
               <div>
-                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2 ">
+                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
                   Phone <MdLocalPhone className="w-5 h-5" />
                 </label>
                 <input
@@ -106,7 +101,8 @@ export default function RegisterPage() {
                   placeholder="phone number"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
+                  focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                   required
                 />
               </div>
@@ -122,40 +118,57 @@ export default function RegisterPage() {
                   placeholder="email address"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
+                  focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                   required
                 />
               </div>
 
-              {/* Password */}
+              {/* Password with Eye INSIDE input */}
               <div>
                 <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
                   Password <RiLockPasswordFill className="w-5 h-5" />
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
-                  required
-                />
+
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 pr-12 rounded-full border-2 border-slate-200
+                     focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 
+                    text-slate-600 hover:text-slate-800"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
               </div>
 
+              {/* Submit */}
               <button
                 type="submit"
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-full transition-colors mt-8"
+                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 
+                px-6 rounded-full transition-colors mt-8"
                 disabled={loading}
               >
                 {loading ? "Registering..." : "Register Now"}
               </button>
+
               {error && (
                 <div className="text-red-500 text-sm mt-2">{error}</div>
               )}
             </form>
 
-            {/* Login */}
+            {/* Login Link */}
             <div className="text-center mt-6">
               <p className="text-slate-600 text-sm">
                 Already Registered?{" "}

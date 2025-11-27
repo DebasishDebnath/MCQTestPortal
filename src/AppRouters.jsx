@@ -1,5 +1,5 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, Navigate, Outlet } from "react-router-dom";
 import UserLayout from "./Layout/UserLayout";
 import AdminLayout from "./Layout/AdminLayout";
 import LoginPage from "./Page/user/LoginPage";
@@ -8,6 +8,15 @@ import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Instruction from "./Page/user/Instruction";
 import SystemCompatibility from "./Page/user/SystemCompatibility";
+
+// Simple auth check (replace with your logic)
+const isLoggedIn = () => !!localStorage.getItem("userToken");
+
+// Protected Route component
+function ProtectedRoute() {
+  return isLoggedIn() ? <Outlet /> : <Navigate to="/login" replace />;
+}
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -15,8 +24,11 @@ const router = createBrowserRouter(
         <Route index element={<LoginPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
-        <Route path="instruction" element={<Instruction />} />
-        <Route path="system-compatibility" element={<SystemCompatibility />} />
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="instruction" element={<Instruction />} />
+          <Route path="system-compatibility" element={<SystemCompatibility />} />
+        </Route>
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>
