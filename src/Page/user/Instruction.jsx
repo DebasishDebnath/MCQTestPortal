@@ -14,7 +14,7 @@ export default function Instruction() {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat bg-[#313d55] bg-blend-overlay relative m-0 p-0 pt-12"
+      className=" h-full bg-cover bg-center bg-no-repeat bg-[#313d55] bg-blend-overlay relative m-0 p-0 pt-12"
       style={{ backgroundImage: "url('/regbg.png')" }}
     >
       {/* ===== PAGE TITLE ===== */}
