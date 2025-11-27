@@ -5,12 +5,14 @@ import { FaPuzzlePiece } from "react-icons/fa6";
 import { FaCamera, FaMicrophone, FaWifi } from "react-icons/fa";
 import { ImSpinner8 } from "react-icons/im";
 import { FaCheck, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function SystemCompatibility() {
   const [cameraOk, setCameraOk] = useState(null);
   const [micOk, setMicOk] = useState(null);
   const [networkOk, setNetworkOk] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // CAMERA CHECK
   async function checkCamera() {
@@ -69,6 +71,11 @@ function SystemCompatibility() {
     }
   }, []);
 
+  const handleProceed = () =>{
+    if(cameraOk && micOk && networkOk){
+      navigate("/instruction");
+    }
+  }
 const StatusIcon = ({ status }) => {
   if (status === null)
     return (
@@ -202,6 +209,7 @@ const StatusIcon = ({ status }) => {
                   ? "bg-[#0a1a44] hover:bg-[#081536]"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
+              onClick={handleProceed}
             >
               Proceed
             </button>
