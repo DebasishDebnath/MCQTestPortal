@@ -12,10 +12,10 @@ export default function SubmissionSuccess({ answered = 0, total = 0 }) {
 
   return (
     <div
-      className="min-h-screen w-full bg-cover bg-center poppins bg-no-repeat bg-[#313d55]/80 bg-blend-overlay relative flex items-center justify-center p-4"
+      className="min-h-full w-full bg-cover bg-center poppins bg-no-repeat bg-[#313d55]/80 bg-blend-overlay relative flex items-center justify-center p-4"
       style={{ backgroundImage: "url('/regbg.png')" }}
     >
-      <div className="bg-white w-[822px] h-[406px] rounded-[25px] shadow-xl p-12 text-center flex flex-col items-center justify-center">
+      <div className="bg-white w-[600px] h-[340px] rounded-[25px] shadow-xl p-12 text-center flex flex-col items-center justify-center">
         
         {/* Lottie Animation */}
         <div className="flex justify-center mb-6">

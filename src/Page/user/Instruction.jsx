@@ -14,7 +14,7 @@ export default function Instruction() {
 
   return (
     <div
-      className=" h-full bg-cover bg-center bg-no-repeat bg-[#313d55] bg-blend-overlay relative m-0 p-0 pt-12"
+      className=" h-full  bg-cover bg-center bg-no-repeat bg-[#313d55] bg-blend-overlay relative m-0 p-0 pt-12 poppins"
       style={{ backgroundImage: "url('/regbg.png')" }}
     >
       {/* ===== PAGE TITLE ===== */}
@@ -80,16 +80,6 @@ export default function Instruction() {
           </button>
         </div>
       </div>
-
-      {/* ===== FOOTER ===== */}
-      <p className="text-sm text-slate-300 poppins absolute bottom-8 left-8">
-        © IEM-UEM Group. All Rights Reserved.
-      </p>
-
-      {/* ===== HELP BUTTON ===== */}
-      <button className="text-sm text-slate-200 absolute bottom-8 right-8">
-        Need Help?
-      </button>
     </div>
   );
 }
