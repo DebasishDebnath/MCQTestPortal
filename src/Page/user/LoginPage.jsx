@@ -41,9 +41,7 @@ export default function LoginPage() {
 
     if (result && result.success && result.data && result.data.accessToken) {
       localStorage.setItem("userToken", result.data.accessToken);
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      }
+      
       navigate("/system-compatibility");
     } else {
       alert("Login failed: Invalid email or password.");
