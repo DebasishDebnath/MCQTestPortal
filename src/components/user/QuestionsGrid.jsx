@@ -16,8 +16,8 @@ function QuestionsGrid({ questions }) {
   };
 
   return (
-    <div className="p-6 border-2 border-gray-300 rounded-2xl w-full ">
-      <div className="flex flex-wrap gap-3 text-center font-medium text-xs justify-center">
+    <div className="p-6 border-2 border-gray-300 rounded-2xl ">
+      <div className="flex flex-wrap gap-2 text-center font-semibold text-[10px] w-fit">
         {questions.map((q, index) => {
           const shape = getShape(q.status);
           const color = getColor(q.status);
@@ -32,8 +32,8 @@ function QuestionsGrid({ questions }) {
                 </div>
               )}
               {shape === "triangle" && (
-                <div className="w-0 h-0 border-l-[16px] border-r-[16px] border-b-[28px] border-l-transparent border-r-transparent border-b-purple-700 flex items-center justify-center relative">
-                  <span className="absolute top-2.5 text-white font-medium">
+                <div className="w-0 h-0 border-l-[16px] border-r-[16px] border-b-[32px] border-l-transparent border-r-transparent border-b-purple-700 flex items-center justify-center relative">
+                  <span className="absolute top-3 text-white font-medium">
                     {q.number}
                   </span>
                 </div>
@@ -55,7 +55,7 @@ function QuestionsGrid({ questions }) {
         })}
       </div>
 
-      <div className="flex flex-col gap-4 text-sm pt-6">
+      <div className="flex flex-col gap-4 text-xs pt-6">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-green-500"></div> Answered
         </div>

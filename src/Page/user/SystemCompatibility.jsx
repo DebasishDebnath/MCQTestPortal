@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaHourglassHalf } from "react-icons/fa6";
-import { HiOutlineDocumentText } from "react-icons/hi2";
-import { FaPuzzlePiece } from "react-icons/fa6";
+import { FaRegHourglassHalf, FaChartPie, FaFileLines } from "react-icons/fa6";
 import { FaCamera, FaMicrophone, FaWifi } from "react-icons/fa";
 import { ImSpinner8 } from "react-icons/im";
 import { FaCheck, FaTimes } from "react-icons/fa";
@@ -39,7 +37,9 @@ function SystemCompatibility() {
     const start = Date.now();
     try {
       // Use a reliable endpoint and measure latency more accurately
-      const response = await fetch("https://www.google.com/generate_204", { mode: "no-cors" });
+      const response = await fetch("https://www.google.com/generate_204", {
+        mode: "no-cors",
+      });
       const latency = Date.now() - start;
 
       // Allow higher latency threshold (e.g., 1000ms)
@@ -62,122 +62,130 @@ function SystemCompatibility() {
     runChecks();
   }, []);
 
-  const handleProceed = () =>{
-    if(cameraOk && micOk && networkOk){
+  const handleProceed = () => {
+    if (cameraOk && micOk && networkOk) {
       navigate("/instruction");
     }
-  }
-const StatusIcon = ({ status }) => {
-  if (status === null)
+  };
+  const StatusIcon = ({ status }) => {
+    if (status === null)
+      return (
+        <div className="flex items-center justify-center">
+          <ImSpinner8 className="animate-spin text-gray-400 text-xl" />
+        </div>
+      );
+
+    if (status === true)
+      return (
+        <div className="flex items-center justify-center">
+          <FaCheck className="text-green-600 text-2xl" />
+        </div>
+      );
+
     return (
       <div className="flex items-center justify-center">
-        <ImSpinner8 className="animate-spin text-gray-400 text-xl" />
+        <FaTimes className="text-red-600 text-2xl" />
       </div>
     );
-
-  if (status === true)
-    return (
-      <div className="flex items-center justify-center">
-        <FaCheck className="text-green-600 text-2xl" />
-      </div>
-    );
+  };
 
   return (
-    <div className="flex items-center justify-center">
-      <FaTimes className="text-red-600 text-2xl" />
-    </div>
-  );
-};
-
-
-
-  return (
-    <>
-      {/* Full Page Background */}
-      <div
-        className=" h-full overflow-hidden flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white"
-        style={{ backgroundImage: "url(/regbg.png)" }}
-      >
+    <div
+      className="h-full flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white w-full pb-10 poppins"
+      style={{ backgroundImage: "url(/regbg.png)" }}
+    >
+      <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
         {/* Left Section */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between items-center p-18">
-          <div className="items-center p-20">
-            <h1 className="text-6xl font-bold mb-4 leading-tight poppins-regular">Welcome to</h1>
-            <h1 className="text-5xl font-bold mb-4  poppins-bold mt-10">Assessment 1</h1>
-            <p className="poppins-medium mt-9 text-base">
-              Read the instructions carefully after System test
-            </p>
+        <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start p-6">
+          <h1 className="text-5xl font-medium leading-tight">Welcome to</h1>
+          <h1 className="text-6xl font-semibold">
+            Assessment 1
+          </h1>
+          <p className="text-lg">
+            Read the instructions carefully after System test
+          </p>
 
-            {/* Stats Row */}
-            <div className="flex justify-center items-center gap-28 mt-8 poppins-regular text-xl text-[#999999]">
-              {/* Duration */}
-              <div className="flex flex-col items-center pr-12 border-r border-white/40">
-                <span className="poppins-semibold underline">Duration</span>
-                <div className="flex items-center gap-2 mt-2">
-                  <FaHourglassHalf className="text-[white] w-7 h-7" />
-                  <span className="text-2xl poppins-semibold text-white ">1 hr</span>
-                </div>
+          {/* Stats Row */}
+          <div className="flex justify-center items-center gap-8 mt-12 text-gray-theme">
+            {/* Duration */}
+            <div className="flex flex-col items-center gap-1">
+              <span className="font-semibold px-2 text-md">Duration</span>
+              <div className="w-full h-px bg-gray-theme"></div>
+              <div className="flex items-center gap-2 mt-2">
+                <FaRegHourglassHalf className="text-white/90" size={20} />
+                <span className="text-2xl font-bold text-white/90 ">
+                  1 hr
+                </span>
               </div>
+            </div>
 
-              {/* Questions */}
-              <div className="flex flex-col items-center pr-12 border-r border-white/40">
-                <span className="poppins-semibold underline">Questions</span>
-                <div className="flex items-center gap-2 mt-2">
-                  <HiOutlineDocumentText className="text-[white] w-7 h-7" />
-                  <span className="text-2xl poppins-semibold text-white ">60</span>
-                </div>
+            
+              <div className="w-px h-16 bg-gray-theme"></div>
+
+            {/* Questions */}
+            <div className="flex flex-col items-center gap-1">
+              <span className="font-semibold px-2 text-md">Questions</span>              
+              <div className="w-full h-px bg-gray-theme"></div>
+              <div className="flex items-center gap-2 mt-2">
+                <FaFileLines className="text-white/90" size={20} />
+                <span className="text-2xl font-bold text-white/90 ">
+                  60
+                </span>
               </div>
+            </div>
 
-              {/* Sections */}
-              <div className="flex flex-col items-center pr-12">
-                <span className="poppins-semibold underline">Sections</span>
-                <div className="flex items-center gap-2 mt-2">
-                  <FaPuzzlePiece className="text-[white] w-7 h-7" />
-                  <span className="text-2xl poppins-semibold text-white ">4</span>
-                </div>
+            <div className="w-px h-16 bg-gray-theme"></div>
+
+            {/* Sections */}
+            <div className="flex flex-col items-center gap-1">
+              <span className="font-semibold px-2 text-md">Sections</span>
+              <div className="w-full h-px bg-gray-theme"></div>
+              <div className="flex items-center gap-2 mt-2">
+                <FaChartPie className="text-white/90" size={20} />
+                <span className="text-2xl font-bold text-white/90 ">4</span>
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Right Section */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center h-full">
-
-          {/* Card */}
-          <div className="w-full max-w-xl bg-white text-[#09163A] rounded-3xl shadow-xl p-8 flex flex-col justify-center">
-            <h2 className="text-3xl poppins-bold mb-2">System Compatibility Check</h2>
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
+          <div className="w-full max-w-2xl bg-white text-slate-900 rounded-3xl shadow-xl p-10">
+            <h2 className="text-3xl font-semibold mb-8 mt-4">
+              System Compatibility Check
+            </h2>
             {loading ? (
               <div className="flex items-center gap-3 mb-6">
                 <ImSpinner8 className="animate-spin text-gray-500 text-2xl" />
-                <span className="text-[#999999] poppins-semibold">
+                <span className="text-gray-theme poppins-semibold">
                   performing compatibility tests...
                 </span>
               </div>
             ) : (
-              <p className="text-[#999999] poppins-semibold mb-6"></p>
+              <p className="text-gray-theme poppins-semibold mb-6"></p>
             )}
 
             {/* ⭐ Compatibility Test List ⭐ */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-lg font-medium">
+            <div className="flex flex-col gap-6 text-blue-theme text-lg font-semibold">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <FaCamera className="text-xl text-[#09163A]" />
+                  <FaCamera className="" />
                   Camera access
                 </div>
                 <StatusIcon status={cameraOk} />
               </div>
 
-              <div className="flex items-center justify-between text-lg font-medium">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <FaMicrophone className="text-xl text-[#09163A]" />
+                  <FaMicrophone className="" />
                   Microphone access
                 </div>
                 <StatusIcon status={micOk} />
               </div>
 
-              <div className="flex items-center justify-between text-lg font-medium">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <FaWifi className="text-xl text-[#09163A]" />
+                  <FaWifi className="" />
                   Network stability
                 </div>
                 <StatusIcon status={networkOk} />
@@ -187,9 +195,9 @@ const StatusIcon = ({ status }) => {
             {/* Proceed Button */}
             <button
               disabled={loading || !(cameraOk && micOk && networkOk)}
-              className={`mt-10 w-full py-3 text-white rounded-xl poppins-semibold transition cursor-pointer ${
+              className={`py-1.5 px-10 text-white rounded-full flex items-center justify-center gap-4 mt-10 ${
                 cameraOk && micOk && networkOk
-                  ? "bg-[#0a1a44] hover:bg-[#081536]"
+                  ? "bg-blue-theme cursor-pointer"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
               onClick={handleProceed}
@@ -199,7 +207,7 @@ const StatusIcon = ({ status }) => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

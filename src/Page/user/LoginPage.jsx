@@ -57,7 +57,7 @@ export default function LoginPage() {
     >
       <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
         {/* Left Section */}
-        <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start">
+        <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start p-6">
           <h1 className="text-5xl font-medium leading-tight">Welcome to</h1>
           <h1 className="text-6xl font-semibold">MCQ Test Platform</h1>
           <p className="text-lg">with Proctoring and full screen mode</p>
