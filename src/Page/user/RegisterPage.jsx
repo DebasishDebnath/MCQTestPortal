@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHttp } from "../../hooks/useHttp.jsx";
 import { FaUser } from "react-icons/fa";
 import { MdLocalPhone, MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { Eye, EyeOff } from "lucide-react";
+import ErrorPopup from "../../Component/ErrorPopup";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -14,7 +15,8 @@ export default function RegisterPage() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const { post, loading, error } = useHttp();
+  const { post, loading, error, errorStatus } = useHttp();
+  const [showError, setShowError] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,6 +36,12 @@ export default function RegisterPage() {
     const result = await post("/api/users/register", body);
     console.log("API response:", result);
   };
+
+  useEffect(() => {
+    if (error && errorStatus === 404) {
+      setShowError(true);
+    }
+  }, [error, errorStatus]);
 
   return (
     <>
@@ -149,6 +157,14 @@ export default function RegisterPage() {
 
                 {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
               </form>
+
+              {/* Error Popup */}
+              {showError && (
+                <ErrorPopup
+                  message={error}
+                  onClose={() => setShowError(false)}
+                />
+              )}
 
               {/* Login link */}
               <div className="text-center mt-6">

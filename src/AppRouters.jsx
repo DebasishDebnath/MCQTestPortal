@@ -14,16 +14,49 @@ import RouteErrorPopup from "./Component/RouteErrorPopup";
 // Simple auth check (replace with your logic)
 const isLoggedIn = () => !!localStorage.getItem("userToken");
 
-// Protected Route component
+// Get user role from localStorage/sessionStorage (adjust as needed)
+const getUserRole = () => localStorage.getItem("userRole"); // e.g., "superadmin", "user"
+
+// Protected Route component for user routes
 function ProtectedRoute() {
+  const role = getUserRole();
+  if (role === "superadmin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
   return isLoggedIn() ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
+// Top-level route guard for "/"
+function UserRouteGuard({ children }) {
+  const role = getUserRole();
+  if (role === "superadmin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  return children;
+}
+
+function AdminAuthGuard({ children }) {
+  const isAuth = isLoggedIn();
+  if (isAuth) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  return children;
+}
+
 import SubmissionSuccess from "./Page/user/SubmissionSuccess";
+import AdminDashboard from "./Page/admin/AdminDashboard";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route path="/" element={<UserLayout />} errorElement={<RouteErrorPopup />}>
+      <Route
+        path="/"
+        element={
+          <UserRouteGuard>
+            <UserLayout />
+          </UserRouteGuard>
+        }
+        errorElement={<RouteErrorPopup />}
+      >
         <Route index element={<LoginPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
@@ -38,8 +71,23 @@ const router = createBrowserRouter(
 
       <Route path="/admin" element={<AdminLayout />} errorElement={<RouteErrorPopup />}>
         <Route index element={<div>Admin Dashboard</div>} />
-        <Route path="login" element={<AdminLogin />} />
-        <Route path="register" element={<AdminRegister />} />
+        <Route
+          path="login"
+          element={
+            <AdminAuthGuard>
+              <AdminLogin />
+            </AdminAuthGuard>
+          }
+        />
+        <Route
+          path="register"
+          element={
+            <AdminAuthGuard>
+              <AdminRegister />
+            </AdminAuthGuard>
+          }
+        />
+        <Route path="dashboard" element={<AdminDashboard />} />
       </Route>
     </>
   )

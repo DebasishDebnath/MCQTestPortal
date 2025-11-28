@@ -3,7 +3,8 @@ import { useHttp } from "../../hooks/useHttp.jsx";
 import { useNavigate } from "react-router-dom";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
-import { Eye, EyeOff } from "lucide-react"; // 👈 Added
+import { Eye, EyeOff } from "lucide-react"; 
+import ErrorPopup from "../../Component/ErrorPopup";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -11,7 +12,9 @@ export default function LoginPage() {
     email: "",
   });
   const [showPassword, setShowPassword] = useState(false); 
-  const { post, loading, error } = useHttp();
+  const { post, loading, error, errorStatus, extractRole } = useHttp();
+  const [showError, setShowError] = useState(false);
+
   const navigate = useNavigate();
 
   // Redirect if already logged in
@@ -36,17 +39,26 @@ export default function LoginPage() {
       email: formData.email,
     };
 
-    const result = await post("/api/users/login", body);
+    const result = await post("/api/superadmins/login", body);
     console.log("API response:", result);
 
     if (result && result.success && result.data && result.data.accessToken) {
       localStorage.setItem("userToken", result.data.accessToken);
-      
-      navigate("/system-compatibility");
+      sessionStorage.setItem("userToken", result.data.accessToken);
+      extractRole(); // <-- Extract and store role after setting token
+      navigate("/admin/dashboard");
+    } else if (errorStatus === 404) {
+      setShowError(true);
     } else {
-      alert("Login failed: Invalid email or password.");
+      setShowError(true);
     }
   };
+
+  useEffect(() => {
+    if (error && errorStatus === 404) {
+      setShowError(true);
+    }
+  }, [error, errorStatus]);
 
   return (
     <>
@@ -121,8 +133,11 @@ export default function LoginPage() {
                   {loading ? "Logging in..." : "Login"}
                 </button>
 
-                {error && (
-                  <div className="text-red-500 text-sm mt-2">{error}</div>
+                {showError && (
+                  <ErrorPopup
+                    message={error}
+                    onClose={() => setShowError(false)}
+                  />
                 )}
               </form>
 
@@ -130,7 +145,7 @@ export default function LoginPage() {
                 <p className="text-slate-600 text-sm">
                   Don't have an account?{" "}
                   <a
-                    href="/register"
+                    href="/admin/register"
                     className="text-blue-600 hover:text-blue-700 font-semibold"
                   >
                     Register
