@@ -1,14 +1,18 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { FaRegCircleDot, FaRegHourglassHalf } from "react-icons/fa6";
-
+import iem from ".././../public/iem.png";
+import uem from ".././../public/uem.png";
 function Header() {
   const location = useLocation();
   const isTestPage = location.pathname.includes("/test/");
   return (
     <header className="bg-blue-theme w-full poppins">
+        <div className="flex items-start pt-2 pb-2 pl-[2%]">
+          <img src={iem} alt="" className="h-[5%] w-[5%]" />
+          <img src={uem} alt="" className="h-[5%] w-[5%]" />
+        </div>
       <div className="text-white px-6 flex justify-between items-center max-w-[1440px] mx-auto">
-        <img src="/Group 57.png" alt="" />
         {isTestPage ? (
           <div className="flex justify-center items-center gap-3 text-sm">
             <FaRegHourglassHalf size={16} /> 10:46{" "}

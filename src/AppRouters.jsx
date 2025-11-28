@@ -9,7 +9,7 @@ import AdminRegister from "./Page/admin/AdminRegister";
 import Instruction from "./Page/user/Instruction";
 import SystemCompatibility from "./Page/user/SystemCompatibility";
 import TestQuestion from "./Page/user/TestQuestion";
-import RouteErrorPopup from "./Component/RouteErrorPopup";
+import RouteErrorPopup from "./components/error/RouteErrorPopup";
 
 // Simple auth check (replace with your logic)
 const isLoggedIn = () => !!localStorage.getItem("userToken");
