@@ -27,7 +27,7 @@ function TestQuestion() {
     { number: 14, status: "blank" },
     { number: 15, status: "blank" },
     { number: 16, status: "answered" },
-    { number: 17, status: "marked" },
+    { number: 107, status: "marked" },
     { number: 18, status: "unanswered" },
     { number: 19, status: "blank" },
     { number: 20, status: "blank" },
@@ -71,10 +71,11 @@ function TestQuestion() {
             </div>
           </div>
           {/* Right section */}
-          <div className="w-100">
+          <div className="max-w-1/4 w-fit">
             <QuestionsGrid questions={data} />
           </div>
         </div>
+
         <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full px-6 gap-6 p-6 justify-center text-sm">
           <button className="cursor-pointer w-40 py-1.5 p-2 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center gap-4">
             <FaArrowLeftLong />

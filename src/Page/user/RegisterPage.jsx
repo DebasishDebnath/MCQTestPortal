@@ -54,10 +54,10 @@ export default function RegisterPage() {
         <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
 
           {/* LEFT SECTION */}
-          <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start">
+          <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start p-6">
             <h1 className="text-5xl font-medium leading-tight">Welcome to</h1>
-            <h1 className="text-6xl font-semibold">MCQ Test Platform</h1>
-            <p className="text-lg">with Proctoring and full screen mode</p>
+            <h1 className="text-6xl font-bold mb-4  poppins-bold mt-10">MCQ Test Platform</h1>
+            <p className="poppins-medium mt-9 text-base">with Proctoring and full screen mode</p>
           </div>
 
           {/* RIGHT SECTION */}
