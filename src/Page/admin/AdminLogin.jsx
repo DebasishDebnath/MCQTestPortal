@@ -3,15 +3,15 @@ import { useHttp } from "../../hooks/useHttp.jsx";
 import { useNavigate } from "react-router-dom";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
-import { Eye, EyeOff } from "lucide-react"; 
-import ErrorPopup from "../../Component/ErrorPopup";
+import { Eye, EyeOff } from "lucide-react";
+import ErrorPopup from "../../components/error/ErrorPopup.jsx";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     password: "",
     email: "",
   });
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
   const { post, loading, error, errorStatus, extractRole } = useHttp();
   const [showError, setShowError] = useState(false);
 

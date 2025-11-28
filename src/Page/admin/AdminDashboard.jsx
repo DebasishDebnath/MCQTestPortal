@@ -1,11 +1,12 @@
-import React from 'react'
+import React from "react";
+import Sidebar from "../../components/admin/Sidebar";
 
 function AdminDashboard() {
   return (
     <div>
-      AdminDashboard
+      <Sidebar />
     </div>
-  )
+  );
 }
 
-export default AdminDashboard
+export default AdminDashboard;

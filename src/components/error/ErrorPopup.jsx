@@ -1,6 +1,6 @@
 import React from "react";
 import Lottie from "lottie-react";
-import errorAnimation from "../../public/error.json";
+import errorAnimation from "../../../public/error.json";
 
 export default function ErrorPopup({ message, onClose }) {
   return (

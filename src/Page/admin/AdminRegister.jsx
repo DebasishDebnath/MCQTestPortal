@@ -4,7 +4,7 @@ import { FaUser } from "react-icons/fa";
 import { MdLocalPhone, MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { Eye, EyeOff } from "lucide-react";
-import ErrorPopup from "../../Component/ErrorPopup";
+import ErrorPopup from "../../components/error/ErrorPopup.jsx";
 
 export default function AdminRegisterPage() {
   const [formData, setFormData] = useState({

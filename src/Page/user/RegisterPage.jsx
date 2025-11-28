@@ -4,7 +4,7 @@ import { FaUser } from "react-icons/fa";
 import { MdLocalPhone, MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { Eye, EyeOff } from "lucide-react";
-import ErrorPopup from "../../Component/ErrorPopup";
+import ErrorPopup from "../../components/error/ErrorPopup.jsx";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -52,7 +52,6 @@ export default function RegisterPage() {
         }}
       >
         <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
-
           {/* LEFT SECTION */}
           <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start p-6">
             <h1 className="text-5xl font-medium leading-tight">Welcome to</h1>
@@ -66,7 +65,6 @@ export default function RegisterPage() {
               <h2 className="text-3xl font-semibold mb-8 mt-4">Register</h2>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
                 {/* Name */}
                 <div>
                   <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
@@ -155,7 +153,9 @@ export default function RegisterPage() {
                   {loading ? "Registering..." : "Register"}
                 </button>
 
-                {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+                {error && (
+                  <div className="text-red-500 text-sm mt-2">{error}</div>
+                )}
               </form>
 
               {/* Error Popup */}
@@ -180,7 +180,6 @@ export default function RegisterPage() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </>
