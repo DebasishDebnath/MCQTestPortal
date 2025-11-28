@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHttp } from "../../hooks/useHttp.jsx";
 import { FaUser } from "react-icons/fa";
 import { MdLocalPhone, MdEmail } from "react-icons/md";
@@ -39,7 +39,7 @@ export default function AdminRegisterPage() {
     if (result) {
       // Optionally, redirect to admin login after successful registration
       window.location.href = "/admin/login";
-    }  
+    }
   };
   useEffect(() => {
     if (error && errorStatus === 404) {
@@ -55,7 +55,6 @@ export default function AdminRegisterPage() {
         }}
       >
         <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
-
           {/* LEFT SECTION */}
           <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start">
             <h1 className="text-5xl font-medium leading-tight">Welcome </h1>
@@ -66,10 +65,11 @@ export default function AdminRegisterPage() {
           {/* RIGHT SECTION */}
           <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
             <div className="w-full max-w-2xl bg-white text-slate-900 rounded-3xl shadow-xl p-10">
-              <h2 className="text-3xl font-semibold mb-8 mt-4">ADMIN Register</h2>
+              <h2 className="text-3xl font-semibold mb-8 mt-4">
+                ADMIN Register
+              </h2>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
                 {/* Name */}
                 <div>
                   <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
@@ -158,12 +158,12 @@ export default function AdminRegisterPage() {
                   {loading ? "Registering..." : "Register"}
                 </button>
 
-               {showError && (
-                               <ErrorPopup
-                                 message={error}
-                                 onClose={() => setShowError(false)}
-                               />
-                             )}
+                {showError && (
+                  <ErrorPopup
+                    message={error}
+                    onClose={() => setShowError(false)}
+                  />
+                )}
               </form>
 
               {/* Login link */}
@@ -180,7 +180,6 @@ export default function AdminRegisterPage() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </>
