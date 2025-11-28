@@ -43,6 +43,15 @@ function AdminAuthGuard({ children }) {
   return children;
 }
 
+function SuperAdminGuard({ children }) {
+  const token = isLoggedIn();
+  const role = getUserRole();
+  if (!token || role !== "superadmin") {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
+
 import SubmissionSuccess from "./Page/user/SubmissionSuccess";
 import AdminDashboard from "./Page/admin/AdminDashboard";
 const router = createBrowserRouter(
@@ -87,7 +96,14 @@ const router = createBrowserRouter(
             </AdminAuthGuard>
           }
         />
-        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route
+          path="dashboard"
+          element={
+            <SuperAdminGuard>
+              <AdminDashboard />
+            </SuperAdminGuard>
+          }
+        />
       </Route>
     </>
   )
