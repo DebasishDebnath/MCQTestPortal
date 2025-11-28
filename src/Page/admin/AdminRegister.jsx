@@ -4,8 +4,9 @@ import { FaUser } from "react-icons/fa";
 import { MdLocalPhone, MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { Eye, EyeOff } from "lucide-react";
+import ErrorPopup from "../../Component/ErrorPopup";
 
-export default function RegisterPage() {
+export default function AdminRegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -14,7 +15,8 @@ export default function RegisterPage() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const { post, loading, error } = useHttp();
+  const { post, loading, error, errorStatus } = useHttp();
+  const [showError, setShowError] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,10 +33,19 @@ export default function RegisterPage() {
       phoneNumber: formData.phone,
     };
 
-    const result = await post("/api/users/register", body);
+    const result = await post("api/superadmins/register", body);
     console.log("API response:", result);
-  };
 
+    if (result) {
+      // Optionally, redirect to admin login after successful registration
+      window.location.href = "/admin/login";
+    }  
+  };
+  useEffect(() => {
+    if (error && errorStatus === 404) {
+      setShowError(true);
+    }
+  }, [error, errorStatus]);
   return (
     <>
       <div
@@ -55,7 +66,7 @@ export default function RegisterPage() {
           {/* RIGHT SECTION */}
           <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
             <div className="w-full max-w-2xl bg-white text-slate-900 rounded-3xl shadow-xl p-10">
-              <h2 className="text-3xl font-semibold mb-8 mt-4">Register</h2>
+              <h2 className="text-3xl font-semibold mb-8 mt-4">ADMIN Register</h2>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
@@ -147,7 +158,12 @@ export default function RegisterPage() {
                   {loading ? "Registering..." : "Register"}
                 </button>
 
-                {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+               {showError && (
+                               <ErrorPopup
+                                 message={error}
+                                 onClose={() => setShowError(false)}
+                               />
+                             )}
               </form>
 
               {/* Login link */}
@@ -155,7 +171,7 @@ export default function RegisterPage() {
                 <p className="text-slate-600 text-sm">
                   Already have an account?{" "}
                   <a
-                    href="/login"
+                    href="/admin/login"
                     className="text-blue-600 hover:text-blue-700 font-semibold"
                   >
                     Login

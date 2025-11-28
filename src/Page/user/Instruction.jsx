@@ -9,7 +9,7 @@ export default function Instruction() {
       return;
     }
 
-    window.location.href = "/test";
+    window.location.href = "/test/1234";
   };
 
   return (

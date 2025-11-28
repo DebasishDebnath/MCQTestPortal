@@ -6,10 +6,10 @@ export default function ErrorPopup({ message, onClose }) {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center 
-                    backdrop-blur-xl z-50 p-4 sm:p-6 lg:p-10 poppins"
+                    backdrop-blur-sm z-50 p-4 sm:p-6 lg:p-10 poppins"
     >
       <div
-        className="relative backdrop-blur-2xl border border-white/30 shadow-2xl 
+        className="relative backdrop-blur-2xl border border-white/30 bg-white  
                       rounded-3xl p-6 sm:p-8 lg:p-10 
                       flex flex-col items-center 
                       w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
