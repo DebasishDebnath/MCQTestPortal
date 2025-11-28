@@ -23,6 +23,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const body = {
       name: formData.name,
       email: formData.email,
@@ -37,140 +38,133 @@ export default function RegisterPage() {
   return (
     <>
       <div
-        className="h-full flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white"
-        style={{ backgroundImage: "url(/regbg.png)" }}
+        className="h-full flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white w-full pb-10 poppins"
+        style={{
+          backgroundImage: "url(/regbg.png)",
+        }}
       >
-        {/* Left Section */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-between items-center p-18">
-          <div className="items-center p-20">
-            <h1 className="text-6xl font-bold mb-4 leading-tight poppins-regular">
-              Welcome
-            </h1>
-            <h1 className="text-6xl font-bold leading-tight poppins-bold mt-10">
-              Super Admin 
-            </h1>
-            <p className="poppins-medium mt-9 text-base">
-              Proceed to register your account
-            </p>
+        <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
+
+          {/* LEFT SECTION */}
+          <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start">
+            <h1 className="text-5xl font-medium leading-tight">Welcome </h1>
+            <h1 className="text-6xl font-semibold">Super Admin</h1>
+            <p className="text-lg">Proceed to Register</p>
           </div>
-        </div>
 
-        {/* Right Section */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center relative">
+          {/* RIGHT SECTION */}
+          <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
+            <div className="w-full max-w-2xl bg-white text-slate-900 rounded-3xl shadow-xl p-10">
+              <h2 className="text-3xl font-semibold mb-8 mt-4">Register</h2>
 
-          {/* Card */}
-          <div className="w-full max-w-xl bg-white text-slate-900 rounded-3xl shadow-xl p-5">
-            <h2 className="text-3xl font-bold mb-8">Register</h2>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name */}
-              <div>
-                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
-                  Name <FaUser className="w-4 h-4" />
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
-                  focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
-                  required
-                />
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
-                  Phone <MdLocalPhone className="w-5 h-5" />
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="phone number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
-                  focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
-                  required
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
-                  Email <MdEmail className="w-5 h-5" />
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="email address"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
-                  focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
-                  required
-                />
-              </div>
-
-              {/* Password with Eye INSIDE input */}
-              <div>
-                <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
-                  Password <RiLockPasswordFill className="w-5 h-5" />
-                </label>
-
-                <div className="relative">
+                {/* Name */}
+                <div>
+                  <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                    Name <FaUser className="w-4 h-4" />
+                  </label>
                   <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="password"
-                    value={formData.password}
+                    type="text"
+                    name="name"
+                    placeholder="name"
+                    value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 pr-12 rounded-full border-2 border-slate-200
-                     focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                    className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
+                    focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
                     required
                   />
-
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 
-                    text-slate-600 hover:text-slate-800"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
                 </div>
-              </div>
 
-              {/* Submit */}
-              <button
-                type="submit"
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 
-                px-6 rounded-full transition-colors mt-8"
-                disabled={loading}
-              >
-                {loading ? "Registering..." : "Register Now"}
-              </button>
+                {/* Phone */}
+                <div>
+                  <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                    Phone <MdLocalPhone className="w-4 h-4" />
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="phone number"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
+                    focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                    required
+                  />
+                </div>
 
-              {error && (
-                <div className="text-red-500 text-sm mt-2">{error}</div>
-              )}
-            </form>
+                {/* Email */}
+                <div>
+                  <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                    Email <MdEmail className="w-4 h-4" />
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="email address"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 rounded-full border-2 border-slate-200 
+                    focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                    required
+                  />
+                </div>
 
-            {/* Login Link */}
-            <div className="text-center mt-6">
-              <p className="text-slate-600 text-sm">
-                Already Registered?{" "}
-                <a
-                  href="/login"
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                {/* Password */}
+                <div>
+                  <label className="text-sm font-semibold mb-2 flex items-center gap-2 ml-2">
+                    Password <RiLockPasswordFill className="w-4 h-4" />
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 pr-12 rounded-full border-2 border-slate-200 
+                      focus:border-blue-500 focus:outline-none placeholder-slate-400 transition-colors"
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800"
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-full transition-colors mt-6"
+                  disabled={loading}
                 >
-                  Login
-                </a>
-              </p>
+                  {loading ? "Registering..." : "Register"}
+                </button>
+
+                {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+              </form>
+
+              {/* Login link */}
+              <div className="text-center mt-6">
+                <p className="text-slate-600 text-sm">
+                  Already have an account?{" "}
+                  <a
+                    href="/login"
+                    className="text-blue-600 hover:text-blue-700 font-semibold"
+                  >
+                    Login
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </>
