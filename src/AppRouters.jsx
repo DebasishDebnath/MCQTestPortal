@@ -79,7 +79,7 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="/admin" element={<AdminLayout />} errorElement={<RouteErrorPopup />}>
-        <Route index element={<div>Admin Dashboard</div>} />
+        {/* <Route index element={<div>Admin Dashboard</div>} /> */}
         <Route
           path="login"
           element={

@@ -14,7 +14,7 @@ function Sidebar() {
   return (
     <div className="flex h-screen ">
       <div
-        className="w-64 h-full flex flex-col "
+        className="w-[15%] h-full flex flex-col "
         style={{ backgroundColor: "#0E2258" }}
       >
         <div className="p-[0.2px] ml-[8%] mr-[8%] bg-[#999999]"></div>
@@ -39,7 +39,7 @@ function Sidebar() {
         </nav>
       </div>
 
-      <div className="flex h-screen">
+      <div className="flex h-screen w-full">
         <Dashboard />
       </div>
     </div>
