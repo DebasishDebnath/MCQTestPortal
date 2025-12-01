@@ -5,6 +5,7 @@ import { ImSpinner8 } from "react-icons/im";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+
 function SystemCompatibility() {
   const [cameraOk, setCameraOk] = useState(null);
   const [micOk, setMicOk] = useState(null);
@@ -36,13 +37,8 @@ function SystemCompatibility() {
   async function checkNetwork() {
     const start = Date.now();
     try {
-      // Use a reliable endpoint and measure latency more accurately
-      const response = await fetch("https://www.google.com/generate_204", {
-        mode: "no-cors",
-      });
+      await fetch("https://www.google.com/generate_204", { mode: "no-cors" });
       const latency = Date.now() - start;
-
-      // Allow higher latency threshold (e.g., 1000ms)
       setNetworkOk(latency < 1000);
     } catch {
       setNetworkOk(false);
@@ -62,11 +58,24 @@ function SystemCompatibility() {
     runChecks();
   }, []);
 
+  // Request full screen and navigate to instruction
   const handleProceed = () => {
     if (cameraOk && micOk && networkOk) {
-      navigate("/instruction");
+      // Request full screen
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().then(() => {
+          
+          navigate("/instruction");
+        });
+      } else {
+        // Fallback for browsers not supporting requestFullscreen
+        
+        navigate("/instruction");
+      }
     }
   };
+
   const StatusIcon = ({ status }) => {
     if (status === null)
       return (
@@ -119,8 +128,7 @@ function SystemCompatibility() {
               </div>
             </div>
 
-            
-              <div className="w-px h-16 bg-gray-theme"></div>
+            <div className="w-px h-16 bg-gray-theme"></div>
 
             {/* Questions */}
             <div className="flex flex-col items-center gap-1">

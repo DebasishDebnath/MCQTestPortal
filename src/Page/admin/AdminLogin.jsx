@@ -17,10 +17,10 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+
   useEffect(() => {
-    if (localStorage.getItem("userToken")) {
-      navigate("/system-compatibility");
+    if (localStorage.getItem("userToken") && localStorage.getItem("userRole") === "superadmin") {
+      navigate("/admin/dashboard");
     }
   }, [navigate]);
 
@@ -45,7 +45,8 @@ export default function LoginPage() {
     if (result && result.success && result.data && result.data.accessToken) {
       localStorage.setItem("userToken", result.data.accessToken);
       sessionStorage.setItem("userToken", result.data.accessToken);
-      extractRole(); // <-- Extract and store role after setting token
+      localStorage.setItem("userRole", "superadmin"); // Ensure role is set for route guards
+      extractRole && extractRole(); // Call extractRole if needed
       navigate("/admin/dashboard");
     } else if (errorStatus === 404) {
       setShowError(true);

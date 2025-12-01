@@ -1,15 +1,22 @@
 import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function Instruction() {
   const [checked, setChecked] = useState(false);
 
   const handleStart = () => {
     if (!checked) {
-      alert("Please agree to the instructions before starting the test.");
+      toast.error("Please agree to the instructions before starting the test.");
       return;
     }
-
-    window.location.href = "/test/1234";
+    const elem = document.documentElement;
+    if (elem.requestFullscreen && !document.fullscreenElement) {
+      elem.requestFullscreen().then(() => {
+        window.location.href = "/test/1234";
+      });
+    } else {
+      window.location.href = "/test/1234";
+    }
   };
 
   return (

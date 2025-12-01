@@ -5,6 +5,7 @@ import { MdLocalPhone, MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { Eye, EyeOff } from "lucide-react";
 import ErrorPopup from "../../components/error/ErrorPopup.jsx";
+import { toast } from "react-hot-toast"; // <-- Add this import
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -35,6 +36,12 @@ export default function RegisterPage() {
 
     const result = await post("/api/users/register", body);
     console.log("API response:", result);
+    if (result && result.success) {
+      toast.success("Registration successful! Please log in.");
+      window.location.href = "/login";
+    } else {
+      toast.error("Registration failed. Please try again.");
+    }
   };
 
   useEffect(() => {
