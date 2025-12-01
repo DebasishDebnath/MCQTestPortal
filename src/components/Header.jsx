@@ -8,11 +8,11 @@ function Header() {
   const isTestPage = location.pathname.includes("/test/");
   return (
     <header className="bg-blue-theme w-full poppins">
-        <div className="flex items-start pt-2 pb-2 pl-[2%]">
-          <img src={iem} alt="" className="h-[5%] w-[5%]" />
-          <img src={uem} alt="" className="h-[5%] w-[5%]" />
-        </div>
       <div className="text-white px-6 flex justify-between items-center max-w-[1440px] mx-auto">
+        <div className="flex items-start">
+          <img src={iem} alt="" className=" w-22" />
+          <img src={uem} alt="" className=" w-22" />
+        </div>
         {isTestPage ? (
           <div className="flex justify-center items-center gap-3 text-sm">
             <FaRegHourglassHalf size={16} /> 10:46{" "}
@@ -22,7 +22,10 @@ function Header() {
           <div></div>
         )}
         {isTestPage ? (
-          <button className="cursor-pointer w-fit py-1.5 px-6 bg-red-700 text-white rounded-full flex items-center justify-center gap-4 text-sm font-medium ml-50">
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('openFinalSubmission'))}
+            className="cursor-pointer w-fit py-1.5 px-6 bg-red-700 text-white rounded-full flex items-center justify-center gap-4 text-sm font-medium ml-10"
+          >
             Finish Test
           </button>
         ) : (
