@@ -5,7 +5,7 @@ function OngoingTests() {
     <div className="bg-white rounded-[11.2px] text-[#202224] w-full p-4">
       <div className="flex justify-between">
         <div className="text-[#202224] text-[12px] mb-2">
-          Tests Created{" "}
+          Ongoing Tests
           <div className="text-[#202224] text-[22.4px] mt-2 font-semibold">
             0
           </div>
