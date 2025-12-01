@@ -4,7 +4,10 @@ import QuestionsGrid from "../../components/user/QuestionsGrid";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import FinalSubmission from "../../components/user/FinalSubmission";
 
+import { useHttp } from "../../hooks/useHttp";
+
 function TestQuestion() {
+  const { get, loading, error } = useHttp();
   const [showFinalSubmission, setShowFinalSubmission] = useState(false);
 
   useEffect(() => {
@@ -45,6 +48,19 @@ function TestQuestion() {
     { number: 19, status: "blank" },
     { number: 20, status: "blank" },
   ];
+
+  useEffect(()=>{
+    const fetchQuestions = async () =>{
+      const token = localStorage.getItem("userToken");
+      const response =  await get("/api/questions/all", {
+        Authorization: `Bearer ${token}`,
+      });
+      if (response){
+        console.log("Fetched questions:", response, token);
+      }
+    }
+    fetchQuestions();
+  }, [])
   return (
     <div
       className={`flex flex-col w-full h-full poppins`}
@@ -70,7 +86,7 @@ function TestQuestion() {
             <h1 className="text-2xl font-medium text-blue-theme">
               Question {question.id}
             </h1>
-            <div className="h-[2px] w-full bg-gray-300 mt-4"></div>
+            <div className="h-0.5 w-full bg-gray-300 mt-4"></div>
             <p className="my-10 text-xl font-semibold">{question.text}</p>
             <div className="flex flex-col gap-4">
               {question.options.map((option, index) => (
@@ -97,7 +113,7 @@ function TestQuestion() {
           </div>
         </div>
 
-        <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full px-6 gap-6 p-6 justify-center text-sm">
+        <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full px-6 gap-6 p-6 text-sm">
           <button className="cursor-pointer w-40 py-1.5 p-2 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center gap-4">
             <FaArrowLeftLong />
             Previous
