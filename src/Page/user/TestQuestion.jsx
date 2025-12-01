@@ -1,9 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { MdArrowDropDown } from "react-icons/md";
 import QuestionsGrid from "../../components/user/QuestionsGrid";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
+import FinalSubmission from "../../components/user/FinalSubmission";
 
 function TestQuestion() {
+  const [showFinalSubmission, setShowFinalSubmission] = useState(false);
+
+  useEffect(() => {
+    const handleOpenFinalSubmission = () => setShowFinalSubmission(true);
+
+    window.addEventListener('openFinalSubmission', handleOpenFinalSubmission);
+
+    return () => {
+      window.removeEventListener('openFinalSubmission', handleOpenFinalSubmission);
+    };
+  }, []);
+
   const question = {
     id: 1,
     text: "What is the capital of France?",
@@ -33,9 +46,17 @@ function TestQuestion() {
     { number: 20, status: "blank" },
   ];
   return (
-    <div className="flex flex-col w-full h-full poppins">
+    <div
+      className={`flex flex-col w-full h-full poppins`}
+    >
+      {showFinalSubmission && 
+      <div className="w-full min-h-screen bg-black/50 backdrop-blur-xs z-20 absolute top-0 left-0 transition-opacity duration-500">
+        <FinalSubmission onClose={() => setShowFinalSubmission(false)} />
+        </div>
+        }
+
       <div className=" flex w-full poppins bg-gray-theme">
-        <div className="flex justify-start items-center max-w-[1440px] mx-auto w-full px-6 py-3">
+        <div className="flex justify-start items-center max-w-[1440px] mx-auto w-full px-6 py-3">        
           <div className="flex gap-10 rounded-md px-3 py-1 bg-gray-100 text-xs font-medium items-center">
             <p>1. Section A</p>
             <MdArrowDropDown size={20} />
