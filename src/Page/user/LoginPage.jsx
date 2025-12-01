@@ -3,7 +3,8 @@ import { useHttp } from "../../hooks/useHttp.jsx";
 import { useNavigate } from "react-router-dom";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
-import { Eye, EyeOff } from "lucide-react"; // 👈 Added
+import { Eye, EyeOff } from "lucide-react";
+import { toast } from "react-hot-toast"; // <-- Add this import
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -41,10 +42,10 @@ export default function LoginPage() {
 
     if (result && result.success && result.data && result.data.accessToken) {
       localStorage.setItem("userToken", result.data.accessToken);
-      
+      toast.success("Login successful!"); // <-- Use toast for success
       navigate("/system-compatibility");
     } else {
-      alert("Login failed: Invalid email or password.");
+      toast.error("Login failed: Invalid email or password."); // <-- Use toast for error
     }
   };
 

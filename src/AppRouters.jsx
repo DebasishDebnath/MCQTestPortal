@@ -71,8 +71,8 @@ const router = createBrowserRouter(
         <Route path="register" element={<RegisterPage />} />
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="instruction" element={<Instruction />} />
           <Route path="system-compatibility" element={<SystemCompatibility />} />
+          <Route path="instruction" element={<Instruction />} />
           <Route path="test/:testid" element={<TestQuestion />} />
         </Route>
         <Route path="success" element={<SubmissionSuccess />} />
