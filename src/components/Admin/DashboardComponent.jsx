@@ -2,15 +2,19 @@ import TestsCreated from "./TestsCreated";
 import UpcomingTests from "./UpcomingTests";
 import OngoingTests from "./OngoingTests";
 import CompletedTests from "./CompletedTests";
+import AllTestShow from "../../components/admin/AllTestShow";
 import React from "react";
 function DashboardComponent() {
   return (
-    <div>
-      <div className="flex gap-10 bg-[#D3DFFF] px-6 py-10 rounded-[25px] items-center justify-center">
+    <div className="bg-[#D3DFFF] rounded-[25px] px-6 ">
+      <div className="flex gap-10 py-[5%]  items-center justify-center">
         <TestsCreated />
         <UpcomingTests />
         <OngoingTests />
         <CompletedTests />
+      </div>
+      <div>
+        <AllTestShow />
       </div>
     </div>
   );

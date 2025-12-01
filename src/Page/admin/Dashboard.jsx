@@ -1,16 +1,19 @@
 import React from "react";
-import DashboardComponent from "../../components/Admin/DashboardComponent";
-
+import DashboardComponent from "../../components/admin/DashboardComponent.jsx";
 export default function Dashboard() {
   return (
-    <div
-      className="min-h-screen w-[100%] bg-[#313d55] bg-cover bg-center bg-blend-overlay pb-10 poppins"
-      style={{
-        backgroundImage: "url(/regbg.png)",
-      }}
-    >
-      <div className="p-8">
-        <DashboardComponent />
+    <div className="flex min-h-screen w-full ">
+      {/* Your sidebar component here */}
+
+      <div
+        className="flex w-full min-h-screen bg-[#313d55] bg-cover bg-center justify-center py-[5%] bg-blend-overlay pb-10 poppins"
+        style={{
+          backgroundImage: "url(/regbg.png)",
+        }}
+      >
+        <div className=" flex  justify-center ">
+          <DashboardComponent />
+        </div>
       </div>
     </div>
   );

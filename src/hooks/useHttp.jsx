@@ -1,67 +1,39 @@
+// src/hooks/useHttp.jsx
 import { useState, useCallback } from "react";
-import {jwtDecode} from "jwt-decode"; 
 
-// Global backend URL (environment or fallback)
-export const mainURL =
-  import.meta.env.VITE_BACKEND_URL || "https://example-backend.com";
-
-export const getToken = () => localStorage.getItem("userToken");
-
-export const extractRole = () => {
-  const token = getToken();
-  if (!token) return null;
-  try {
-    const decoded = jwtDecode(token);
-    const role = decoded.role || decoded.userRole || decoded["role"];
-    if (role) localStorage.setItem("userRole", role);
-    return role;
-  } catch {
-    return null;
-  }
-};
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+// Example .env value:
+// VITE_BACKEND_URL="https://your-backend-url.com/api"
 
 export const useHttp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [errorStatus, setErrorStatus] = useState(null);
 
   const request = useCallback(
-    async (path, method = "GET", body = null, headers = {}) => {
+    async (endpoint, method = "GET", body = null, headers = {}) => {
       setLoading(true);
       setError(null);
-      setErrorStatus(null);
-
-      // Safe URL builder
-      const cleanPath = path.startsWith("/") ? path : `/${path}`;
-      const finalURL = `${mainURL}${cleanPath}`;
 
       try {
-        const options = { method, headers: { ...headers } };
+        const config = {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            ...headers,
+          },
+        };
 
-        // Auto JSON unless FormData
         if (body) {
-          if (body instanceof FormData) {
-            options.body = body;
-          } else {
-            options.body = JSON.stringify(body);
-            options.headers["Content-Type"] = "application/json";
-          }
+          config.body = JSON.stringify(body);
         }
 
-        const response = await fetch(finalURL, options);
-
-        const contentType = response.headers.get("content-type");
-        const data =
-          contentType?.includes("application/json")
-            ? await response.json()
-            : await response.text();
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
         if (!response.ok) {
-          setErrorStatus(response.status);
-          setError(data?.message || `Request failed (${response.status})`);
-          throw new Error(data?.message || "Request failed");
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
+        const data = await response.json();
         return data;
       } catch (err) {
         setError(err.message);
@@ -73,15 +45,22 @@ export const useHttp = () => {
     []
   );
 
-  return {
-    loading,
-    error,
-    errorStatus,
-    get: (path, headers = {}) => request(path, "GET", null, headers),
-    post: (path, body, headers = {}) => request(path, "POST", body, headers),
-    put: (path, body, headers = {}) => request(path, "PUT", body, headers),
-    del: (path, headers = {}) => request(path, "DELETE", null, headers),
-    getToken,
-    extractRole,
-  };
+  const get = useCallback(
+    (endpoint, headers) => request(endpoint, "GET", null, headers),
+    [request]
+  );
+  const post = useCallback(
+    (endpoint, body, headers) => request(endpoint, "POST", body, headers),
+    [request]
+  );
+  const put = useCallback(
+    (endpoint, body, headers) => request(endpoint, "PUT", body, headers),
+    [request]
+  );
+  const del = useCallback(
+    (endpoint, headers) => request(endpoint, "DELETE", null, headers),
+    [request]
+  );
+
+  return { get, post, put, del, loading, error };
 };
