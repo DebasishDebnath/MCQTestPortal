@@ -40,7 +40,9 @@ function Sidebar() {
       </div>
 
       <div className="flex h-screen w-full">
-        <Dashboard />
+        {activeItem === "dashboard" && <Dashboard />}
+        {/* {activeItem === "test-details" && <TestDetails />}
+        {activeItem === "settings" && <SettingsPage />} */}
       </div>
     </div>
   );
