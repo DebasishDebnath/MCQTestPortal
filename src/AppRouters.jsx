@@ -3,7 +3,7 @@ import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, N
 import UserLayout from "./Layout/UserLayout";
 import AdminLayout from "./Layout/AdminLayout";
 import LoginPage from "./Page/User/LoginPage.jsx";
-import RegisterPage from "./Page/User/RegisterPage";
+import RegisterPage from "./Page/User/RegisterPage.jsx";
 import AdminLogin from "./Page/Admin/AdminLogin";
 import AdminRegister from "./Page/Admin/AdminRegister";
 import Instruction from "./Page/User/Instruction";
