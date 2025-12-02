@@ -8,8 +8,8 @@ import {
   Outlet,
 } from "react-router-dom";
 
-import LoginPage from "./Page/User/LoginPage.jsx";
-import RegisterPage from "./Page/User/RegisterPage.jsx";
+import LoginPage from "./Page/Admin/AdminLogin";
+import RegisterPage from "./Page/User/RegisterPage";
 import UserLayout from "./Layout/UserLayout";
 import AdminLayout from "./Layout/AdminLayout";
 import AdminLogin from "./Page/Admin/AdminLogin";
