@@ -1,6 +1,6 @@
 import React from "react";
 import AppRouters from "./AppRouters";
-import { Toaster } from "react-hot-toast"; // Add this import
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (

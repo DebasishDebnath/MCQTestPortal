@@ -54,7 +54,7 @@ export default function AdminRegisterPage() {
           backgroundImage: "url(/regbg.png)",
         }}
       >
-        <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full">
+        <div className="flex justify-center items-center max-w-full mx-auto w-full">
           {/* LEFT SECTION */}
           <div className="flex flex-col w-1/2 justify-between items-center poppins gap-6 items-start p-6">
             <h1 className="text-5xl font-medium leading-tight">Welcome </h1>
