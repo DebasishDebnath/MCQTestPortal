@@ -58,60 +58,67 @@ function SeparateTest({ testData }) {
   }, [testData.startDate]);
 
   return (
-    <div className="border border-[#E4E4E4] rounded-[15px] px-5 pb-6">
-      <div className="flex gap-5 pt-3 pb-3 relative">
-        <div className="bg-[#DCE3F6] text-[#5C7CD4] rounded-[3.55px] px-2 text-[12px] flex items-center">
+    <div className="border border-gray-200 rounded-2xl px-5 py-4 flex flex-col gap-2 w-full">
+      <div className="flex gap-5 relative">
+        <div className="bg-indigo-100 text-indigo-400 rounded-sm px-2 flex items-center text-xs">
           {formatDateTime(testData.startDate)}
         </div>
 
         {/* Status badge */}
         {status === "future" && (
-          <div className="bg-[#5C7CD4] px-3 text-white text-[12px] flex items-center justify-center rounded-[3.55px] py-1">
+          <div className="bg-indigo-400 px-3 text-white flex items-center text-xs justify-center rounded-sm py-1">
             Upcoming
           </div>
         )}
 
         {status === "upcoming" && (
-          <div className="bg-[#5C7CD4] px-3 text-white text-[12px] flex items-center justify-center rounded-[3.55px] py-1">
+          <div className="bg-indigo-400 px-3 text-white flex items-center justify-center rounded-sm py-1">
             Starts in {timeLeft} min
           </div>
         )}
 
         {status === "ongoing" && (
-          <div className="bg-green-500 px-3 text-white text-[12px] flex items-center justify-center rounded-[3.55px] py-1">
+          <div className="bg-green-400 px-3 text-white flex items-center justify-center rounded-sm py-1">
             Ongoing • {timeLeft} min left
           </div>
         )}
         <div className="flex items-end justify-end absolute right-0 top-0 cursor-pointer">
           {(status === "future" || status === "upcoming") && (
-            <button className="text-blue-500 underline mt-2 cursor-pointer">
+            <button className="text-indigo-400 cursor-pointer">
               <TbEdit size={25} />
             </button>
           )}
         </div>
       </div>
 
-      <div className="text-[15px] font-medium">{testData.title}</div>
+      <div className="text-lg font-medium flex flex-col gap-4">
+        {testData.title}
+      </div>
 
-      <div className="flex gap-3 pt-1 text-[#727272]">
+      <div className="flex flex-col text-gray-500 text-sm">
+      <div className="flex gap-3 items-center">
         <div className="flex items-center">
           {testData.questions.length} Questions
         </div>
+          <GoDotFill size={10} />
         <div className="flex items-center">
-          <GoDotFill /> 60 Marks
+          60 Marks
         </div>
-        <div className="flex items-center gap-2">
-          <IoMdTime /> {testData.durationMinutes / 60} hour
+          <GoDotFill size={10} />
+        <div className="flex items-center gap-1">
+          <IoMdTime className="text-gray-800" size={18}/> {testData.durationMinutes / 60} hour
         </div>
-        <div className="flex items-center gap-2">
-          <FaUser /> {testData.users.length}
+          <GoDotFill size={10} />
+        <div className="flex items-center gap-1">
+          <FaUser className="text-gray-800" size={14}/> {testData.users.length}
         </div>
       </div>
 
-      <div className="flex gap-3 pt-1 text-[#727272]">Department: </div>
-      <div className="flex gap-3 pt-1 text-[#727272]">Semester: </div>
+      <div className="flex gap-3 pt-1">Department: </div>
+      <div className="flex gap-3 pt-1">Semester: </div></div>
 
-      <div className="flex border-[#D9D9D9] border text-[#5C7CD4] w-[22%] items-center justify-center rounded-sm py-1 shadow-md shadow-[#6386e7] mt-2 cursor-pointer">
+
+      <div className="flex border-indigo-400 border text-indigo-400 w-fit items-center justify-center rounded-md py-1 px-4 shadow-md shadow-indigo-200 mt-2 cursor-pointer">
         Student Performance
       </div>
     </div>

@@ -1,23 +1,21 @@
 import React from "react";
-import event from "../../../public/event.png";
+import event from "/event.png";
 function UpcomingTests() {
   return (
-    <div className="bg-white rounded-[11.2px] text-[#202224] w-full p-4">
-      <div className="flex justify-between">
-        <div className="text-[#202224] text-[12px] mb-2">
-          Upcoming Tests
-          <div className="text-[#202224] text-[22.4px] mt-2 font-semibold">
-            0  
-          </div>
+    <div className="bg-white rounded-2xl w-full p-6 poppins flex flex-col gap-2 h-full">
+      <div className="flex justify-between gap-4">
+        <div className="text-gray-700 text-md flex flex-col gap-2">
+          Upcoming Tests{" "}
+          <div className="text-gray-700 text-2xl font-semibold">0</div>
         </div>
         {/* <div>0</div> */}
-        <div className="bg-[#adbde983] h-[2%] w-[30%] rounded-[18.4px] flex items-center justify-center p-2.5">
+        <div className="bg-indigo-100 h-[44px] w-[50px] rounded-2xl flex items-center justify-center p-2">
           <img src={event} alt="" />
         </div>
       </div>
-      <div className="text-[#7E7E7E] font-semibold text-[11px] mr-5">
-       
-        <div>Tests that are scheduled to publish soon</div>
+      <div className="text-gray-500 font-medium text-xs ">
+        Tests that are scheduled
+        <br /> to publish soon.
       </div>
     </div>
   );

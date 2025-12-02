@@ -32,17 +32,17 @@ function AllTestShow() {
     }
   };
   return (
-    <div className="bg-white rounded-[15px] px-[7%] py-[3%]">
+    <div className="bg-white rounded-3xl px-10 py-10">
       <div className="flex justify-between items-center mb-6">
-        <div className="text-[#0E2258] font-semibold text-[24px]">
+        <div className="text-blue-theme font-semibold text-[24px]">
           All Tests
         </div>
-        <div className="flex gap-6 items-center">
-          <button className="border rounded-[25px] px-14 py-2 border-[#5C7CD4] font-bold text-[#5C7CD4] cursor-pointer hover:bg-[#5C7CD4] hover:text-white transition-colors">
+        <div className="flex gap-6 items-center text-sm">
+          <button className="border rounded-full px-10 py-2 border-indigo-400 font-semibold text-indigo-400 cursor-pointer hover:bg-indigo-400 hover:text-white transition-colors">
             Create Test
           </button>
-          <div className="flex items-center gap-2 text-[#0E2258] font-medium whitespace-nowrap cursor-pointer hover:text-[#5C7CD4] transition-colors">
-            View All <FaArrowRightLong />
+          <div className="flex items-center gap-2 text-blue-theme font-medium whitespace-nowrap cursor-pointer hover:text-indigo-400 transition-colors">
+            View All {"  "} <FaArrowRightLong />
           </div>
         </div>
       </div>

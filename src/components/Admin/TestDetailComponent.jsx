@@ -13,20 +13,29 @@ function TestDetailComponent() {
     dateTime: "10 Nov , 9:00 AM",
   });
 
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [questionsFile, setQuestionsFile] = useState(null);
+  const [studentsFile, setStudentsFile] = useState(null);
 
-  const handleSubmit = () => {
-    console.log("Form submitted:", formData);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form submitted:", {
+      details: formData,
+      questionsFile: questionsFile,
+      studentsFile: studentsFile,
+    });
   };
 
-  const handleUploadSubmit = () => {
-    console.log("Upload submitted:", uploadedFile);
-  };
-
-  const handleFileChange = (e) => {
+  const handleQuestionsFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUploadedFile(file);
+      setQuestionsFile(file);
+    }
+  };
+
+  const handleStudentsFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setStudentsFile(file);
     }
   };
 
@@ -34,16 +43,28 @@ function TestDetailComponent() {
     e.preventDefault();
   };
 
-  const handleDrop = (e) => {
+  const handleQuestionsDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
-      setUploadedFile(file);
+      setQuestionsFile(file);
+    }
+  };
+
+  const handleStudentsDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      setStudentsFile(file);
     }
   };
 
   return (
-      <div className="w-6xl bg-white rounded-3xl shadow-xl p-10 flex gap-12">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-7xl bg-white rounded-3xl shadow-xl p-10 flex flex-col gap-10"
+    >
+      <div className="flex gap-12">
         <div className="w-1/2">
           <h2 className="text-2xl font-semibold text-blue-theme mb-6">
             Test Details
@@ -226,19 +247,10 @@ function TestDetailComponent() {
                 }
               />
             </div>
-
-            {/* Submit Button */}
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-blue-900 hover:bg-blue-950 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors mt-6"
-            >
-              Submit
-              <ArrowRight size={18} />
-            </button>
           </div>
         </div>
-        <div className="w-1/2 flex flex-col gap-10">
-          <div className="flex flex-col gap-3">
+        <div className="w-1/2 flex flex-col gap-10 h-full">
+          <div className="flex flex-col gap-3 h-1/2">
             <div className="flex flex-col gap-2">
               <h2 className="text-2xl font-semibold text-blue-theme">
                 Upload Questions
@@ -250,17 +262,17 @@ function TestDetailComponent() {
 
             {/* Upload Area */}
             <div
-              className="border-2 border-dashed border-blue-900 rounded-xl bg-blue-50 p-12 text-center"
+              className="border-2 border-dashed border-blue-900 rounded-xl bg-blue-50 p-12 text-center h-full flex items-center justify-center"
               onDragOver={handleDragOver}
-              onDrop={handleDrop}
+              onDrop={handleQuestionsDrop}
             >
               <div className="flex flex-col items-center gap-4">
                 <img src="/upload.png" alt="upload" className="w-10" />
 
                 <div>
                   <p className="text-gray-800 mb-1">
-                    {uploadedFile
-                      ? uploadedFile.name
+                    {questionsFile
+                      ? questionsFile.name
                       : "Drag your file(s) to start uploading"}
                   </p>
                   <p className="text-gray-500 text-sm">OR</p>
@@ -271,7 +283,7 @@ function TestDetailComponent() {
                     type="file"
                     className="hidden"
                     accept=".xlsx,.xls"
-                    onChange={handleFileChange}
+                    onChange={handleQuestionsFileChange}
                   />
                   <div className="px-6 py-2 border-2 bg-white border-blue-900 rounded-lg text-blue-theme font-medium hover:bg-gray-50 transition-colors">
                     Browse files
@@ -280,7 +292,7 @@ function TestDetailComponent() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 h-1/2">
             <div className="flex flex-col gap-2">
               <h2 className="text-2xl font-semibold text-blue-theme">
                 Upload Student Details
@@ -292,17 +304,17 @@ function TestDetailComponent() {
 
             {/* Upload Area */}
             <div
-              className="border-2 border-dashed border-blue-900 rounded-xl bg-blue-50 p-12 text-center"
+              className="border-2 border-dashed border-blue-900 rounded-xl bg-blue-50 p-12 text-center h-full flex items-center justify-center"
               onDragOver={handleDragOver}
-              onDrop={handleDrop}
+              onDrop={handleStudentsDrop}
             >
               <div className="flex flex-col items-center gap-4">
                 <img src="/upload.png" alt="upload" className="w-10" />
 
                 <div>
                   <p className="text-gray-800 mb-1">
-                    {uploadedFile
-                      ? uploadedFile.name
+                    {studentsFile
+                      ? studentsFile.name
                       : "Drag your file(s) to start uploading"}
                   </p>
                   <p className="text-gray-500 text-sm">OR</p>
@@ -313,7 +325,7 @@ function TestDetailComponent() {
                     type="file"
                     className="hidden"
                     accept=".xlsx,.xls"
-                    onChange={handleFileChange}
+                    onChange={handleStudentsFileChange}
                   />
                   <div className="px-6 py-2 border-2 bg-white border-blue-900 rounded-lg text-blue-theme font-medium hover:bg-gray-50 transition-colors">
                     Browse files
@@ -324,6 +336,17 @@ function TestDetailComponent() {
           </div>
         </div>
       </div>
+      {/* Submit Button for the whole form */}
+      <div className="flex justify-center">
+        <button
+          type="submit"
+          className="bg-blue-900 hover:bg-blue-950 text-white font-medium py-3 px-8 rounded-lg flex items-center justify-center gap-2 transition-colors"
+        >
+          Submit
+          <ArrowRight size={18} />
+        </button>
+      </div>
+    </form>
   );
 }
 

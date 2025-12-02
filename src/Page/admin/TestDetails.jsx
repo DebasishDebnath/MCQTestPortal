@@ -6,7 +6,7 @@ export default function Dashboard() {
       {/* Your sidebar component here */}
 
       <div
-        className="flex w-full min-h-screen bg-[#313d55] bg-cover bg-center justify-center py-[5%] bg-blend-overlay pb-10 poppins"
+        className="flex w-full min-h-screen bg-[#313d55] bg-cover bg-center justify-center xl:p-20 p-10 bg-blend-overlay poppins"
         style={{
           backgroundImage: "url(/regbg.png)",
         }}
