@@ -6,8 +6,8 @@ import AllTestShow from "../../components/Admin/AllTestShow";
 import React from "react";
 function DashboardComponent() {
   return (
-    <div className="bg-[#D3DFFF] rounded-[25px] px-6 ">
-      <div className="flex gap-10 py-[5%]  items-center justify-center">
+    <div className="bg-indigo-100 w-full max-w-7xl rounded-3xl shadow-xl p-10 flex flex-col h-fit gap-6">
+      <div className="grid grid-cols-4 gap-6 items-center justify-center w-full h-full">
         <TestsCreated />
         <UpcomingTests />
         <OngoingTests />

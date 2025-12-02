@@ -19,8 +19,8 @@ function Sidebar() {
       className="w-[250px] h-full flex flex-col flex-shrink-0"
       style={{ backgroundColor: "#0E2258" }}
     >
-      <div className="h-px mx-4 bg-[#5C7CD4]"></div>
-      <nav className="flex-1 px-4 mt-[10%]">
+      <div className="h-px mx-4 bg-indigo-400"></div>
+      <nav className="flex-1 px-4 mt-6">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activePath.startsWith(item.path);
@@ -30,7 +30,7 @@ function Sidebar() {
               onClick={() => navigate(item.path)}
               className={`w-full cursor-pointer flex items-center gap-3 px-4 py-3 mb-2 rounded-lg transition-colors  ${
                 isActive
-                  ? "bg-[#5C7CD4] bg-opacity-20 text-white border-[#5C7CD4]"
+                  ? "bg-indigo-400 bg-opacity-20 text-white border-indigo-400"
                   : "text-gray-300 hover:bg-[#5c7cd427] hover:bg-opacity-10 "
               }`}
             >

@@ -1,8 +1,8 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { FaRegCircleDot, FaRegHourglassHalf } from "react-icons/fa6";
-import iem from ".././../public/iem.png";
-import uem from ".././../public/uem.png";
+import iem from "/iem.png";
+import uem from "/uem.png";
 function Header() {
   const location = useLocation();
   const isTestPage = location.pathname.includes("/test/");
