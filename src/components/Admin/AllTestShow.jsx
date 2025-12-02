@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { useHttp } from "./../../hooks/useHttp.jsx";
+import { useHttp } from "../../hooks/useHttp.jsx";
 import SeparateTest from "./SeparateTest.jsx";
 
 function AllTestShow() {

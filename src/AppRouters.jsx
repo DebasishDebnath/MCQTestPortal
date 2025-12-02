@@ -2,16 +2,16 @@ import React from "react";
 import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, Navigate, Outlet } from "react-router-dom";
 import UserLayout from "./Layout/UserLayout";
 import AdminLayout from "./Layout/AdminLayout";
-import LoginPage from "./Page/user/LoginPage";
-import RegisterPage from "./Page/user/RegisterPage";
-import AdminLogin from "./Page/admin/AdminLogin";
-import AdminRegister from "./Page/admin/AdminRegister";
-import Instruction from "./Page/user/Instruction";
-import AllTest from "./Page/admin/AllTest";
-import SystemCompatibility from "./Page/user/SystemCompatibility";
-import TestQuestion from "./Page/user/TestQuestion";
+import LoginPage from "./Page/User/LoginPage";
+import RegisterPage from "./Page/User/RegisterPage";
+import AdminLogin from "./Page/Admin/AdminLogin";
+import AdminRegister from "./Page/Admin/AdminRegister";
+import Instruction from "./Page/User/Instruction";
+import AllTest from "./Page/Admin/AllTest";
+import SystemCompatibility from "./Page/User/SystemCompatibility";
+import TestQuestion from "./Page/User/TestQuestion";
 import RouteErrorPopup from "./components/error/RouteErrorPopup";
-import TestDetails from "./Page/admin/TestDetails";
+import TestDetails from "./Page/Admin/TestDetails";
 
 // Simple auth check (replace with your logic)
 const isLoggedIn = () => !!localStorage.getItem("userToken");
@@ -54,8 +54,8 @@ function SuperAdminGuard({ children }) {
   return children;
 }
 
-import SubmissionSuccess from "./Page/user/SubmissionSuccess";
-import AdminDashboard from "./Page/admin/AdminDashboard";
+import SubmissionSuccess from "./Page/User/SubmissionSuccess";
+import AdminDashboard from "./Page/Admin/AdminDashboard";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
