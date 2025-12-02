@@ -8,28 +8,36 @@ import {
   Outlet,
 } from "react-router-dom";
 
-import LoginPage from "./Page/admin/AdminLogin";
-import AdminLogin from "./Page/admin/AdminLogin";
-
-import RegisterPage from "./Page/User/RegisterPage";
+// User Pages
+import LoginPage from "./Page/admin/AdminLogin"; 
+import RegisterPage from "./Page/user/RegisterPage";
 import UserLayout from "./Layout/UserLayout";
+
+// Admin Pages
 import AdminLayout from "./Layout/AdminLayout";
+import AdminLogin from "./Page/admin/AdminLogin";
+import AdminRegister from "./Page/admin/AdminRegister";
+import AdminDashboard from "./Page/admin/AdminDashboard";
 
-import AdminRegister from "./Page/Admin/AdminRegister";
-import Instruction from "./Page/User/Instruction";
-import AllTest from "./Page/Admin/AllTest";
-import SystemCompatibility from "./Page/User/SystemCompatibility";
-import TestQuestion from "./Page/User/TestQuestion";
+// User Components
+import Instruction from "./Page/user/Instruction";
+import SystemCompatibility from "./Page/user/SystemCompatibility";
+import TestQuestion from "./Page/user/TestQuestion";
+import SubmissionSuccess from "./Page/user/SubmissionSuccess";
+
+// Admin Components
+import AllTest from "./Page/admin/AllTest";
+import TestDetails from "./Page/admin/TestDetails";
+
+// Error Component
 import RouteErrorPopup from "./components/error/RouteErrorPopup";
-import TestDetails from "./Page/Admin/TestDetails";
 
-// Simple auth check (replace with your logic)
+// ---------------- AUTH HELPERS ----------------
+
 const isLoggedIn = () => !!localStorage.getItem("userToken");
+const getUserRole = () => localStorage.getItem("userRole");
 
-// Get user role from localStorage/sessionStorage (adjust as needed)
-const getUserRole = () => localStorage.getItem("userRole"); // e.g., "superadmin", "user"
-
-// Protected Route component for user routes
+// User Protected Route
 function ProtectedRoute() {
   const role = getUserRole();
   if (role === "superadmin") {
@@ -38,7 +46,7 @@ function ProtectedRoute() {
   return isLoggedIn() ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
-// Top-level route guard for "/"
+// Default landing route guard
 function UserRouteGuard({ children }) {
   const role = getUserRole();
   if (role === "superadmin") {
@@ -47,14 +55,16 @@ function UserRouteGuard({ children }) {
   return children;
 }
 
+// Prevent logged-in admin from re-accessing login page
 function AdminAuthGuard({ children }) {
-  const isAuth = isLoggedIn();
-  if (isAuth) {
-    return <Navigate to="/admin/dashboard" replace />;
-  }
-  return children;
+  return isLoggedIn() ? (
+    <Navigate to="/admin/dashboard" replace />
+  ) : (
+    children
+  );
 }
 
+// Protect admin routes
 function SuperAdminGuard({ children }) {
   const token = isLoggedIn();
   const role = getUserRole();
@@ -64,11 +74,12 @@ function SuperAdminGuard({ children }) {
   return children;
 }
 
-import SubmissionSuccess from "./Page/user/SubmissionSuccess";
-import AdminDashboard from "./Page/admin/AdminDashboard";
+// ---------------- ROUTER SETUP ----------------
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
+      {/* USER ROUTES */}
       <Route
         path="/"
         element={
@@ -81,19 +92,18 @@ const router = createBrowserRouter(
         <Route index element={<LoginPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
-        {/* Protected routes */}
+
+        {/* Protected User Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route
-            path="system-compatibility"
-            element={<SystemCompatibility />}
-          />
+          <Route path="system-compatibility" element={<SystemCompatibility />} />
           <Route path="instruction" element={<Instruction />} />
           <Route path="test/:testid" element={<TestQuestion />} />
         </Route>
+
         <Route path="success" element={<SubmissionSuccess />} />
       </Route>
 
-      {/* Routes for Admin Login/Register that use a different layout */}
+      {/* ADMIN AUTH ROUTES */}
       <Route
         path="/admin/login"
         element={
@@ -111,7 +121,7 @@ const router = createBrowserRouter(
         }
       />
 
-      {/* Protected Admin Routes with Sidebar Layout */}
+      {/* ADMIN PROTECTED ROUTES */}
       <Route
         path="/admin"
         element={
@@ -121,7 +131,6 @@ const router = createBrowserRouter(
         }
         errorElement={<RouteErrorPopup />}
       >
-        {/* <Route index element={<div>Admin Dashboard</div>} /> */}
         <Route
           path="login"
           element={
