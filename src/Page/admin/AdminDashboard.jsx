@@ -1,12 +1,8 @@
 import React from "react";
-import Sidebar from "../../components/admin/Sidebar";
+import Dashboard from "./Dashboard";
 
 function AdminDashboard() {
-  return (
-    <div>
-      <Sidebar />
-    </div>
-  );
+  return <Dashboard />;
 }
 
 export default AdminDashboard;

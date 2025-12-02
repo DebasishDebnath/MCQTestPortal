@@ -1,5 +1,5 @@
 import React from "react";
-import TestDetailComponent from "../../components/admin/TestDetailComponent.jsx";
+import TestDetailComponent from "../../components/Admin/TestDetailComponent";
 export default function Dashboard() {
   return (
     <div className="flex min-h-screen w-full ">
@@ -11,9 +11,7 @@ export default function Dashboard() {
           backgroundImage: "url(/regbg.png)",
         }}
       >
-        <div className="flex justify-center ">
           <TestDetailComponent />
-        </div>
       </div>
     </div>
   );
