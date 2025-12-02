@@ -4,10 +4,7 @@ import QuestionsGrid from "../../components/user/QuestionsGrid";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import FinalSubmission from "../../components/user/FinalSubmission";
 
-import { useHttp } from "../../hooks/useHttp";
-
 function TestQuestion() {
-  const { get, loading, error } = useHttp();
   const [showFinalSubmission, setShowFinalSubmission] = useState(false);
 
   useEffect(() => {
@@ -49,18 +46,6 @@ function TestQuestion() {
     { number: 20, status: "blank" },
   ];
 
-  useEffect(()=>{
-    const fetchQuestions = async () =>{
-      const token = localStorage.getItem("userToken");
-      const response =  await get("/api/questions/all", {
-        Authorization: `Bearer ${token}`,
-      });
-      if (response){
-        console.log("Fetched questions:", response, token);
-      }
-    }
-    fetchQuestions();
-  }, [])
   return (
     <div
       className={`flex flex-col w-full h-full poppins`}
