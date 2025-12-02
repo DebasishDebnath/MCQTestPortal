@@ -13,6 +13,7 @@ function TestQuestion() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [markedForReview, setMarkedForReview] = useState({});
+  const [visitedQuestions, setVisitedQuestions] = useState(new Set()); // Start empty - no questions visited initially
 
   useEffect(() => {
     // Get questions from navigation state
@@ -39,6 +40,7 @@ function TestQuestion() {
     }
 
     setQuestions(questionsList);
+    setVisitedQuestions(new Set()); // Don't mark any question as visited initially
   }, [location.state, navigate]);
 
   useEffect(() => {
@@ -55,14 +57,28 @@ function TestQuestion() {
   const getQuestionGridData = () => {
     return questions.map((q, index) => {
       const questionId = q._id;
-      const hasAnswer = answers[questionId] !== undefined;
+      const hasAnswer = answers[questionId] !== undefined && 
+        (Array.isArray(answers[questionId]) ? answers[questionId].length > 0 : answers[questionId] !== null);
       const isMarked = markedForReview[questionId];
-      const isVisited = index <= currentQuestionIndex;
+      const isVisited = visitedQuestions.has(index);
 
-      let status = "blank";
-      if (isMarked) status = "marked";
-      else if (hasAnswer) status = "answered";
-      else if (isVisited) status = "unanswered";
+      let status = "blank"; // Default is "not visited"
+      
+      // Only change status if the question has been visited
+      if (isVisited) {
+        // Check if question is marked for review (highest priority)
+        if (isMarked) {
+          status = "marked";
+        } 
+        // Check if question has an answer
+        else if (hasAnswer) {
+          status = "answered";
+        } 
+        // Question was visited but not answered
+        else {
+          status = "unanswered";
+        }
+      }
 
       return {
         number: index + 1,
@@ -76,10 +92,23 @@ function TestQuestion() {
 
   const handleAnswerSelect = (optionIndex) => {
     console.log(`✅ Selected option ${optionIndex} for question ${currentQuestion._id}`);
+    
+    // Mark current question as visited when answering
+    setVisitedQuestions(prev => new Set([...prev, currentQuestionIndex]));
+    
+    // For multiple choice, don't save empty arrays
+    if (Array.isArray(optionIndex) && optionIndex.length === 0) {
+      const updatedAnswers = { ...answers };
+      delete updatedAnswers[currentQuestion._id];
+      setAnswers(updatedAnswers);
+      return;
+    }
+    
     setAnswers({
       ...answers,
       [currentQuestion._id]: optionIndex
     });
+    
     // Remove from marked for review if answer is selected
     if (markedForReview[currentQuestion._id]) {
       const updatedMarked = { ...markedForReview };
@@ -90,15 +119,19 @@ function TestQuestion() {
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
-      console.log(`➡️ Moving to question ${currentQuestionIndex + 2}`);
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      const nextIndex = currentQuestionIndex + 1;
+      console.log(`➡️ Moving to question ${nextIndex + 1}`);
+      setVisitedQuestions(prev => new Set([...prev, nextIndex]));
+      setCurrentQuestionIndex(nextIndex);
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-      console.log(`⬅️ Moving to question ${currentQuestionIndex}`);
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      const prevIndex = currentQuestionIndex - 1;
+      console.log(`⬅️ Moving to question ${prevIndex + 1}`);
+      setVisitedQuestions(prev => new Set([...prev, prevIndex]));
+      setCurrentQuestionIndex(prevIndex);
     }
   };
 
@@ -107,10 +140,19 @@ function TestQuestion() {
     const updatedAnswers = { ...answers };
     delete updatedAnswers[currentQuestion._id];
     setAnswers(updatedAnswers);
+    
+    // Also remove from marked for review when clearing
+    const updatedMarked = { ...markedForReview };
+    delete updatedMarked[currentQuestion._id];
+    setMarkedForReview(updatedMarked);
   };
 
   const handleMarkForReview = () => {
     console.log(`🔖 Marking question ${currentQuestion._id} for review`);
+    
+    // Mark current question as visited
+    setVisitedQuestions(prev => new Set([...prev, currentQuestionIndex]));
+    
     setMarkedForReview({
       ...markedForReview,
       [currentQuestion._id]: true
@@ -119,6 +161,7 @@ function TestQuestion() {
 
   const handleQuestionClick = (index) => {
     console.log(`🎯 Jumping to question ${index + 1}`);
+    setVisitedQuestions(prev => new Set([...prev, index]));
     setCurrentQuestionIndex(index);
   };
 
@@ -130,7 +173,13 @@ function TestQuestion() {
     <div className={`flex flex-col w-full h-full poppins`}>
       {showFinalSubmission && 
       <div className="w-full min-h-screen bg-black/50 backdrop-blur-xs z-20 absolute top-0 left-0 transition-opacity duration-500">
-        <FinalSubmission onClose={() => setShowFinalSubmission(false)} />
+        <FinalSubmission 
+          onClose={() => setShowFinalSubmission(false)}
+          questions={questions}
+          answers={answers}
+          markedForReview={markedForReview}
+          questionGridData={getQuestionGridData()}
+        />
         </div>
       }
 
@@ -247,11 +296,11 @@ function TestQuestion() {
             Mark for review
           </button>
           <button 
-            onClick={handleNext}
-            disabled={currentQuestionIndex === questions.length - 1}
-            className="cursor-pointer w-40 py-1.5 p-2 bg-green-400 text-white rounded-full flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={currentQuestionIndex === questions.length - 1 ? () => setShowFinalSubmission(true) : handleNext}
+            className="cursor-pointer w-40 py-1.5 p-2 bg-green-400 text-white rounded-full flex items-center justify-center gap-4"
           >
-            Save and next <FaArrowRightLong />
+            {currentQuestionIndex === questions.length - 1 ? 'Submit' : 'Save and next'} 
+            {currentQuestionIndex !== questions.length - 1 && <FaArrowRightLong />}
           </button>
         </div>
       </div>
