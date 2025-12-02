@@ -23,7 +23,7 @@ function FinalSubmission({ onClose, questions, answers, markedForReview, questio
     datasets: [
       {
         data: [attempted, markedCount, visitedQuestions, notVisited],
-        backgroundColor: ['#0e2258', '#ead114', '#ff0000', '#999999'],
+        backgroundColor: ['#00c950', '#8200db', '#fdc700', '#e5e7eb'],
         borderWidth: 0,
         cutout: '30%',
       },
@@ -72,22 +72,22 @@ function FinalSubmission({ onClose, questions, answers, markedForReview, questio
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="w-3 h-3" style={{ backgroundColor: '#0e2258' }}></span>
+                <span className="w-3 h-3" style={{ backgroundColor: '#00c950' }}></span>
                 <span className="text-gray-700">Attempted: {attempted}/{totalQuestions}</span>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="w-3 h-3" style={{ backgroundColor: '#ead114' }}></span>
+                <span className="w-3 h-3" style={{ backgroundColor: '#8200db' }}></span>
                 <span className="text-gray-700">Marked for Review: {markedCount}/{totalQuestions}</span>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full bg-red-600"></span>
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#fdc700' }}></span>
                 <span className="text-gray-700">Unanswered: {visitedQuestions}/{totalQuestions}</span>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="w-3 h-3" style={{ backgroundColor: '#999999' }}></span>
+                <span className="w-3 h-3" style={{ backgroundColor: '#e5e7eb' }}></span>
                 <span className="text-gray-700">Not Visited: {notVisited}/{totalQuestions}</span>
               </div>
             </div>
