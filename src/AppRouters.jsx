@@ -12,7 +12,7 @@ import LoginPage from "./Page/Admin/AdminLogin";
 import RegisterPage from "./Page/User/RegisterPage";
 import UserLayout from "./Layout/UserLayout";
 import AdminLayout from "./Layout/AdminLayout";
-import AdminLogin from "./Page/Admin/AdminLogin";
+import { AdminLogin } from "./Page/Admin/AdminLogin";
 import AdminRegister from "./Page/Admin/AdminRegister";
 import Instruction from "./Page/User/Instruction";
 import AllTest from "./Page/Admin/AllTest";
