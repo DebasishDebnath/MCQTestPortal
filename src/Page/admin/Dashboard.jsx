@@ -1,5 +1,5 @@
 import React from "react";
-import DashboardComponent from "../../components/admin/DashboardComponent.jsx";
+import DashboardComponent from "../../components/Admin/DashboardComponent.jsx";
 export default function Dashboard() {
   return (
     <div className="flex min-h-screen w-full ">
