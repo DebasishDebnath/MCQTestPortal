@@ -7,9 +7,11 @@ import RegisterPage from "./Page/user/RegisterPage";
 import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Instruction from "./Page/user/Instruction";
+import AllTest from "./Page/admin/AllTest";
 import SystemCompatibility from "./Page/user/SystemCompatibility";
 import TestQuestion from "./Page/user/TestQuestion";
 import RouteErrorPopup from "./components/error/RouteErrorPopup";
+import TestDetails from "./Page/admin/TestDetails";
 
 // Simple auth check (replace with your logic)
 const isLoggedIn = () => !!localStorage.getItem("userToken");
@@ -78,7 +80,34 @@ const router = createBrowserRouter(
         <Route path="success" element={<SubmissionSuccess />} />
       </Route>
 
-      <Route path="/admin" element={<AdminLayout />} errorElement={<RouteErrorPopup />}>
+      {/* Routes for Admin Login/Register that use a different layout */}
+      <Route
+        path="/admin/login"
+        element={
+          <AdminAuthGuard>
+            <AdminLogin />
+          </AdminAuthGuard>
+        }
+      />
+      <Route
+        path="/admin/register"
+        element={
+          <AdminAuthGuard>
+            <AdminRegister />
+          </AdminAuthGuard>
+        }
+      />
+
+      {/* Protected Admin Routes with Sidebar Layout */}
+      <Route
+        path="/admin"
+        element={
+          <SuperAdminGuard>
+            <AdminLayout />
+          </SuperAdminGuard>
+        }
+        errorElement={<RouteErrorPopup />}
+      >
         {/* <Route index element={<div>Admin Dashboard</div>} /> */}
         <Route
           path="login"
@@ -99,10 +128,18 @@ const router = createBrowserRouter(
         <Route
           path="dashboard"
           element={
-            <SuperAdminGuard>
-              <AdminDashboard />
-            </SuperAdminGuard>
+            <AdminDashboard />
           }
+        />
+        <Route
+          path="test-details"
+          element={
+            <TestDetails />
+          }
+        />
+        <Route
+          path="all-test"
+          element={<AllTest />}
         />
       </Route>
     </>

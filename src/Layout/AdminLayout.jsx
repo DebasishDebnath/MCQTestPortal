@@ -1,16 +1,21 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import Sidebar from "../components/admin/Sidebar";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 
 function AdminLayout() {
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
-      <Header />
-      <main className="flex-1 overflow-auto">
-        <Outlet />
+    <div className="flex h-screen bg-gray-100">
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar />
+          <div className="flex-1 overflow-y-auto">
+            {/* The Outlet will render the matched child route component (e.g., AdminDashboard, TestDetails) */}
+            <Outlet />
+          </div>
+        </div>
       </main>
-      <Footer />
     </div>
   );
 }
