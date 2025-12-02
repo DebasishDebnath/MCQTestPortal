@@ -2,7 +2,7 @@ import React from "react";
 import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, Navigate, Outlet } from "react-router-dom";
 import UserLayout from "./Layout/UserLayout";
 import AdminLayout from "./Layout/AdminLayout";
-import LoginPage from "./Page/User/LoginPage";
+import LoginPage from "./Page/User/LoginPage.jsx";
 import RegisterPage from "./Page/User/RegisterPage";
 import AdminLogin from "./Page/Admin/AdminLogin";
 import AdminRegister from "./Page/Admin/AdminRegister";

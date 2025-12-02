@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
 import { Eye, EyeOff } from "lucide-react";
-import { toast } from "react-hot-toast"; // <-- Add this import
+import { toast } from "react-hot-toast";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
