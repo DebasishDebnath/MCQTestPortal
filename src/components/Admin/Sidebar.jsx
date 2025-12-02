@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { LayoutDashboard, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, FileText, Settings, Sigma } from "lucide-react";
 import Dashboard from "../../Page/admin/Dashboard";
+import TestDetails from "../../Page/admin/TestDetails";
 
 function Sidebar() {
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -8,6 +9,7 @@ function Sidebar() {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "test-details", label: "Test Details", icon: FileText },
+    { id: "all-test", label: "All Tests", icon: Sigma },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -40,7 +42,10 @@ function Sidebar() {
       </div>
 
       <div className="flex h-screen w-full">
-        <Dashboard />
+        {activeItem === "dashboard" && <Dashboard />}
+        {activeItem === "test-details" && <TestDetails />}
+        {activeItem === "all-test" && <AllTest />}
+        {/* {activeItem === "settings" && <SettingsPage />} */}
       </div>
     </div>
   );
