@@ -111,7 +111,7 @@ function SeparateTest({ testData }) {
       <div className="flex gap-3 pt-1 text-[#727272]">Department: </div>
       <div className="flex gap-3 pt-1 text-[#727272]">Semester: </div>
 
-      <div className="flex border-[#D9D9D9] border text-[#5C7CD4] w-[22%] items-center justify-center rounded-[4px] py-1 shadow-md shadow-[#6386e7] mt-2 cursor-pointer">
+      <div className="flex border-[#D9D9D9] border text-[#5C7CD4] w-[22%] items-center justify-center rounded-sm py-1 shadow-md shadow-[#6386e7] mt-2 cursor-pointer">
         Student Performance
       </div>
     </div>
