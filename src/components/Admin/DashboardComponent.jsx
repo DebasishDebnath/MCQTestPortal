@@ -2,7 +2,7 @@ import TestsCreated from "./TestsCreated";
 import UpcomingTests from "./UpcomingTests";
 import OngoingTests from "./OngoingTests";
 import CompletedTests from "./CompletedTests";
-import AllTestShow from "../../components/admin/AllTestShow";
+import AllTestShow from "../../components/Admin/AllTestShow";
 import React from "react";
 function DashboardComponent() {
   return (
