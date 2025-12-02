@@ -33,7 +33,7 @@ export default function AdminRegisterPage() {
       phoneNumber: formData.phone,
     };
 
-    const result = await post("api/superadmins/register", body);
+    const result = await post("/api/superadmins/register", body);
     console.log("API response:", result);
 
     if (result) {

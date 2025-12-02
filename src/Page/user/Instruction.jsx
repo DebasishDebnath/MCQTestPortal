@@ -1,21 +1,53 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useHttp } from "../../hooks/useHttp";
 
 export default function Instruction() {
   const [checked, setChecked] = useState(false);
+  const navigate = useNavigate();
+  const { get, loading } = useHttp();
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!checked) {
       toast.error("Please agree to the instructions before starting the test.");
       return;
     }
+
+    // Get token from localStorage
+    const token = localStorage.getItem("userToken");
+
+    if (!token) {
+      toast.error("Authentication required. Please login again.");
+      navigate("/login");
+      return;
+    }
+
+    // Make API call to fetch questions
+    const response = await get("/api/questions/all", {
+      Authorization: `Bearer ${token}`,
+    });
+
+    console.log("Questions :", response.data)
+    if (!response) {
+      toast.error("Failed to load questions. Please try again.");
+      return;
+
+    }
+
+    // Request fullscreen after successful API call
     const elem = document.documentElement;
     if (elem.requestFullscreen && !document.fullscreenElement) {
-      elem.requestFullscreen().then(() => {
-        window.location.href = "/test/1234";
-      });
+      elem.requestFullscreen()
+        .then(() => {
+          navigate("/test/692d347af663be77d350a2c0");
+        })
+        .catch((err) => {
+          console.error("Fullscreen error:", err);
+          navigate("/test/692d347af663be77d350a2c0");
+        });
     } else {
-      window.location.href = "/test/1234";
+      navigate("/test/692d347af663be77d350a2c0");
     }
   };
 
@@ -81,9 +113,10 @@ export default function Instruction() {
         <div className="flex justify-center mt-10">
           <button
             onClick={handleStart}
-            className="bg-blue-theme text-white poppins px-10 py-1.5 rounded-full text-lg font-semibold hover:bg-blue-900 transition cursor-pointer"
+            disabled={loading}
+            className="bg-blue-theme text-white poppins px-10 py-1.5 rounded-full text-lg font-semibold hover:bg-blue-900 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Start Test
+            {loading ? "Loading..." : "Start Test"}
           </button>
         </div>
       </div>
