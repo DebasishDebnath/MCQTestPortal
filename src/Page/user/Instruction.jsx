@@ -9,45 +9,67 @@ export default function Instruction() {
   const { get, loading } = useHttp();
 
   const handleStart = async () => {
+    console.log("=== Start Test Button Clicked ===");
+    
     if (!checked) {
+      console.log("❌ Checkbox not checked");
       toast.error("Please agree to the instructions before starting the test.");
       return;
     }
+    console.log("✅ Checkbox verified");
 
     // Get token from localStorage
     const token = localStorage.getItem("userToken");
+    console.log("Token retrieved:", token ? "Token exists" : "No token found");
 
     if (!token) {
+      console.log("❌ No authentication token");
       toast.error("Authentication required. Please login again.");
       navigate("/login");
       return;
     }
 
     // Make API call to fetch questions
+    console.log("📡 Calling API: /api/questions/all");
     const response = await get("/api/questions/all", {
       Authorization: `Bearer ${token}`,
     });
 
-    console.log("Questions :", response.data)
-    if (!response) {
+    console.log("API Response:", response);
+
+    if (!response || !response.data) {
+      console.log("❌ API call failed or no data received");
       toast.error("Failed to load questions. Please try again.");
       return;
-
     }
+    
+    console.log("✅ Questions loaded successfully:", response.data);
 
     // Request fullscreen after successful API call
+    console.log("🖥️ Requesting fullscreen...");
     const elem = document.documentElement;
     if (elem.requestFullscreen && !document.fullscreenElement) {
       elem.requestFullscreen()
         .then(() => {
-          navigate("/test/692d347af663be77d350a2c0");
+          console.log("✅ Fullscreen activated");
+          console.log("🚀 Navigating to test page with questions data");
+          navigate("/test/692d347af663be77d350a2c0", { 
+            state: { questions: response.data } 
+          });
         })
         .catch((err) => {
-          console.error("Fullscreen error:", err);
-          navigate("/test/692d347af663be77d350a2c0");
+          console.error("❌ Fullscreen error:", err);
+          console.log("🚀 Navigating to test page anyway");
+          navigate("/test/692d347af663be77d350a2c0", { 
+            state: { questions: response.data } 
+          });
         });
     } else {
-      navigate("/test/692d347af663be77d350a2c0");
+      console.log("ℹ️ Fullscreen not available or already active");
+      console.log("🚀 Navigating to test page");
+      navigate("/test/692d347af663be77d350a2c0", { 
+        state: { questions: response.data } 
+      });
     }
   };
 

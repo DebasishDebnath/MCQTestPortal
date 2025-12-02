@@ -1,6 +1,6 @@
 import React from "react";
 
-function QuestionsGrid({ questions }) {
+function QuestionsGrid({ questions, onQuestionClick }) {
   const getShape = (type) => {
     if (type === "answered") return "square";
     if (type === "marked") return "triangle";
@@ -23,7 +23,11 @@ function QuestionsGrid({ questions }) {
           const color = getColor(q.status);
 
           return (
-            <div key={index} className="cursor-pointer">
+            <div
+              key={index}
+              className="cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => onQuestionClick && onQuestionClick(index)}
+            >
               {shape === "square" && (
                 <div
                   className={`w-8 h-8 flex items-center justify-center text-white ${color}`}
