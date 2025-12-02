@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 // User Pages
-import LoginPage from "./Page/user/AdminLogin"; 
+import LoginPage from "./Page/user/LoginPage"; 
 import RegisterPage from "./Page/user/RegisterPage";
 import UserLayout from "./Layout/UserLayout";
 
