@@ -1,9 +1,17 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, Navigate, Outlet } from "react-router-dom";
-import UserLayout from "./Layout/UserLayout";
-import AdminLayout from "./Layout/AdminLayout";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  createRoutesFromElements,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
+
 import LoginPage from "./Page/User/LoginPage.jsx";
 import RegisterPage from "./Page/User/RegisterPage.jsx";
+import UserLayout from "./Layout/UserLayout";
+import AdminLayout from "./Layout/AdminLayout";
 import AdminLogin from "./Page/Admin/AdminLogin";
 import AdminRegister from "./Page/Admin/AdminRegister";
 import Instruction from "./Page/User/Instruction";
@@ -73,7 +81,10 @@ const router = createBrowserRouter(
         <Route path="register" element={<RegisterPage />} />
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="system-compatibility" element={<SystemCompatibility />} />
+          <Route
+            path="system-compatibility"
+            element={<SystemCompatibility />}
+          />
           <Route path="instruction" element={<Instruction />} />
           <Route path="test/:testid" element={<TestQuestion />} />
         </Route>
@@ -125,22 +136,9 @@ const router = createBrowserRouter(
             </AdminAuthGuard>
           }
         />
-        <Route
-          path="dashboard"
-          element={
-            <AdminDashboard />
-          }
-        />
-        <Route
-          path="test-details"
-          element={
-            <TestDetails />
-          }
-        />
-        <Route
-          path="all-test"
-          element={<AllTest />}
-        />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="test-details" element={<TestDetails />} />
+        <Route path="all-test" element={<AllTest />} />
       </Route>
     </>
   )
