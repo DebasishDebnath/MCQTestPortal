@@ -17,7 +17,7 @@ import UserLayout from "./Layout/UserLayout";
 import AdminLayout from "./Layout/AdminLayout";
 import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
-import AdminDashboard from "./Page/admin/AdminDashboard";
+import Dashboard from "./Page/admin/Dashboard";
 
 // User Components
 import Instruction from "./Page/user/Instruction";
@@ -147,7 +147,7 @@ const router = createBrowserRouter(
             </AdminAuthGuard>
           }
         />
-        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="test-details" element={<TestDetails />} />
         <Route path="all-test" element={<AllTest />} />
       </Route>
