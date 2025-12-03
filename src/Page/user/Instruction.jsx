@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom"; // ✅ Add useParams
 import { useHttp } from "../../hooks/useHttp";
 
 export default function Instruction() {
   const [checked, setChecked] = useState(false);
   const navigate = useNavigate();
+  const { testid } = useParams(); // ✅ Get testid from URL
   const { get, loading } = useHttp();
 
   const handleStart = async () => {
     console.log("=== Start Test Button Clicked ===");
+    console.log("📋 Test ID from URL:", testid); // ✅ Log the testid
     
     if (!checked) {
       console.log("❌ Checkbox not checked");
@@ -29,9 +31,9 @@ export default function Instruction() {
       return;
     }
 
-    // Make API call to fetch questions
-    console.log("📡 Calling API: /api/questions/all");
-    const response = await get("/api/questions/all", {
+    // ✅ Make API call with dynamic testid from URL
+    console.log(`📡 Calling API: /api/exam/${testid}/questions`);
+    const response = await get(`/api/exam/${testid}/questions`, {
       Authorization: `Bearer ${token}`,
     });
 
@@ -53,21 +55,24 @@ export default function Instruction() {
         .then(() => {
           console.log("✅ Fullscreen activated");
           console.log("🚀 Navigating to test page with questions data");
-          navigate("/test/692d347af663be77d350a2c0", { 
+          // ✅ Use dynamic testid instead of hardcoded
+          navigate(`/test/${testid}`, { 
             state: { questions: response.data } 
           });
         })
         .catch((err) => {
           console.error("❌ Fullscreen error:", err);
           console.log("🚀 Navigating to test page anyway");
-          navigate("/test/692d347af663be77d350a2c0", { 
+          // ✅ Use dynamic testid
+          navigate(`/test/${testid}`, { 
             state: { questions: response.data } 
           });
         });
     } else {
       console.log("ℹ️ Fullscreen not available or already active");
       console.log("🚀 Navigating to test page");
-      navigate("/test/692d347af663be77d350a2c0", { 
+      // ✅ Use dynamic testid
+      navigate(`/test/${testid}`, { 
         state: { questions: response.data } 
       });
     }
