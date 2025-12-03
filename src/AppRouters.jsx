@@ -15,6 +15,7 @@ import UserLayout from "./Layout/UserLayout";
 
 // Admin Pages
 import AdminLayout from "./Layout/AdminLayout";
+import AdminAuthLayout from "./Layout/AdminAuthLayout";
 import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Dashboard from "./Page/admin/Dashboard";
@@ -103,53 +104,33 @@ const router = createBrowserRouter(
         <Route path="success" element={<SubmissionSuccess />} />
       </Route>
 
-      {/* ADMIN AUTH ROUTES */}
-      <Route
-        path="/admin/login"
-        element={
-          <AdminAuthGuard>
-            <AdminLogin />
-          </AdminAuthGuard>
-        }
-      />
-      <Route
-        path="/admin/register"
-        element={
-          <AdminAuthGuard>
-            <AdminRegister />
-          </AdminAuthGuard>
-        }
-      />
-
-      {/* ADMIN PROTECTED ROUTES */}
+      {/* ADMIN ROUTES */}
       <Route
         path="/admin"
-        element={
-          <SuperAdminGuard>
-            <AdminLayout />
-          </SuperAdminGuard>
-        }
+        element={<AdminAuthLayout />}
         errorElement={<RouteErrorPopup />}
       >
         <Route
           path="login"
           element={
             <AdminAuthGuard>
-              <AdminLogin />
+              <AdminLogin /> 
             </AdminAuthGuard>
           }
         />
         <Route
           path="register"
           element={
-            <AdminAuthGuard>
+            <AdminAuthGuard> 
               <AdminRegister />
             </AdminAuthGuard>
           }
         />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="test-details" element={<TestDetails />} />
-        <Route path="all-test" element={<AllTest />} />
+        <Route element={<SuperAdminGuard><AdminLayout /></SuperAdminGuard>}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="test-details" element={<TestDetails />} />
+          <Route path="all-test" element={<AllTest />} />
+        </Route>
       </Route>
     </>
   )
