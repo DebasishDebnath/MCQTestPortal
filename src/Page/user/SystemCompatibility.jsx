@@ -3,15 +3,17 @@ import { FaRegHourglassHalf, FaChartPie, FaFileLines } from "react-icons/fa6";
 import { FaCamera, FaMicrophone, FaWifi } from "react-icons/fa";
 import { ImSpinner8 } from "react-icons/im";
 import { FaCheck, FaTimes } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 
 function SystemCompatibility() {
+  const { testid } = useParams();
+  const navigate = useNavigate();
+  
   const [cameraOk, setCameraOk] = useState(null);
   const [micOk, setMicOk] = useState(null);
   const [networkOk, setNetworkOk] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   // CAMERA CHECK
   async function checkCamera() {
@@ -66,12 +68,12 @@ function SystemCompatibility() {
       if (elem.requestFullscreen) {
         elem.requestFullscreen().then(() => {
           
-          navigate("/instruction");
+          navigate(`/instruction/${testid}`);
         });
       } else {
         // Fallback for browsers not supporting requestFullscreen
         
-        navigate("/instruction");
+        navigate(`/instruction/${testid}`);
       }
     }
   };
