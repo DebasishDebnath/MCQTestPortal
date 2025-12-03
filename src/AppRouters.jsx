@@ -95,8 +95,8 @@ const router = createBrowserRouter(
 
         {/* Protected User Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="system-compatibility" element={<SystemCompatibility />} />
-          <Route path="instruction" element={<Instruction />} />
+          <Route path="system-compatibility/:testid" element={<SystemCompatibility />} />
+          <Route path="instruction/:testid" element={<Instruction />} />
           <Route path="test/:testid" element={<TestQuestion />} />
         </Route>
 
