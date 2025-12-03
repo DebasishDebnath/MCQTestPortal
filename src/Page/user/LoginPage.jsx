@@ -21,27 +21,32 @@ export default function LoginPage() {
     const urlParams = new URLSearchParams(location.search);
     const token = urlParams.get('token');
     
-    // Extract testId from path like /test/692fc29e...
-    const pathParts = location.pathname.split('/');
+    // ✅ Extract testId from current pathname (e.g., /test/692fc29efb14b8c377a2fd5d)
+    const pathParts = location.pathname.split('/').filter(Boolean); // Remove empty strings
     const testIdIndex = pathParts.indexOf('test');
-    const testId = testIdIndex !== -1 ? pathParts[testIdIndex + 1] : null;
+    const testId = testIdIndex !== -1 && pathParts[testIdIndex + 1] ? pathParts[testIdIndex + 1] : null;
+    
+    console.log('🔍 URL Analysis:', { pathname: location.pathname, token: !!token, testId });
     
     if (token && testId) {
       localStorage.setItem('userToken', token);
       toast.success("Access granted!");
-      navigate(`/system-compatibility/${testId}`);
-    } else if (localStorage.getItem("userToken")) {
-      // Check if user is trying to access a test-related route
+      // ✅ Redirect to system compatibility with the testId
+      navigate(`/system-compatibility/${testId}`, { replace: true });
+      return; // ✅ Exit early to prevent further checks
+    } 
+    
+    // ✅ Only check for existing user if no token in URL
+    if (localStorage.getItem("userToken")) {
       const currentPath = location.pathname;
       const isTestRoute = currentPath.includes('/system-compatibility/') || 
                           currentPath.includes('/instruction/') || 
                           currentPath.includes('/test/');
 
-      // If not a test route, redirect to dashboard
-      if (!isTestRoute) {
+      // If not a test route and not on login/register, redirect to dashboard
+      if (!isTestRoute && currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
         navigate("/dashboard");
       }
-      // If it's a test route, don't redirect - let them access it
     }
   }, [navigate, location]);
 
