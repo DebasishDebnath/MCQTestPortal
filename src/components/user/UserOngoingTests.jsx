@@ -1,24 +1,74 @@
-import React from "react";
-import liveStreaming from "/live-streaming.png";
-function UserOngoingTests() {
+import React, { useEffect, useState } from "react";
+import { FaArrowRightLong } from "react-icons/fa6";
+import { useHttp } from "../../hooks/useHttp.jsx";
+import UserSeparateTest from "./UserSeparateTest.jsx";
+
+function UserAllTests() {
+  const { get } = useHttp();
+  const [tests, setTests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    fetchAllExams();
+  }, []);
+
+  const fetchAllExams = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const token = localStorage.getItem("userToken");
+      console.log(token, "token");
+      const response = await get("/api/exam/getAllExams", {
+        Authorization: `Bearer ${token}`,
+      });
+
+      console.log(response);
+      setTests(response.data || response);
+    } catch (err) {
+      setError(err.message || "Failed to fetch exams");
+      console.error("Error fetching exams:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <div className="bg-white rounded-2xl w-full p-6 poppins flex flex-col gap-2 h-full">
-      <div className="flex justify-between gap-4">
-        <div className="text-gray-700 text-md flex flex-col gap-2">
-          Ongoing Tests{" "}
-          <div className="text-gray-700 text-2xl font-semibold">0</div>
+    <div className="bg-white rounded-3xl px-10 py-10">
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-blue-theme font-semibold text-[24px]">
+          Ongoing Tests
         </div>
-        {/* <div>0</div> */}
-        <div className="bg-indigo-100 h-[44px] w-[50px] rounded-2xl flex items-center justify-center p-2">
-          <img src={liveStreaming} alt="" />
+        <div className="flex gap-6 items-center text-sm">
+          
+          <div className="flex items-center gap-2 text-blue-theme font-medium whitespace-nowrap cursor-pointer hover:text-indigo-400 transition-colors">
+            View All {"  "} <FaArrowRightLong />
+          </div>
         </div>
       </div>
-      <div className="text-gray-500 font-medium text-xs ">
-        Live tests currently
-        <br /> active for students.
+
+      <div className="space-y-4">
+        {loading && (
+          <div className="text-center py-8 text-gray-500">Loading tests...</div>
+        )}
+
+        {error && (
+          <div className="text-center py-8 text-red-500">Error: {error}</div>
+        )}
+
+        {!loading && !error && tests.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No tests available
+          </div>
+        )}
+
+        {!loading &&
+          !error &&
+          tests.length > 0 &&
+          tests.map((test) => (
+            <UserSeparateTest key={test.id || test._id} testData={test} />
+          ))}
       </div>
     </div>
   );
 }
 
-export default UserOngoingTests;
+export default UserAllTests;

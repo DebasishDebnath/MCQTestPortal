@@ -33,6 +33,7 @@ import TestDetails from "./Page/admin/TestDetails";
 // Error Component
 import RouteErrorPopup from "./components/error/RouteErrorPopup";
 import UserDashboard from "./Page/user/UserDashboard";
+import UserResults from "./Page/user/UserCompletedTests";
 
 // ---------------- AUTH HELPERS ----------------
 
@@ -98,6 +99,8 @@ const router = createBrowserRouter(
         {/* Protected User Routes */}
         <Route element={<ProtectedRoute />}>
         <Route path="dashboard" element={<UserDashboard />} />
+        <Route path="completed-tests" element={<UserResults />} />
+        
           <Route path="system-compatibility/:testid" element={<SystemCompatibility />} />
           <Route path="instruction/:testid" element={<Instruction />} />
           <Route path="test/:testid" element={<TestQuestion />} />
