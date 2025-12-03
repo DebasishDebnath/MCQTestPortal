@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHttp } from "../../hooks/useHttp.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
 import { Eye, EyeOff } from "lucide-react";
@@ -14,13 +14,27 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false); 
   const { post, loading, error } = useHttp();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Redirect if already logged in
+  // Handle token from URL (backend link)
   useEffect(() => {
-    if (localStorage.getItem("userToken")) {
-      navigate("/system-compatibility");
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+    
+    // Extract testId from path like /test/692fc29e...
+    const pathParts = location.pathname.split('/');
+    const testIdIndex = pathParts.indexOf('test');
+    const testId = testIdIndex !== -1 ? pathParts[testIdIndex + 1] : null;
+    
+    if (token && testId) {
+      localStorage.setItem('userToken', token);
+      toast.success("Access granted!");
+      navigate(`/system-compatibility/${testId}`);
+    } else if (localStorage.getItem("userToken")) {
+      // Already logged in, go to dashboard
+      navigate("/dashboard");
     }
-  }, [navigate]);
+  }, [navigate, location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,25 +56,12 @@ export default function LoginPage() {
 
     if (result && result.success && result.data && result.data.accessToken) {
       localStorage.setItem("userToken", result.data.accessToken);
-      toast.success("Login successful!"); // <-- Use toast for success
-      navigate("/system-compatibility");
+      toast.success("Login successful!");
+      navigate("/dashboard"); // Go to dashboard after manual login
     } else {
-      toast.error("Login failed: Invalid email or password."); // <-- Use toast for error
+      toast.error("Login failed: Invalid email or password.");
     }
   };
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const testId = window.location.pathname.split('/').pop();
-    
-    if (token) {
-      localStorage.setItem('userToken', token);
-      if (testId && testId !== 'login') {
-        navigate(`/system-compatibility/${testId}`);
-      }
-    }
-  }, [navigate]);
 
   return (
     <div
