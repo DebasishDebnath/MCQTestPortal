@@ -35,7 +35,7 @@ export default function UserDashboard() {
         }}
       >
         <UserDashboardComponent
-          ongoingTests={exams.live}
+          // ongoingTests={exams.live}
           upcomingTests={exams.draft}
           completedTests={exams.closed}
         />

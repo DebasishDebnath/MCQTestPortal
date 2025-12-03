@@ -35,7 +35,7 @@ function UserAllTests() {
     <div className="bg-white rounded-3xl px-10 py-10">
       <div className="flex justify-between items-center mb-6">
         <div className="text-blue-theme font-semibold text-[24px]">
-          Ongoing Tests
+          Completed Tests
         </div>
         <div className="flex gap-6 items-center text-sm">
           
@@ -60,12 +60,12 @@ function UserAllTests() {
           </div>
         )}
 
-        {!loading &&
+        {/* {!loading &&
           !error &&
           tests.length > 0 &&
           tests.map((test) => (
             <UserSeparateTest key={test.id || test._id} testData={test} />
-          ))}
+          ))} */}
       </div>
     </div>
   );
