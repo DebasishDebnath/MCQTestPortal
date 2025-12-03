@@ -60,7 +60,7 @@ function SeparateTest({ testData }) {
   return (
     <div className="border border-gray-200 rounded-2xl px-5 py-4 flex flex-col gap-2 w-full">
       <div className="flex gap-5 relative">
-        <div className="bg-indigo-100 text-indigo-400 rounded-sm px-2 flex items-center text-xs">
+        <div className="bg-indigo-100 text-indigo-400 rounded-sm px-2 py-1 flex items-center text-xs">
           {formatDateTime(testData.startDate)}
         </div>
 

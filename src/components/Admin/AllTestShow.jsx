@@ -33,7 +33,7 @@ function AllTestShow() {
     }
   };
   return (
-    <div className="bg-white rounded-3xl px-10 py-10 w-full">
+    <div className="bg-white rounded-2xl px-10 py-10 w-full">
       <div className="flex justify-between items-center mb-6">
         <div className="text-blue-theme font-semibold text-[24px]">
           All Tests
