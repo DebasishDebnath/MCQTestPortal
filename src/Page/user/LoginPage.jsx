@@ -31,8 +31,17 @@ export default function LoginPage() {
       toast.success("Access granted!");
       navigate(`/system-compatibility/${testId}`);
     } else if (localStorage.getItem("userToken")) {
-      // Already logged in, go to dashboard
-      navigate("/dashboard");
+      // Check if user is trying to access a test-related route
+      const currentPath = location.pathname;
+      const isTestRoute = currentPath.includes('/system-compatibility/') || 
+                          currentPath.includes('/instruction/') || 
+                          currentPath.includes('/test/');
+
+      // If not a test route, redirect to dashboard
+      if (!isTestRoute) {
+        navigate("/dashboard");
+      }
+      // If it's a test route, don't redirect - let them access it
     }
   }, [navigate, location]);
 
