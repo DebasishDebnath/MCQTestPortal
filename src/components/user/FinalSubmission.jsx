@@ -7,20 +7,23 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function FinalSubmission({ onClose }) {
-  // Sample data - you can replace this with props or state
-  const totalQuestions = 100;
-  const attempted = 70;
-  const markedForRevisit = 10;
-  const unattempted = 12;
+function FinalSubmission({ onClose, questions, answers, markedForReview, questionGridData }) {
+  // Calculate statistics from actual data
+  const totalQuestions = questions?.length || 0;
+  const attempted = Object.keys(answers || {}).length;
+  const markedCount = Object.keys(markedForReview || {}).filter(key => markedForReview[key]).length;
+  
+  // Count unanswered visited questions
+  const visitedQuestions = questionGridData?.filter(q => q.status === 'unanswered').length || 0;
+  const notVisited = questionGridData?.filter(q => q.status === 'blank').length || 0;
 
   // Chart data
   const chartData = {
-    labels: ['Attempted', 'Marked for Revisit', 'Unattempted'],
+    labels: ['Attempted', 'Marked for Review', 'Unanswered', 'Not Visited'],
     datasets: [
       {
-        data: [attempted, markedForRevisit, unattempted],
-        backgroundColor: ['#1e3a8a', '#fbbf24', '#d1d5db'],
+        data: [attempted, markedCount, visitedQuestions, notVisited],
+        backgroundColor: ['#00c950', '#8200db', '#fdc700', '#e5e7eb'],
         borderWidth: 0,
         cutout: '30%',
       },
@@ -69,18 +72,23 @@ function FinalSubmission({ onClose }) {
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full bg-blue-900"></span>
+                <span className="w-3 h-3" style={{ backgroundColor: '#00c950' }}></span>
                 <span className="text-gray-700">Attempted: {attempted}/{totalQuestions}</span>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full bg-yellow-400"></span>
-                <span className="text-gray-700">Marked for Revisit: {markedForRevisit}/{totalQuestions}</span>
+                <span className="w-3 h-3" style={{ backgroundColor: '#8200db' }}></span>
+                <span className="text-gray-700">Marked for Review: {markedCount}/{totalQuestions}</span>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full bg-gray-300"></span>
-                <span className="text-gray-700">Unattempted: {unattempted}/{totalQuestions}</span>
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#fdc700' }}></span>
+                <span className="text-gray-700">Unanswered: {visitedQuestions}/{totalQuestions}</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="w-3 h-3" style={{ backgroundColor: '#e5e7eb' }}></span>
+                <span className="text-gray-700">Not Visited: {notVisited}/{totalQuestions}</span>
               </div>
             </div>
           </div>
@@ -107,17 +115,20 @@ function FinalSubmission({ onClose }) {
                 <td className="p-3 text-gray-700">1</td>
                 <td className="p-3">
                   <div>
-                    <div className="font-medium text-blue-theme">Program</div>
-                    <div className="text-xs text-gray-500">Untested Section</div>
+                    <div className="font-medium text-blue-theme">Section A</div>
+                    <div className="text-xs text-gray-500">
+                      {attempted === totalQuestions ? 'All Questions Attempted' : 
+                       attempted === 0 ? 'Untested Section' : 'Partially Attempted'}
+                    </div>
                   </div>
                 </td>
                 <td className="p-3">
                   <div className="flex items-center gap-3">
                     <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                      <div className="bg-blue-theme h-full" style={{ width: '100%' }}></div>
+                      <div className="bg-blue-theme h-full" style={{ width: `${(attempted / totalQuestions) * 100}%` }}></div>
                     </div>
-                    <span className="text-sm text-gray-600 whitespace-nowrap">70/100</span>
-                    <span className="text-xs text-gray-500">Total 1 Questions</span>
+                    <span className="text-sm text-gray-600 whitespace-nowrap">{attempted}/{totalQuestions}</span>
+                    <span className="text-xs text-gray-500">Total {totalQuestions} Questions</span>
                   </div>
                 </td>
               </tr>
