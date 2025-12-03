@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { useHttp } from "./../../hooks/useHttp.jsx";
 import SeparateTest from "./SeparateTest.jsx";
-
+import { useNavigate } from "react-router-dom";
 function AllTestShow() {
   const { get } = useHttp();
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
   useEffect(() => {
     fetchAllExams();
   }, []);
@@ -32,7 +33,7 @@ function AllTestShow() {
     }
   };
   return (
-    <div className="bg-white rounded-3xl px-10 py-10">
+    <div className="bg-white rounded-3xl px-10 py-10 w-full">
       <div className="flex justify-between items-center mb-6">
         <div className="text-blue-theme font-semibold text-[24px]">
           All Tests
@@ -41,7 +42,10 @@ function AllTestShow() {
           <button className="border rounded-full px-10 py-2 border-indigo-400 font-semibold text-indigo-400 cursor-pointer hover:bg-indigo-400 hover:text-white transition-colors">
             Create Test
           </button>
-          <div className="flex items-center gap-2 text-blue-theme font-medium whitespace-nowrap cursor-pointer hover:text-indigo-400 transition-colors">
+          <div
+            className="flex items-center gap-2 text-blue-theme font-medium whitespace-nowrap cursor-pointer hover:text-indigo-400 transition-colors"
+            onClick={() => navigate("/admin/all-test")}
+          >
             View All {"  "} <FaArrowRightLong />
           </div>
         </div>

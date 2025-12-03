@@ -1,7 +1,21 @@
 import React from "react";
+import AllTestComponent from "../../components/Admin/AllTestComponent";
 
 function AllTest() {
-  return <div>AllTest</div>;
+  return (
+    <div className="flex min-h-screen w-full ">
+      {/* Your sidebar component here */}
+
+      <div
+        className="flex w-full min-h-screen bg-[#313d55] bg-cover bg-center justify-center xl:p-20 p-10 bg-blend-overlay poppins"
+        style={{
+          backgroundImage: "url(/regbg.png)",
+        }}
+      >
+        <AllTestComponent />
+      </div>
+    </div>
+  );
 }
 
 export default AllTest;
