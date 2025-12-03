@@ -67,13 +67,11 @@ function SystemCompatibility() {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
         elem.requestFullscreen().then(() => {
-          
-          navigate(`/instruction/${testid}`);
+          navigate(`/instruction/${testid}`); // ✅ Use dynamic testid
         });
       } else {
         // Fallback for browsers not supporting requestFullscreen
-        
-        navigate(`/instruction/${testid}`);
+        navigate(`/instruction/${testid}`); // ✅ Use dynamic testid
       }
     }
   };

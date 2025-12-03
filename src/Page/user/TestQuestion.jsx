@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom"; // ✅ Add useParams
 import { MdArrowDropDown } from "react-icons/md";
 import QuestionsGrid from "../../components/user/QuestionsGrid";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
@@ -8,6 +8,7 @@ import FinalSubmission from "../../components/user/FinalSubmission";
 function TestQuestion() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { testid } = useParams(); // ✅ Get testid from URL
   const [showFinalSubmission, setShowFinalSubmission] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -23,7 +24,8 @@ function TestQuestion() {
 
     if (!receivedData) {
       console.log("❌ No data found, redirecting to instructions");
-      navigate("/instruction");
+      // ✅ Include testid in redirect
+      navigate(`/instruction/${testid}`, { replace: true });
       return;
     }
 
@@ -35,13 +37,14 @@ function TestQuestion() {
 
     if (!questionsList || questionsList.length === 0) {
       console.log("❌ No questions found, redirecting to instructions");
-      navigate("/instruction");
+      // ✅ Include testid in redirect
+      navigate(`/instruction/${testid}`, { replace: true });
       return;
     }
 
     setQuestions(questionsList);
     setVisitedQuestions(new Set()); // Don't mark any question as visited initially
-  }, [location.state, navigate]);
+  }, [location.state, navigate, testid]); // ✅ Add testid to dependencies
 
   useEffect(() => {
     const handleOpenFinalSubmission = () => setShowFinalSubmission(true);
