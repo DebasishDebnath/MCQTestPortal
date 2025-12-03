@@ -49,6 +49,19 @@ export default function LoginPage() {
     }
   };
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const testId = window.location.pathname.split('/').pop();
+    
+    if (token) {
+      localStorage.setItem('userToken', token);
+      if (testId && testId !== 'login') {
+        navigate(`/system-compatibility/${testId}`);
+      }
+    }
+  }, [navigate]);
+
   return (
     <div
       className="h-full flex bg-[#313d55] bg-cover bg-center bg-no-repeat bg-blend-overlay text-white w-full pb-10 poppins"
