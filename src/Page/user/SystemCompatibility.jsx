@@ -4,7 +4,7 @@ import { FaCamera, FaMicrophone, FaWifi } from "react-icons/fa";
 import { ImSpinner8 } from "react-icons/im";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
-
+import { toast } from "react-hot-toast";
 
 function SystemCompatibility() {
   const { testid } = useParams();
@@ -14,47 +14,104 @@ function SystemCompatibility() {
   const [micOk, setMicOk] = useState(null);
   const [networkOk, setNetworkOk] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cameraError, setCameraError] = useState("");
+  const [micError, setMicError] = useState("");
 
   // CAMERA CHECK
   async function checkCamera() {
+    console.log("🎥 Checking camera access...");
     try {
-      await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      console.log("✅ Camera access granted");
       setCameraOk(true);
-    } catch {
+      setCameraError("");
+      // Stop the stream after checking
+      stream.getTracks().forEach(track => track.stop());
+    } catch (error) {
+      console.error("❌ Camera access failed:", error.name, error.message);
       setCameraOk(false);
+      
+      // Set user-friendly error messages
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+        setCameraError("Camera permission denied. Please allow camera access.");
+
+      } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+        setCameraError("No camera found on this device.");
+      } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+        setCameraError("Camera is already in use by another application.");
+      } else {
+        setCameraError("Failed to access camera. Please check your device.");
+      }
     }
   }
 
   // MICROPHONE CHECK
   async function checkMic() {
+    console.log("🎤 Checking microphone access...");
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log("✅ Microphone access granted");
       setMicOk(true);
-    } catch {
+      setMicError("");
+      // Stop the stream after checking
+      stream.getTracks().forEach(track => track.stop());
+    } catch (error) {
+      console.error("❌ Microphone access failed:", error.name, error.message);
       setMicOk(false);
+      
+      // Set user-friendly error messages
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+        setMicError("Microphone permission denied. Please allow microphone access.");
+
+      } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+        setMicError("No microphone found on this device.");
+      } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+        setMicError("Microphone is already in use by another application.");
+      } else {
+        setMicError("Failed to access microphone. Please check your device.");
+      }
     }
   }
 
   // NETWORK CHECK
   async function checkNetwork() {
+    console.log("🌐 Checking network stability...");
     const start = Date.now();
     try {
       await fetch("https://www.google.com/generate_204", { mode: "no-cors" });
       const latency = Date.now() - start;
+      console.log(`✅ Network check completed in ${latency}ms`);
       setNetworkOk(latency < 1000);
-    } catch {
+      if (latency >= 1000) {
+
+      }
+    } catch (error) {
+      console.error("❌ Network check failed:", error);
       setNetworkOk(false);
+
     }
   }
 
   useEffect(() => {
+    console.log("🚀 Starting system compatibility checks...");
     setLoading(true);
 
     async function runChecks() {
+      // Check if browser supports getUserMedia
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error("❌ Browser doesn't support getUserMedia");
+
+        setCameraOk(false);
+        setMicOk(false);
+        setLoading(false);
+        return;
+      }
+
       await checkCamera();
       await checkMic();
       await checkNetwork();
       setLoading(false);
+      console.log("✅ All compatibility checks completed");
     }
 
     runChecks();
@@ -62,17 +119,26 @@ function SystemCompatibility() {
 
   // Request full screen and navigate to instruction
   const handleProceed = () => {
+    console.log("🚀 Proceeding to instructions...");
     if (cameraOk && micOk && networkOk) {
-      // Request full screen
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
-        elem.requestFullscreen().then(() => {
-          navigate(`/instruction/${testid}`); // ✅ Use dynamic testid
-        });
+        elem.requestFullscreen()
+          .then(() => {
+            console.log("✅ Fullscreen activated");
+            navigate(`/instruction/${testid}`);
+          })
+          .catch((err) => {
+            console.error("❌ Fullscreen failed:", err);
+            toast.error("Fullscreen mode failed, but proceeding anyway");
+            navigate(`/instruction/${testid}`);
+          });
       } else {
-        // Fallback for browsers not supporting requestFullscreen
-        navigate(`/instruction/${testid}`); // ✅ Use dynamic testid
+        console.log("ℹ️ Fullscreen not supported");
+        navigate(`/instruction/${testid}`);
       }
+    } else {
+      toast.error("Please ensure all system checks pass before proceeding");
     }
   };
 
@@ -175,20 +241,30 @@ function SystemCompatibility() {
 
             {/* ⭐ Compatibility Test List ⭐ */}
             <div className="flex flex-col gap-6 text-blue-theme text-lg font-semibold">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FaCamera className="" />
-                  Camera access
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FaCamera className="" />
+                    Camera access
+                  </div>
+                  <StatusIcon status={cameraOk} />
                 </div>
-                <StatusIcon status={cameraOk} />
+                {cameraError && (
+                  <p className="text-red-500 text-sm mt-1 ml-8">{cameraError}</p>
+                )}
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FaMicrophone className="" />
-                  Microphone access
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FaMicrophone className="" />
+                    Microphone access
+                  </div>
+                  <StatusIcon status={micOk} />
                 </div>
-                <StatusIcon status={micOk} />
+                {micError && (
+                  <p className="text-red-500 text-sm mt-1 ml-8">{micError}</p>
+                )}
               </div>
 
               <div className="flex items-center justify-between">
@@ -205,7 +281,7 @@ function SystemCompatibility() {
               disabled={loading || !(cameraOk && micOk && networkOk)}
               className={`py-1.5 px-10 text-white rounded-full flex items-center justify-center gap-4 mt-10 ${
                 cameraOk && micOk && networkOk
-                  ? "bg-blue-theme cursor-pointer"
+                  ? "bg-blue-theme cursor-pointer hover:bg-blue-600"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
               onClick={handleProceed}

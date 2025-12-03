@@ -96,14 +96,18 @@ const router = createBrowserRouter(
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
 
+        {/* ✅ Add this route OUTSIDE protected routes to handle backend links */}
+        <Route path="test/:testid" element={<LoginPage />} />
+
         {/* Protected User Routes */}
         <Route element={<ProtectedRoute />}>
-        <Route path="dashboard" element={<UserDashboard />} />
-        <Route path="completed-tests" element={<UserResults />} />
-        
+          <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="completed-tests" element={<UserResults />} />
+          
           <Route path="system-compatibility/:testid" element={<SystemCompatibility />} />
           <Route path="instruction/:testid" element={<Instruction />} />
-          <Route path="test/:testid" element={<TestQuestion />} />
+          {/* ✅ Keep this protected route for actual test taking */}
+          <Route path="test-page/:testid" element={<TestQuestion />} />
         </Route>
 
         <Route path="success" element={<SubmissionSuccess />} />

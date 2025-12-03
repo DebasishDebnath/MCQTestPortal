@@ -21,12 +21,22 @@ export default function LoginPage() {
     const urlParams = new URLSearchParams(location.search);
     const token = urlParams.get('token');
     
-    // ✅ Extract testId from current pathname (e.g., /test/692fc29efb14b8c377a2fd5d)
-    const pathParts = location.pathname.split('/').filter(Boolean); // Remove empty strings
-    const testIdIndex = pathParts.indexOf('test');
-    const testId = testIdIndex !== -1 && pathParts[testIdIndex + 1] ? pathParts[testIdIndex + 1] : null;
+    // ✅ Extract testId from the pathname
+    const pathParts = location.pathname.split('/').filter(Boolean);
+    let testId = null;
     
-    console.log('🔍 URL Analysis:', { pathname: location.pathname, token: !!token, testId });
+    // Check if the URL is /test/:testid or any other pattern
+    if (pathParts.length >= 2) {
+      // Get the last segment as testId (e.g., from /test/692fc29efb14b8c377a2fd5d)
+      testId = pathParts[pathParts.length - 1];
+    }
+    
+    console.log('🔍 URL Analysis:', { 
+      pathname: location.pathname, 
+      token: !!token, 
+      testId,
+      pathParts 
+    });
     
     if (token && testId) {
       localStorage.setItem('userToken', token);
