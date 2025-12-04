@@ -1,79 +1,88 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
-import { useNavigate, useParams } from "react-router-dom"; // ✅ Add useParams
+import { useNavigate, useParams } from "react-router-dom";
 import { useHttp } from "../../hooks/useHttp";
 
 export default function Instruction() {
   const [checked, setChecked] = useState(false);
   const navigate = useNavigate();
-  const { testid } = useParams(); // ✅ Get testid from URL
+  const { testid } = useParams();
   const { get, loading } = useHttp();
 
   const handleStart = async () => {
-    console.log("=== Start Test Button Clicked ===");
-    console.log("📋 Test ID from URL:", testid); // ✅ Log the testid
+
     
     if (!checked) {
-      console.log("❌ Checkbox not checked");
+
       toast.error("Please agree to the instructions before starting the test.");
       return;
     }
-    console.log("✅ Checkbox verified");
 
-    // Get token from localStorage
+
     const token = localStorage.getItem("userToken");
-    console.log("Token retrieved:", token ? "Token exists" : "No token found");
+
 
     if (!token) {
-      console.log("❌ No authentication token");
+
       toast.error("Authentication required. Please login again.");
       navigate("/login");
       return;
     }
 
-    // ✅ Make API call with dynamic testid from URL
-    console.log(`📡 Calling API: /api/exam/${testid}/questions`);
-    const response = await get(`/api/exam/${testid}/questions`, {
+    // ✅ Load first page (10 questions)
+    console.log(`📡 Calling API: /api/questions/all/${testid}?page=1&limit=10`);
+    const response = await get(`/api/questions/all/${testid}?page=1&limit=10`, {
       Authorization: `Bearer ${token}`,
     });
 
     console.log("API Response:", response);
 
     if (!response || !response.data) {
-      console.log("❌ API call failed or no data received");
+
       toast.error("Failed to load questions. Please try again.");
       return;
     }
     
-    console.log("✅ Questions loaded successfully:", response.data);
 
-    // Request fullscreen after successful API call
-    console.log("🖥️ Requesting fullscreen...");
+    // ✅ FIX: Use totalQuestions from response (backend sends it as totalQuestions)
+
+
+
     const elem = document.documentElement;
     if (elem.requestFullscreen && !document.fullscreenElement) {
       elem.requestFullscreen()
         .then(() => {
-          console.log("✅ Fullscreen activated");
-          console.log("🚀 Navigating to test page with questions data");
-          // ✅ Use dynamic testid instead of hardcoded
-          navigate(`/test/${testid}`, { 
-            state: { questions: response.data } 
+
+          navigate(`/test-page/${testid}`, { 
+            state: { 
+              initialQuestions: response.data.questions,
+              // ✅ FIX: Backend sends totalQuestions field
+              totalQuestions: response.data.totalQuestions,
+              currentPage: 1
+            } 
           });
         })
         .catch((err) => {
           console.error("❌ Fullscreen error:", err);
-          console.log("🚀 Navigating to test page anyway");
-          // ✅ Use dynamic testid
-          navigate(`/test/${testid}`, { 
-            state: { questions: response.data } 
+
+          navigate(`/test-page/${testid}`, { 
+            state: { 
+              initialQuestions: response.data.questions,
+              // ✅ FIX: Backend sends totalQuestions field
+              totalQuestions: response.data.totalQuestions,
+              currentPage: 1
+            } 
           });
         });
     } else {
-      console.log("ℹ️ Fullscreen not available or already active");
-      console.log("🚀 Navigating to test page");
-      // ✅ Use dynamic testid
-      navigate(`/test/${testid}`, { 
-        state: { questions: response.data } 
+
+      navigate(`/test-page/${testid}`, { 
+        state: { 
+          initialQuestions: response.data.questions,
+          // ✅ FIX: Backend sends totalQuestions field
+          totalQuestions: response.data.totalQuestions,
+          currentPage: 1
+        } 
       });
     }
   };
