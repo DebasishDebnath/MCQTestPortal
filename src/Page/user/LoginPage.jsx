@@ -6,6 +6,14 @@ import { MdEmail } from "react-icons/md";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
 
+// ⭐ TESTING BYPASS - COMMENT OUT WHEN NOT NEEDED ⭐
+const TESTING_MODE = true; // Set to false to disable bypass
+const TEST_CONFIG = {
+  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTMxNjdhYTNjZThlODI5MDBmYzM2NjkiLCJlbWFpbCI6ImRleWFua2FuMTU0QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiZXhhbUlkIjoiNjkzMTY3YWEzY2U4ZTgyOTAwZmMzNjViIiwiaWF0IjoxNzY0ODQ1NTQwLCJleHAiOjE3NjQ5MzE5NDB9.4j1VyzhiouSSrVhMEGryOJjqDnt4FyL_YNbjGA78BJY", // Replace with your actual test token
+  testId: "693167aa3ce8e82900fc365b", // Replace with your actual test ID
+};
+// ⭐ END TESTING BYPASS ⭐
+
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     password: "",
@@ -16,18 +24,25 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle token from URL (backend link)
+  // Handle token from URL (backend link) OR testing bypass
   useEffect(() => {
+    // ⭐ TESTING BYPASS ⭐
+    if (TESTING_MODE && TEST_CONFIG.token && TEST_CONFIG.testId) {
+      console.log('🧪 TESTING MODE ACTIVE - Bypassing authentication');
+      localStorage.setItem('userToken', TEST_CONFIG.token);
+      toast.success("Test mode activated!");
+      navigate(`/system-compatibility/${TEST_CONFIG.testId}`, { replace: true });
+      return;
+    }
+    // ⭐ END TESTING BYPASS ⭐
+
     const urlParams = new URLSearchParams(location.search);
     const token = urlParams.get('token');
     
-    // ✅ Extract testId from the pathname
     const pathParts = location.pathname.split('/').filter(Boolean);
     let testId = null;
     
-    // Check if the URL is /test/:testid or any other pattern
     if (pathParts.length >= 2) {
-      // Get the last segment as testId (e.g., from /test/692fc29efb14b8c377a2fd5d)
       testId = pathParts[pathParts.length - 1];
     }
     
@@ -41,19 +56,16 @@ export default function LoginPage() {
     if (token && testId) {
       localStorage.setItem('userToken', token);
       toast.success("Access granted!");
-      // ✅ Redirect to system compatibility with the testId
       navigate(`/system-compatibility/${testId}`, { replace: true });
-      return; // ✅ Exit early to prevent further checks
+      return;
     } 
     
-    // ✅ Only check for existing user if no token in URL
     if (localStorage.getItem("userToken")) {
       const currentPath = location.pathname;
       const isTestRoute = currentPath.includes('/system-compatibility/') || 
                           currentPath.includes('/instruction/') || 
                           currentPath.includes('/test/');
 
-      // If not a test route and not on login/register, redirect to dashboard
       if (!isTestRoute && currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
         navigate("/dashboard");
       }
@@ -81,7 +93,7 @@ export default function LoginPage() {
     if (result && result.success && result.data && result.data.accessToken) {
       localStorage.setItem("userToken", result.data.accessToken);
       toast.success("Login successful!");
-      navigate("/dashboard"); // Go to dashboard after manual login
+      navigate("/dashboard");
     } else {
       toast.error("Login failed: Invalid email or password.");
     }
@@ -100,6 +112,13 @@ export default function LoginPage() {
           <h1 className="text-5xl font-medium leading-tight">Welcome to</h1>
           <h1 className="text-6xl font-semibold">MCQ Test Platform</h1>
           <p className="text-lg">with Proctoring and full screen mode</p>
+          
+          {/* ⭐ Testing Mode Indicator ⭐ */}
+          {TESTING_MODE && (
+            <div className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold">
+              🧪 TESTING MODE ACTIVE
+            </div>
+          )}
         </div>
 
         {/* Right Section */}
