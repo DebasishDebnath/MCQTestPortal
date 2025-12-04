@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, FileText, Settings, Sigma } from "lucide-react";
+import { LayoutDashboard, FilePlus, Settings, FolderOpen } from "lucide-react";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -9,8 +9,8 @@ function Sidebar() {
 
   const menuItems = [
     { path: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { path: "/admin/test-details", label: "Test Details", icon: FileText },
-    { path: "/admin/all-test", label: "All Tests", icon: Sigma },
+    { path: "/admin/create-test", label: "Create Test", icon: FilePlus },
+    { path: "/admin/all-test", label: "All Tests", icon: FolderOpen },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
 

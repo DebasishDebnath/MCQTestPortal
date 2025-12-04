@@ -1,28 +1,75 @@
 import React, { useState } from "react";
-import { ChevronDown, ArrowRight, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, Upload } from "lucide-react";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import InputAdornment from "@mui/material/InputAdornment";
+import { inputBaseClasses } from "@mui/material/InputBase";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import dayjs from "dayjs";
+import { useHttp } from "../../hooks/useHttp";
 
 function TestDetailComponent() {
+  const { post, loading: isSubmitting, error } = useHttp();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    department: "Computer Science and Technology",
-    semester: "5th Semester",
-    subjectName: "Machine Learning",
-    subjectCode: "PCCS572",
-    testCategory: "Midterm Examination",
-    testType: "Subjective",
-    numberOfQuestions: "60",
-    dateTime: "10 Nov , 9:00 AM",
+    testName: "",
+    semester: "",
+    department: "",
+    totalMarks: "",
+    duration: "",
+    testType: "Online",
+    startDateTime: dayjs(),
+    endDateTime: dayjs().add(1, "hour"),
+    examSupervisiorEmail: "",
   });
 
   const [questionsFile, setQuestionsFile] = useState(null);
   const [studentsFile, setStudentsFile] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", {
-      details: formData,
-      questionsFile: questionsFile,
-      studentsFile: studentsFile,
-    });
+    const token = localStorage.getItem("userToken");
+
+    const data = new FormData();
+    data.append("title", formData.testName);
+    data.append("semester", formData.semester);
+    data.append("department", formData.department);
+    data.append("totalMarks", formData.totalMarks);
+    data.append("durationMinutes", formData.duration);
+    data.append("testMode", formData.testType);
+    data.append("startDate", formData.startDateTime.toISOString());
+    data.append("endDate", formData.endDateTime.toISOString());
+    if (formData.testType === "Offline") {
+      data.append("supervisorEmail", formData.examSupervisiorEmail);
+    }
+    if (questionsFile) {
+      data.append("questions", questionsFile);
+    }
+    if (studentsFile) {
+      data.append("students", studentsFile);
+    }
+
+    try {
+      const response = await post("/api/exam/create", data, {
+        Authorization: `Bearer ${token}`,
+      });
+      console.log("Exam created successfully:", response);
+      navigate("/admin/all-test"); // Navigate to all tests page on success
+      // Navigate to success page with state
+      // navigate("/admin/success", {
+      //   state: {
+      //     date: formData.startDateTime.format("MMM DD, YYYY"),
+      //     startTime: formData.startDateTime.format("hh:mm A"),
+      //     endTime: formData.endDateTime.format("hh:mm A"),
+      //   },
+      // });
+    } catch (err) {
+      console.error("Failed to create exam:", err);
+      // You can display the 'error' state to the user
+    }
   };
 
   const handleQuestionsFileChange = (e) => {
@@ -64,288 +111,277 @@ function TestDetailComponent() {
       onSubmit={handleSubmit}
       className="w-full max-w-7xl bg-white rounded-3xl shadow-xl p-10 flex flex-col gap-10"
     >
-      <div className="flex gap-12">
-        <div className="w-1/2">
-          <h2 className="text-2xl font-semibold text-blue-theme mb-6">
-            Test Details
-          </h2>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <div className="flex gap-12">
+          <div className="w-1/2">
+            <h2 className="text-2xl font-semibold text-blue-theme mb-6">
+              Test Details
+            </h2>
 
-          <div className="flex flex-col gap-4">
-            {/* Department */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">
-                Department *
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
-                  value={formData.department}
-                  onChange={(e) =>
-                    setFormData({ ...formData, department: e.target.value })
-                  }
-                >
-                  <option>Computer Science and Technology</option>
-                  <option>Information Technology</option>
-                  <option>Electronics Engineering</option>
-                </select>
-                <ChevronDown
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                  size={20}
-                />
-              </div>
-            </div>
+            <div className="flex flex-col gap-6">
+              {/* Department */}
+              <TextField
+                required
+                id="department"
+                label="Test Name"
+                fullWidth
+                value={formData.testName}
+                onChange={(e) =>
+                  setFormData({ ...formData, testName: e.target.value })
+                }
+              />
 
-            {/* Semester */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">
-                Semester *
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
-                  value={formData.semester}
-                  onChange={(e) =>
-                    setFormData({ ...formData, semester: e.target.value })
-                  }
-                >
-                  <option>5th Semester</option>
-                  <option>6th Semester</option>
-                  <option>7th Semester</option>
-                </select>
-                <ChevronDown
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                  size={20}
-                />
-              </div>
-            </div>
+              {/* Semester */}
+              <TextField
+                id="semester"
+                label="Semester"
+                fullWidth
+                value={formData.semester}
+                onChange={(e) =>
+                  setFormData({ ...formData, semester: e.target.value })
+                }
+              />
 
-            {/* Subject Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">
-                Subject Name *
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
-                  value={formData.subjectName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, subjectName: e.target.value })
-                  }
-                >
-                  <option>Machine Learning</option>
-                  <option>Data Structures</option>
-                  <option>Algorithms</option>
-                </select>
-                <ChevronDown
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                  size={20}
-                />
-              </div>
-            </div>
+              {/* Subject Name */}
+              <TextField
+                required
+                id="department"
+                label="Department"
+                fullWidth
+                value={formData.department}
+                onChange={(e) =>
+                  setFormData({ ...formData, department: e.target.value })
+                }
+              />
 
-            {/* Subject Code */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">
-                Subject Code *
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
-                  value={formData.subjectCode}
-                  onChange={(e) =>
-                    setFormData({ ...formData, subjectCode: e.target.value })
-                  }
-                >
-                  <option>PCCS572</option>
-                  <option>PCCS573</option>
-                  <option>PCCS574</option>
-                </select>
-                <ChevronDown
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                  size={20}
-                />
-              </div>
-            </div>
-
-            {/* Test Category */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">
-                Test Category *
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
-                  value={formData.testCategory}
-                  onChange={(e) =>
-                    setFormData({ ...formData, testCategory: e.target.value })
-                  }
-                >
-                  <option>Midterm Examination</option>
-                  <option>Final Examination</option>
-                  <option>Quiz</option>
-                </select>
-                <ChevronDown
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                  size={20}
-                />
-              </div>
-            </div>
-
-            {/* Test Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">
-                Test Type *
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
-                  value={formData.testType}
-                  onChange={(e) =>
-                    setFormData({ ...formData, testType: e.target.value })
-                  }
-                >
-                  <option>Subjective</option>
-                  <option>Objective</option>
-                  <option>Mixed</option>
-                </select>
-                <ChevronDown
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                  size={20}
-                />
-              </div>
-            </div>
-
-            {/* Number of Questions */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">
-                Number of Questions *
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
-                value={formData.numberOfQuestions}
+              {/* Test Type */}
+              <TextField
+                id="test-mode"
+                select
+                required
+                fullWidth
+                label="Test Mode"
+                value={formData.testType}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    numberOfQuestions: e.target.value,
+                    testType: e.target.value,
+                    // Clear supervisor email if switching to Online
+                    examSupervisiorEmail:
+                      e.target.value === "Online"
+                        ? ""
+                        : formData.examSupervisiorEmail,
                   })
                 }
-              />
-            </div>
+              >
+                <MenuItem value="Online">Online</MenuItem>
+                <MenuItem value="Offline">Offline</MenuItem>
+              </TextField>
 
-            {/* Date & Time */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">
-                Date & Time *
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
-                value={formData.dateTime}
+              <TextField
+                required
+                id="exam-supervisior-email"
+                label="Exam Supervisior Email"
+                fullWidth
+                value={formData.examSupervisiorEmail}
                 onChange={(e) =>
-                  setFormData({ ...formData, dateTime: e.target.value })
+                  setFormData({
+                    ...formData,
+                    examSupervisiorEmail: e.target.value,
+                  })
+                }
+                hidden={formData.testType !== "Offline"}
+              />
+
+              {/* Total Marks */}
+              <TextField
+                required
+                id="total-marks"
+                label="Total Marks"
+                fullWidth
+                value={formData.totalMarks}
+                onChange={(e) =>
+                  setFormData({ ...formData, totalMarks: e.target.value })
                 }
               />
+
+              {/* Duration */}
+              <TextField
+                required
+                id="duration"
+                label="Duration"
+                fullWidth
+                value={formData.duration}
+                onChange={(e) =>
+                  setFormData({ ...formData, duration: e.target.value })
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment
+                      position="end"
+                      sx={{
+                        // Show adornment only when label is shrunk
+                        opacity: 0,
+                        pointerEvents: "none",
+                        [`[data-shrink=true] ~ .${inputBaseClasses.root} &`]: {
+                          opacity: 1,
+                          pointerEvents: "auto",
+                        },
+                        // Also show on focus
+                        [`.${inputBaseClasses.root}:focus-within &`]: {
+                          opacity: 1,
+                          pointerEvents: "auto",
+                        },
+                      }}
+                    >
+                      minutes
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              {/* Date & Time */}
+              <DateTimePicker
+                label="Start Date & Time"
+                value={formData.startDateTime}
+                onChange={(newValue) =>
+                  setFormData({ ...formData, startDateTime: newValue })
+                }
+                slotProps={{
+                  textField: {
+                    required: true,
+                    fullWidth: true,
+                    sx: {
+                      "& .MuiOutlinedInput-root": { borderRadius: "0.75rem" },
+                    },
+                  },
+                }}
+              />
+              <DateTimePicker
+                label="End Date & Time"
+                value={formData.endDateTime}
+                onChange={(newValue) =>
+                  setFormData({ ...formData, endDateTime: newValue })
+                }
+                slotProps={{
+                  textField: {
+                    required: true,
+                    fullWidth: true,
+                    sx: {
+                      "& .MuiOutlinedInput-root": { borderRadius: "0.75rem" },
+                    },
+                  },
+                }}
+              />
             </div>
           </div>
-        </div>
-        <div className="w-1/2 flex flex-col gap-10 h-full">
-          <div className="flex flex-col gap-3 h-1/2">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-semibold text-blue-theme">
-                Upload Questions
-              </h2>
-              <p className="text-sm text-gray-400">
-                Upload Excel files upto 20 kb
-              </p>
-            </div>
+          <div className="w-1/2 flex flex-col gap-10 h-full">
+            <div className="flex flex-col gap-3 h-1/2">
+              <div className="flex flex-col gap-2">
+                <h2 className="text-2xl font-semibold text-blue-theme">
+                  Upload Questions
+                </h2>
+                <p className="text-sm text-gray-400">
+                  Upload Excel files upto 20 kb
+                </p>
+              </div>
 
-            {/* Upload Area */}
-            <div
-              className="border-2 border-dashed border-blue-900 rounded-xl bg-blue-50 p-12 text-center h-full flex items-center justify-center"
-              onDragOver={handleDragOver}
-              onDrop={handleQuestionsDrop}
-            >
-              <div className="flex flex-col items-center gap-4">
-                <img src="/upload.png" alt="upload" className="w-10" />
+              {/* Upload Area */}
+              <div
+                className="border-2 border-dashed border-blue-900 rounded-xl bg-blue-50 p-10 text-center h-full flex items-center justify-center"
+                onDragOver={handleDragOver}
+                onDrop={handleQuestionsDrop}
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <img src="/upload.png" alt="upload" className="w-10" />
 
-                <div>
-                  <p className="text-gray-800 mb-1">
-                    {questionsFile
-                      ? questionsFile.name
-                      : "Drag your file(s) to start uploading"}
-                  </p>
-                  <p className="text-gray-500 text-sm">OR</p>
-                </div>
-
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".xlsx,.xls"
-                    onChange={handleQuestionsFileChange}
-                  />
-                  <div className="px-6 py-2 border-2 bg-white border-blue-900 rounded-lg text-blue-theme font-medium hover:bg-gray-50 transition-colors">
-                    Browse files
+                  <div>
+                    <p className="text-gray-800 mb-1">
+                      {questionsFile
+                        ? questionsFile.name
+                        : "Drag your file(s) to start uploading"}
+                    </p>
+                    <p className="text-gray-500 text-sm">OR</p>
                   </div>
-                </label>
+
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept=".xlsx,.xls"
+                      onChange={handleQuestionsFileChange}
+                    />
+                    <div className="px-6 py-2 border-2 bg-white border-blue-900 rounded-lg text-blue-theme font-medium hover:bg-gray-50 transition-colors">
+                      Browse files
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 h-1/2">
+              <div className="flex flex-col gap-2">
+                <h2 className="text-2xl font-semibold text-blue-theme">
+                  Upload Student Details
+                </h2>
+                <p className="text-sm text-gray-400">
+                  Upload Excel files upto 20 kb
+                </p>
+              </div>
+
+              {/* Upload Area */}
+              <div
+                className="border-2 border-dashed border-blue-900 rounded-xl bg-blue-50 p-10 text-center h-full flex items-center justify-center"
+                onDragOver={handleDragOver}
+                onDrop={handleStudentsDrop}
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <img src="/upload.png" alt="upload" className="w-10" />
+
+                  <div>
+                    <p className="text-gray-800 mb-1">
+                      {studentsFile
+                        ? studentsFile.name
+                        : "Drag your file(s) to start uploading"}
+                    </p>
+                    <p className="text-gray-500 text-sm">OR</p>
+                  </div>
+
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept=".xlsx,.xls"
+                      onChange={handleStudentsFileChange}
+                    />
+                    <div className="px-6 py-2 border-2 bg-white border-blue-900 rounded-lg text-blue-theme font-medium hover:bg-gray-50 transition-colors">
+                      Browse files
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-3 h-1/2">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-semibold text-blue-theme">
-                Upload Student Details
-              </h2>
-              <p className="text-sm text-gray-400">
-                Upload Excel files upto 20 kb
-              </p>
-            </div>
-
-            {/* Upload Area */}
-            <div
-              className="border-2 border-dashed border-blue-900 rounded-xl bg-blue-50 p-12 text-center h-full flex items-center justify-center"
-              onDragOver={handleDragOver}
-              onDrop={handleStudentsDrop}
-            >
-              <div className="flex flex-col items-center gap-4">
-                <img src="/upload.png" alt="upload" className="w-10" />
-
-                <div>
-                  <p className="text-gray-800 mb-1">
-                    {studentsFile
-                      ? studentsFile.name
-                      : "Drag your file(s) to start uploading"}
-                  </p>
-                  <p className="text-gray-500 text-sm">OR</p>
-                </div>
-
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".xlsx,.xls"
-                    onChange={handleStudentsFileChange}
-                  />
-                  <div className="px-6 py-2 border-2 bg-white border-blue-900 rounded-lg text-blue-theme font-medium hover:bg-gray-50 transition-colors">
-                    Browse files
-                  </div>
-                </label>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-      {/* Submit Button for the whole form */}
-      <div className="flex justify-center">
-        <button
-          type="submit"
-          className="bg-blue-900 hover:bg-blue-950 text-white font-medium py-3 px-8 rounded-lg flex items-center justify-center gap-2 transition-colors"
-        >
-          Submit
-          <ArrowRight size={18} />
-        </button>
-      </div>
+        {/* Submit Button for the whole form */}
+        <div className="flex justify-center gap-10">
+          <button
+            type="button"
+            onClick={() => navigate("/admin/dashboard")}
+            className="bg-white hover:bg-red-500 border border-red-500 text-red-500 hover:text-white font-medium py-2 px-8 rounded-lg flex items-center justify-center gap-2 transition-colors min-w-50 cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-blue-theme text-white font-medium py-2 px-8 rounded-lg flex items-center justify-center gap-2 transition-colors min-w-50 disabled:bg-gray-400 cursor-pointer"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creating..." : "Next"}
+            <ArrowRight size={18} />
+          </button>
+        </div>
+      </LocalizationProvider>
+      {error && <div className="text-center text-red-500 mt-4">Error: {error.message}</div>}
     </form>
   );
 }

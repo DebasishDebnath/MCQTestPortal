@@ -28,7 +28,7 @@ import SubmissionSuccess from "./Page/user/SubmissionSuccess";
 
 // Admin Components
 import AllTest from "./Page/admin/AllTest";
-import TestDetails from "./Page/admin/TestDetails";
+import CreateTest from "./Page/admin/CreateTest";
 
 // Error Component
 import RouteErrorPopup from "./components/error/RouteErrorPopup";
@@ -138,7 +138,7 @@ const router = createBrowserRouter(
         />
         <Route element={<SuperAdminGuard><AdminLayout /></SuperAdminGuard>}>
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="test-details" element={<TestDetails />} />
+          <Route path="create-test" element={<CreateTest />} />
           <Route path="all-test" element={<AllTest />} />
         </Route>
         <Route path="success" element={<ScheduleSuccess />} />
