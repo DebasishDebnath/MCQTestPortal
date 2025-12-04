@@ -1,6 +1,6 @@
 import React from "react";
 import TestDetailComponent from "../../components/Admin/TestDetailComponent";
-export default function Dashboard() {
+export default function CreateTest() {
   return (
     <div className="flex min-h-screen w-full ">
       {/* Your sidebar component here */}

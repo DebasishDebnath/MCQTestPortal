@@ -39,7 +39,7 @@ function AllTestShow() {
           All Tests
         </div>
         <div className="flex gap-6 items-center text-sm">
-          <button className="border rounded-full px-10 py-2 border-indigo-400 font-semibold text-indigo-400 cursor-pointer hover:bg-indigo-400 hover:text-white transition-colors">
+          <button className="border rounded-full px-10 py-2 border-indigo-400 font-semibold text-indigo-400 cursor-pointer hover:bg-indigo-400 hover:text-white transition-colors" onClick={() => navigate("/admin/create-test")}>
             Create Test
           </button>
           <div
