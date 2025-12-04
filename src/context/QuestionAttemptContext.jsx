@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 import { useHttp } from "../hooks/useHttp";
 import { toast } from "react-hot-toast";
 
@@ -10,23 +10,39 @@ export function useQuestionAttempt() {
 
 export function QuestionAttemptProvider({ children }) {
   const { post } = useHttp();
-  const [attempts, setAttempts] = useState({}); // { [questionId]: { answered: bool, value: [], cleared: bool } }
+  const [attempts, setAttempts] = useState({});
 
-  // Helper to normalize selectedIndex to array
   const normalizeSelectedIndex = (value) => {
     if (Array.isArray(value)) return value;
     if (value === null || value === undefined) return [];
     return [value];
   };
 
-  // Save answer (create)
+  const initializeQuestion = useCallback(
+    (questionId) => {
+      setAttempts((prev) => {
+        if (prev[questionId]) return prev;
+        return {
+          ...prev,
+          [questionId]: {
+            answered: false,
+            value: [],
+            cleared: false,
+            isNew: true,
+          },
+        };
+      });
+    },
+    [setAttempts]
+  );
+
   const saveAnswer = async (examId, questionId, value) => {
     const token = localStorage.getItem("userToken");
     const selectedIndex = normalizeSelectedIndex(value);
 
     const body = {
       examId,
-      answer: { questionId, selectedIndex },
+      answer: { questionId, selectedIndex }, // <-- use selectedIndex
     };
 
     const res = await post("/api/attempts/create", body, {
@@ -37,9 +53,10 @@ export function QuestionAttemptProvider({ children }) {
       setAttempts((prev) => ({
         ...prev,
         [questionId]: {
-          answered: selectedIndex.length > 0,
+          answered: true,
           value: selectedIndex,
           cleared: false,
+          isNew: false,
         },
       }));
       return true;
@@ -48,14 +65,13 @@ export function QuestionAttemptProvider({ children }) {
     return false;
   };
 
-  // Edit answer
   const editAnswer = async (examId, questionId, value) => {
     const token = localStorage.getItem("userToken");
     const selectedIndex = normalizeSelectedIndex(value);
 
     const body = {
       examId,
-      answer: { questionId, selectedIndex },
+      answer: { questionId, selectedIndex }, // <-- use selectedIndex
     };
 
     const res = await post("/api/attempts/edit", body, {
@@ -69,6 +85,7 @@ export function QuestionAttemptProvider({ children }) {
           answered: selectedIndex.length > 0,
           value: selectedIndex,
           cleared: false,
+          isNew: false,
         },
       }));
       return true;
@@ -77,7 +94,6 @@ export function QuestionAttemptProvider({ children }) {
     return false;
   };
 
-  // Clear answer
   const clearAnswer = async (examId, questionId) => {
     const token = localStorage.getItem("userToken");
     const body = { examId, questionId };
@@ -89,7 +105,12 @@ export function QuestionAttemptProvider({ children }) {
     if (res && res.success) {
       setAttempts((prev) => ({
         ...prev,
-        [questionId]: { answered: false, value: [], cleared: true },
+        [questionId]: {
+          answered: false,
+          value: [],
+          cleared: true,
+          isNew: false,
+        },
       }));
       return true;
     }
@@ -97,9 +118,53 @@ export function QuestionAttemptProvider({ children }) {
     return false;
   };
 
+  const getAttemptStatus = useCallback(
+    (questionId) => {
+      return attempts[questionId] || { answered: false, value: [], cleared: false, isNew: true };
+    },
+    [attempts]
+  );
+
+  const isAttempted = useCallback(
+    (questionId) => {
+      const status = attempts[questionId];
+      return status && !status.isNew;
+    },
+    [attempts]
+  );
+
+  const initializeQuestions = useCallback(
+    (questionIds) => {
+      setAttempts((prev) => {
+        const updated = { ...prev };
+        questionIds.forEach((qId) => {
+          if (!updated[qId]) {
+            updated[qId] = {
+              answered: false,
+              value: [],
+              cleared: false,
+              isNew: true,
+            };
+          }
+        });
+        return updated;
+      });
+    },
+    [setAttempts]
+  );
+
   return (
     <QuestionAttemptContext.Provider
-      value={{ attempts, saveAnswer, editAnswer, clearAnswer }}
+      value={{
+        attempts,
+        saveAnswer,
+        editAnswer,
+        clearAnswer,
+        initializeQuestion,
+        getAttemptStatus,
+        isAttempted,
+        initializeQuestions,
+      }}
     >
       {children}
     </QuestionAttemptContext.Provider>

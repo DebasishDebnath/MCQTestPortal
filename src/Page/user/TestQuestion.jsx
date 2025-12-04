@@ -6,12 +6,25 @@ import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import FinalSubmission from "../../components/user/FinalSubmission";
 import { useHttp } from "../../hooks/useHttp";
 import { toast } from "react-hot-toast";
+import { useQuestionAttempt } from "../../context/QuestionAttemptContext";
 
 function TestQuestion() {
   const location = useLocation();
   const navigate = useNavigate();
   const { testid } = useParams();
   const { get, post } = useHttp();
+  
+  // Get attempt context
+  const {
+    attempts,
+    saveAnswer: saveAttempt,
+    editAnswer: editAttempt,
+    clearAnswer: clearAttempt,
+    initializeQuestion,
+    getAttemptStatus,
+    isAttempted,
+    initializeQuestions,
+  } = useQuestionAttempt();
 
   const [showFinalSubmission, setShowFinalSubmission] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -19,12 +32,9 @@ function TestQuestion() {
   const [answers, setAnswers] = useState({});
   const [markedForReview, setMarkedForReview] = useState({});
   const [visitedQuestions, setVisitedQuestions] = useState(new Set());
-
-  // ✅ Pagination states
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [loadedPages, setLoadedPages] = useState(new Set([1]));
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  // ✅ Store questions in a map by their sequential index
   const [questionMap, setQuestionMap] = useState(new Map());
   const QUESTIONS_PER_PAGE = 10;
 
@@ -47,15 +57,18 @@ function TestQuestion() {
     setTotalQuestions(receivedData.totalQuestions);
     setVisitedQuestions(new Set());
 
-    // ✅ Initialize question map with first page questions
     const initialMap = new Map();
     questionsList.forEach((q, index) => {
       initialMap.set(index, q);
     });
     setQuestionMap(initialMap);
-  }, [location.state, navigate, testid]);
+    
+    // Initialize attempt tracking for loaded questions
+    const questionIds = questionsList.map(q => q._id);
+    initializeQuestions(questionIds);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state, navigate, testid]); // Remove initializeQuestions from dependencies
 
-  // ✅ Function to load more questions
   const loadMoreQuestions = async (pageNumber) => {
     if (loadedPages.has(pageNumber) || isLoadingMore) {
       return;
@@ -72,7 +85,6 @@ function TestQuestion() {
     );
 
     if (response && response.data && response.data.questions) {
-      // ✅ Update question map with new questions
       setQuestionMap((prev) => {
         const newMap = new Map(prev);
         const startIndex = (pageNumber - 1) * QUESTIONS_PER_PAGE;
@@ -82,7 +94,6 @@ function TestQuestion() {
         return newMap;
       });
 
-      // ✅ Also update questions array for backward compatibility
       setQuestions((prev) => {
         const newQuestions = [...prev];
         const startIndex = (pageNumber - 1) * QUESTIONS_PER_PAGE;
@@ -93,6 +104,10 @@ function TestQuestion() {
       });
 
       setLoadedPages((prev) => new Set([...prev, pageNumber]));
+      
+      // Initialize attempt tracking for newly loaded questions
+      const questionIds = response.data.questions.map(q => q._id);
+      initializeQuestions(questionIds);
     } else {
       console.error("❌ Failed to load more questions");
       toast.error("Failed to load more questions");
@@ -101,7 +116,6 @@ function TestQuestion() {
     setIsLoadingMore(false);
   };
 
-  // ✅ Check if we need to load more questions when navigating
   const checkAndLoadQuestions = async (targetIndex) => {
     const pageNeeded = Math.ceil((targetIndex + 1) / QUESTIONS_PER_PAGE);
 
@@ -121,7 +135,6 @@ function TestQuestion() {
     };
   }, []);
 
-  // ✅ Generate question grid data - FIXED
   const getQuestionGridData = () => {
     const allQuestions = Array.from({ length: totalQuestions }, (_, index) => {
       const loadedQuestion = questionMap.get(index);
@@ -135,8 +148,8 @@ function TestQuestion() {
       }
 
       const questionId = loadedQuestion._id;
-      const hasAnswer =
-        answers[questionId] !== undefined &&
+      const attemptStatus = getAttemptStatus(questionId);
+      const hasAnswer = answers[questionId] !== undefined &&
         (Array.isArray(answers[questionId])
           ? answers[questionId].length > 0
           : answers[questionId] !== null);
@@ -148,7 +161,7 @@ function TestQuestion() {
       if (isVisited) {
         if (isMarked) {
           status = "marked";
-        } else if (hasAnswer) {
+        } else if (hasAnswer || attemptStatus.answered) {
           status = "answered";
         } else {
           status = "unanswered";
@@ -190,21 +203,54 @@ function TestQuestion() {
     }
   };
 
+  // Main save/update logic based on attempt state
+  const saveOrUpdateAnswer = async () => {
+    if (!currentQuestion) return false;
+
+    const questionId = currentQuestion._id;
+    const answerValue = answers[questionId];
+    const attemptStatus = getAttemptStatus(questionId);
+
+    // If no answer selected, skip
+    if (answerValue === undefined || 
+        (Array.isArray(answerValue) && answerValue.length === 0)) {
+      return true;
+    }
+
+    let selectedIndex = Array.isArray(answerValue) ? answerValue : [answerValue];
+
+    // Decide whether to create or edit based on attempt state
+    if (attemptStatus.isNew || attemptStatus.cleared) {
+      // Create new attempt
+      return await saveAttempt(testid, questionId, selectedIndex);
+    } else if (attemptStatus.answered) {
+      // Update existing attempt
+      return await editAttempt(testid, questionId, selectedIndex);
+    }
+
+    return true;
+  };
+
   const handleNext = async () => {
-    const saved = await saveAnswer();
+    const saved = await saveOrUpdateAnswer();
     if (!saved) return;
+    
     if (currentQuestionIndex < totalQuestions - 1) {
       const nextIndex = currentQuestionIndex + 1;
-
       await checkAndLoadQuestions(nextIndex);
-
       setVisitedQuestions((prev) => new Set([...prev, nextIndex]));
       setCurrentQuestionIndex(nextIndex);
+      
+      // Initialize next question if needed
+      const nextQuestion = questionMap.get(nextIndex);
+      if (nextQuestion) {
+        initializeQuestion(nextQuestion._id);
+      }
     }
   };
 
   const handlePrevious = async () => {
-    const saved = await saveAnswer(); // ✅ Save current answer before going back
+    const saved = await saveOrUpdateAnswer();
     if (!saved) return;
 
     if (currentQuestionIndex > 0) {
@@ -215,31 +261,18 @@ function TestQuestion() {
   };
 
   const handleClearResponse = async () => {
-    const token = localStorage.getItem("userToken");
     const questionId = currentQuestion._id;
 
-    const body = {
-      examId: testid,
-      questionId: questionId,
-    };
+    const success = await clearAttempt(testid, questionId);
 
-    const response = await post("/api/attempts/delete", body, {
-      Authorization: `Bearer ${token}`,
-    });
-
-    if (response && response.success) {
+    if (success) {
       const updatedAnswers = { ...answers };
       delete updatedAnswers[questionId];
       setAnswers(updatedAnswers);
 
-      // Save updated answers to localStorage
-      localStorage.setItem(`answers_${testid}`, JSON.stringify(updatedAnswers));
-
       const updatedMarked = { ...markedForReview };
       delete updatedMarked[questionId];
       setMarkedForReview(updatedMarked);
-    } else {
-      toast.error("Failed to clear response");
     }
   };
 
@@ -251,44 +284,17 @@ function TestQuestion() {
   };
 
   const handleQuestionClick = async (index) => {
+    // Save current question before navigating
+    await saveOrUpdateAnswer();
+    
     await checkAndLoadQuestions(index);
-
     setVisitedQuestions((prev) => new Set([...prev, index]));
     setCurrentQuestionIndex(index);
-  };
-  const saveAnswer = async () => {
-    const token = localStorage.getItem("userToken");
-    const answerValue = answers[currentQuestion._id];
     
-    // ✅ Always send as array - wrap single answer in array
-    let selectedIndex = [];
-    
-    if (answerValue !== undefined) {
-      if (Array.isArray(answerValue)) {
-        selectedIndex = answerValue;
-      } else {
-        selectedIndex = [answerValue]; // Wrap single answer in array
-      }
-    }
-
-    const body = {
-      examId: testid,
-      answer: {
-        questionId: currentQuestion._id,
-        selectedIndex: selectedIndex,
-      },
-    };
-    
-    const response = await post(`/api/attempts/create`, body, {
-      Authorization: `Bearer ${token}`,
-    });
-    
-    if (response && response.success) {
-      return true;
-    } else {
-      console.error("❌ Failed to save answer");
-      toast.error("Failed to save answer");
-      return false;
+    // Initialize clicked question if needed
+    const clickedQuestion = questionMap.get(index);
+    if (clickedQuestion) {
+      initializeQuestion(clickedQuestion._id);
     }
   };
 
@@ -406,7 +412,7 @@ function TestQuestion() {
                         className="max-w-xs rounded"
                       />
                     ) : (
-                      <span>{optionObj.text}</span> // <-- FIXED HERE
+                      <span>{optionObj.text}</span>
                     )}
                   </label>
                 </div>

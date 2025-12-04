@@ -3,11 +3,18 @@ import { IoWarningOutline } from "react-icons/io5";
 import { LuClock } from "react-icons/lu";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { useParams, useNavigate } from "react-router-dom";
+import { useHttp } from "../../hooks/useHttp";
+import { toast } from "react-hot-toast";
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function FinalSubmission({ onClose, questions, answers, markedForReview, questionGridData }) {
+  const { testid } = useParams();
+  const navigate = useNavigate();
+  const { post } = useHttp();
+
   // Calculate statistics from actual data
   const totalQuestions = questions?.length || 0;
   const attempted = Object.keys(answers || {}).length;
@@ -41,6 +48,19 @@ function FinalSubmission({ onClose, questions, answers, markedForReview, questio
         enabled: true,
       },
     },
+  };
+
+  const handleFinishTest = async () => {
+    const token = localStorage.getItem("userToken");
+    const res = await post("/api/exam/submit", { examId: testid }, {
+      Authorization: `Bearer ${token}`,
+    });
+    if (res && res.success) {
+      toast.success("Test submitted successfully!");
+      navigate(`/test/thankyou/${testid}`); // or wherever you want to redirect
+    } else {
+      toast.error(res?.message || "Failed to submit test");
+    }
   };
 
   return (
@@ -139,7 +159,10 @@ function FinalSubmission({ onClose, questions, answers, markedForReview, questio
 
       {/* Footer Buttons */}
       <div className="bg-white border-t-2 border-gray-300 py-4 px-8 flex gap-4 items-center">
-        <button className="cursor-pointer py-2 px-8 bg-red-700 hover:bg-red-800 text-white rounded-full text-sm font-medium transition-colors">
+        <button
+          className="cursor-pointer py-2 px-8 bg-red-700 hover:bg-red-800 text-white rounded-full text-sm font-medium transition-colors"
+          onClick={handleFinishTest}
+        >
           Finish test
         </button>
         <button onClick={onClose} className="cursor-pointer py-2 px-8 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 rounded-full text-sm font-medium transition-colors">
