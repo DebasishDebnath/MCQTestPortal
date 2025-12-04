@@ -34,6 +34,7 @@ import TestDetails from "./Page/admin/TestDetails";
 import RouteErrorPopup from "./components/error/RouteErrorPopup";
 import UserDashboard from "./Page/user/UserDashboard";
 import UserResults from "./Page/user/UserCompletedTests";
+import ScheduleSuccess from "./Page/admin/ScheduleSuccess";
 
 // ---------------- AUTH HELPERS ----------------
 
@@ -140,6 +141,7 @@ const router = createBrowserRouter(
           <Route path="test-details" element={<TestDetails />} />
           <Route path="all-test" element={<AllTest />} />
         </Route>
+        <Route path="success" element={<ScheduleSuccess />} />
       </Route>
     </>
   )
