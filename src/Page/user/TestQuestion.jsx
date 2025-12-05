@@ -46,7 +46,12 @@ function TestQuestion() {
     console.log("[PROCTORING]", msg);
   };
 
-  const proctorHook = useVideoProctor(videoRef, handleProctoringHardWarning, handleProctoringLog);
+  const proctorHook = useVideoProctor(
+    videoRef,
+    handleProctoringHardWarning,
+    handleProctoringLog,
+    testid // Pass testid here
+  );
 
   // 🚨 Legacy AI Proctoring Hook - start immediately when component mounts (SILENT)
   const { warningCount, isProctoringReady, isInitializing, isExamActive } =
