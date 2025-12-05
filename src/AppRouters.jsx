@@ -19,6 +19,7 @@ import AdminAuthLayout from "./Layout/AdminAuthLayout";
 import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Dashboard from "./Page/admin/Dashboard";
+import StudentAnalytics from "./Page/admin/StudentAnalytics";
 // User Components
 import Instruction from "./Page/user/Instruction";
 import SystemCompatibility from "./Page/user/SystemCompatibility";
@@ -28,12 +29,12 @@ import SubmissionSuccess from "./Page/user/SubmissionSuccess";
 // Admin Components
 import AllTest from "./Page/admin/AllTest";
 import CreateTest from "./Page/admin/CreateTest";
+import ScheduleSuccess from "./Page/admin/ScheduleSuccess";
 
 // Error Component
 import RouteErrorPopup from "./components/error/RouteErrorPopup";
 import UserDashboard from "./Page/user/UserDashboard";
 import UserResults from "./Page/user/UserCompletedTests";
-import ScheduleSuccess from "./Page/admin/ScheduleSuccess";
 
 // ---------------- AUTH HELPERS ----------------
 
@@ -145,8 +146,9 @@ const router = createBrowserRouter(
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="create-test" element={<CreateTest />} />
           <Route path="all-test" element={<AllTest />} />
+          <Route path="student-analytics" element={<StudentAnalytics />} />
+          <Route path="success" element={<ScheduleSuccess />} />
         </Route>
-        <Route path="success" element={<ScheduleSuccess />} />
       </Route>
     </>
   )

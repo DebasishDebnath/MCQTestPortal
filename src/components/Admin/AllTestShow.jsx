@@ -73,7 +73,7 @@ function AllTestShow() {
         {!loading &&
           !error &&
           tests.length > 0 &&
-          tests.map((test) => (
+          tests.slice(0, 2).map((test) => (
             <SeparateTest key={test.id || test._id} testData={test} />
           ))}
       </div>

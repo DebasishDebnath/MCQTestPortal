@@ -10,8 +10,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import { useHttp } from "../../hooks/useHttp";
+import * as XLSX from "xlsx";
 
-function TestDetailComponent() {
+function TestDetailComponent({ onProceed, initialData }) {
   const { post, loading: isSubmitting, error } = useHttp();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -29,39 +30,54 @@ function TestDetailComponent() {
   const [questionsFile, setQuestionsFile] = useState(null);
   const [studentsFile, setStudentsFile] = useState(null);
 
+  React.useEffect(() => {
+    // If there's initial data (from going back from preview), pre-fill the form
+    if (initialData) {
+      const { details } = initialData;
+      setFormData({
+        ...details,
+        // Convert ISO strings back to dayjs objects for the DateTimePicker
+        startDateTime: dayjs(details.startDateTime),
+        endDateTime: dayjs(details.endDateTime),
+      });
+    }
+  }, [initialData]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("userToken");
-
-    const payload = {
-      title: formData.testName,
-      semester: formData.semester,
-      department: formData.department,
-      totalMarks: formData.totalMarks,
-      durationMinutes: formData.duration,
-      testMode: formData.testType,
-      startDate: formData.startDateTime.toISOString(),
-      endDate: formData.endDateTime.toISOString(),
-      supervisorEmail: formData.testType === "Offline" ? formData.examSupervisiorEmail : undefined,
-    };
-
-    try {
-      const response = await post("/api/exam/create", payload, {
-        Authorization: `Bearer ${token}`,
-      });
-      console.log("Exam created successfully:", response);
-      // Navigate to success page with state
-      // navigate("/admin/success", {
-      //   state: {
-      //     date: formData.startDateTime.format("MMM DD, YYYY"),
-      //     startTime: formData.startDateTime.format("hh:mm A"),
-      //     endTime: formData.endDateTime.format("hh:mm A"),
-      //   },
-      // });
-    } catch (err) {
-      console.error("Failed to create exam:", err);
-      // You can display the 'error' state to the user
+    if (!questionsFile) {
+      alert("Please upload a questions file.");
+      return;
     }
+
+    // 1. Read and parse the Excel file
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const data = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet);
+
+      // 2. Prepare data for storage
+      const testPreviewData = {
+        details: {
+          ...formData,
+          // Convert dayjs objects to strings for JSON serialization
+          startDateTime: formData.startDateTime.toISOString(),
+          endDateTime: formData.endDateTime.toISOString(),
+        },
+        questions: json,
+        files: {
+          questionsFileName: questionsFile?.name,
+          studentsFileName: studentsFile?.name,
+        },
+      };
+
+      // 3. Pass data up to the parent component
+      onProceed(testPreviewData);
+    };
+    reader.readAsArrayBuffer(questionsFile);
   };
 
   const handleQuestionsFileChange = (e) => {
