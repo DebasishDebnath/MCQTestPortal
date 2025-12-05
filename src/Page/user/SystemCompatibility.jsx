@@ -16,59 +16,83 @@ function SystemCompatibility() {
   const [loading, setLoading] = useState(true);
   const [cameraError, setCameraError] = useState("");
   const [micError, setMicError] = useState("");
+  const [streamRef, setStreamRef] = useState(null);
 
-  // CAMERA CHECK
-  async function checkCamera() {
-    console.log("🎥 Checking camera access...");
+  // COMBINED CAMERA + MIC CHECK (single permission request)
+  async function checkCameraAndMic() {
+    console.log("🎥🎤 Checking camera + microphone access...");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      console.log("✅ Camera access granted");
-      setCameraOk(true);
-      setCameraError("");
-      // Stop the stream after checking
-      stream.getTracks().forEach(track => track.stop());
-    } catch (error) {
-      console.error("❌ Camera access failed:", error.name, error.message);
-      setCameraOk(false);
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "user", width: 1280, height: 720 },
+        audio: true 
+      });
       
-      // Set user-friendly error messages
+      console.log("✅ Camera + Microphone access granted");
+      
+      // Check if we actually got video and audio tracks
+      const videoTracks = stream.getVideoTracks();
+      const audioTracks = stream.getAudioTracks();
+      
+      if (videoTracks.length > 0) {
+        setCameraOk(true);
+        setCameraError("");
+      } else {
+        setCameraOk(false);
+        setCameraError("Camera track not available");
+      }
+      
+      if (audioTracks.length > 0) {
+        setMicOk(true);
+        setMicError("");
+      } else {
+        setMicOk(false);
+        setMicError("Microphone track not available");
+      }
+      
+      // ✅ Store stream in sessionStorage to reuse in TestQuestion
+      sessionStorage.setItem(`mediaStream_${testid}`, JSON.stringify({
+        timestamp: Date.now(),
+        hasVideo: videoTracks.length > 0,
+        hasAudio: audioTracks.length > 0,
+      }));
+      console.log("💾 Stream permission cached in sessionStorage");
+      
+      // Store stream reference to reuse
+      setStreamRef(stream);
+      
+    } catch (error) {
+      console.error("❌ Camera/Mic access failed:", error.name, error.message);
+      
+      // Handle permission errors
       if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-        setCameraError("Camera permission denied. Please allow camera access.");
-
+        setCameraError("Permission denied. Please allow camera access in browser settings.");
+        setMicError("Permission denied. Please allow microphone access in browser settings.");
+        setCameraOk(false);
+        setMicOk(false);
+        
+        // Show helpful toast
+        toast.error(
+          "⚠️ Camera & Microphone Required:\n\n1. Click camera icon in address bar\n2. Select 'Allow' for both\n3. Refresh page",
+          { duration: 8000 }
+        );
+        
       } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
         setCameraError("No camera found on this device.");
-      } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
-        setCameraError("Camera is already in use by another application.");
-      } else {
-        setCameraError("Failed to access camera. Please check your device.");
-      }
-    }
-  }
-
-  // MICROPHONE CHECK
-  async function checkMic() {
-    console.log("🎤 Checking microphone access...");
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log("✅ Microphone access granted");
-      setMicOk(true);
-      setMicError("");
-      // Stop the stream after checking
-      stream.getTracks().forEach(track => track.stop());
-    } catch (error) {
-      console.error("❌ Microphone access failed:", error.name, error.message);
-      setMicOk(false);
-      
-      // Set user-friendly error messages
-      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-        setMicError("Microphone permission denied. Please allow microphone access.");
-
-      } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
         setMicError("No microphone found on this device.");
+        setCameraOk(false);
+        setMicOk(false);
+        
       } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
-        setMicError("Microphone is already in use by another application.");
+        setCameraError("Camera/Mic already in use by another application.");
+        setMicError("Camera/Mic already in use by another application.");
+        setCameraOk(false);
+        setMicOk(false);
+        
       } else {
-        setMicError("Failed to access microphone. Please check your device.");
+        setCameraError("Failed to access camera. Check device settings.");
+        setMicError("Failed to access microphone. Check device settings.");
+        setCameraOk(false);
+        setMicOk(false);
       }
     }
   }
@@ -76,19 +100,18 @@ function SystemCompatibility() {
   // NETWORK CHECK
   async function checkNetwork() {
     console.log("🌐 Checking network stability...");
-    const start = Date.now();
     try {
-      await fetch("https://www.google.com/generate_204", { mode: "no-cors" });
+      const start = Date.now();
+      const response = await fetch("https://www.google.com/generate_204", { 
+        mode: "no-cors",
+        cache: "no-cache"
+      });
       const latency = Date.now() - start;
       console.log(`✅ Network check completed in ${latency}ms`);
-      setNetworkOk(latency < 1000);
-      if (latency >= 1000) {
-
-      }
+      setNetworkOk(true);
     } catch (error) {
       console.error("❌ Network check failed:", error);
       setNetworkOk(false);
-
     }
   }
 
@@ -100,26 +123,42 @@ function SystemCompatibility() {
       // Check if browser supports getUserMedia
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         console.error("❌ Browser doesn't support getUserMedia");
-
         setCameraOk(false);
         setMicOk(false);
+        setCameraError("Your browser doesn't support camera access");
+        setMicError("Your browser doesn't support microphone access");
         setLoading(false);
         return;
       }
 
-      await checkCamera();
-      await checkMic();
+      // Run checks in sequence
+      await checkCameraAndMic();
       await checkNetwork();
+      
       setLoading(false);
       console.log("✅ All compatibility checks completed");
     }
 
     runChecks();
+
+    // Cleanup: stop stream on unmount
+    return () => {
+      if (streamRef) {
+        streamRef.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
 
   // Request full screen and navigate to instruction
   const handleProceed = () => {
     console.log("🚀 Proceeding to instructions...");
+    
+    // ✅ Stop the test stream before navigation (proctoring will request fresh one)
+    if (streamRef) {
+      streamRef.getTracks().forEach(track => track.stop());
+      setStreamRef(null);
+    }
+    
     if (cameraOk && micOk && networkOk) {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
@@ -232,7 +271,7 @@ function SystemCompatibility() {
               <div className="flex items-center gap-3 mb-6">
                 <ImSpinner8 className="animate-spin text-gray-500 text-2xl" />
                 <span className="text-gray-theme poppins-semibold">
-                  performing compatibility tests...
+                  Performing compatibility tests...
                 </span>
               </div>
             ) : (
@@ -279,14 +318,14 @@ function SystemCompatibility() {
             {/* Proceed Button */}
             <button
               disabled={loading || !(cameraOk && micOk && networkOk)}
-              className={`py-1.5 px-10 text-white rounded-full flex items-center justify-center gap-4 mt-10 ${
+              className={`w-full py-3 px-10 text-white rounded-full flex items-center justify-center gap-4 mt-10 font-semibold ${
                 cameraOk && micOk && networkOk
                   ? "bg-blue-theme cursor-pointer hover:bg-blue-600"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
               onClick={handleProceed}
             >
-              Proceed
+              Proceed to Instructions
             </button>
           </div>
         </div>
