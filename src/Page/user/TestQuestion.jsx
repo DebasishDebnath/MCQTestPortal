@@ -8,6 +8,7 @@ import { useHttp } from "../../hooks/useHttp";
 import { toast } from "react-hot-toast";
 import { useQuestionAttempt } from "../../context/QuestionAttemptContext";
 import { useProctoring } from "../../hooks/useProctoring";
+import useVideoProctor from "../../hooks/useVideoProctor";
 
 function TestQuestion() {
   const location = useLocation();
@@ -26,8 +27,29 @@ function TestQuestion() {
     initializeQuestions,
   } = useQuestionAttempt();
 
-  // 🚨 AI Proctoring Hook - start immediately when component mounts (SILENT)
-  const { videoRef, warningCount, isProctoringReady, isInitializing, isExamActive } =
+  // 🎥 Video Proctoring Hook
+  const videoRef = React.useRef(null);
+  const [proctoringLogs, setProctoringLogs] = useState([]);
+  const [hardWarnings, setHardWarnings] = useState(0);
+
+  const handleProctoringHardWarning = (reason, count) => {
+    toast.error(`⚠️ Hard Warning (${count}/3): ${reason}`, { duration: 3000 });
+    setHardWarnings(count);
+
+    if (count >= 3) {
+      handleAutoExamSubmit("Multiple proctoring violations detected!");
+    }
+  };
+
+  const handleProctoringLog = (msg) => {
+    setProctoringLogs((prev) => [...prev, msg]);
+    console.log("[PROCTORING]", msg);
+  };
+
+  const proctorHook = useVideoProctor(videoRef, handleProctoringHardWarning, handleProctoringLog);
+
+  // 🚨 Legacy AI Proctoring Hook - start immediately when component mounts (SILENT)
+  const { warningCount, isProctoringReady, isInitializing, isExamActive } =
     useProctoring(testid, true, true);
 
   const [showFinalSubmission, setShowFinalSubmission] = useState(false);
@@ -37,17 +59,33 @@ function TestQuestion() {
   const [markedForReview, setMarkedForReview] = useState({});
   const [visitedQuestions, setVisitedQuestions] = useState(new Set());
   const [totalQuestions, setTotalQuestions] = useState(0);
-  const [durationMinutes, setDurationMinutes] = useState(0); // ✅ ADD THIS STATE
+  const [durationMinutes, setDurationMinutes] = useState(0);
   const [loadedPages, setLoadedPages] = useState(new Set([1]));
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [questionMap, setQuestionMap] = useState(new Map());
   const QUESTIONS_PER_PAGE = 10;
 
+  // Start video proctoring when component mounts
+  useEffect(() => {
+    const startProctoring = async () => {
+      const started = await proctorHook.start();
+      if (!started) {
+        console.warn("Video proctoring failed to start");
+      }
+    };
+
+    startProctoring();
+
+    return () => {
+      proctorHook.stop();
+    };
+  }, []);
+
   // Only block browser navigation (beforeunload) - F5 is already handled in useProctoring
   useEffect(() => {
     const blockBeforeUnload = (e) => {
       e.preventDefault();
-      e.returnValue = ""; // Required for Chrome
+      e.returnValue = "";
       return "Are you sure you want to leave? Your exam progress may be lost.";
     };
 
@@ -63,7 +101,6 @@ function TestQuestion() {
     const handleAutoSubmit = async (event) => {
       const answeredCount = Object.keys(answers).length;
       
-      // Save final state before redirect
       const token = localStorage.getItem("userToken");
       try {
         await post("/api/exam/submit", { examId: testid }, {
@@ -73,7 +110,6 @@ function TestQuestion() {
         console.error("Auto-submit error:", error);
       }
 
-      // Navigate with answered count
       navigate(`/test/thankyou/${testid}`, { 
         state: { answered: answeredCount },
         replace: true 
@@ -102,7 +138,7 @@ function TestQuestion() {
 
     setQuestions(questionsList);
     setTotalQuestions(receivedData.totalQuestions);
-    setDurationMinutes(receivedData.durationMinutes || 120); // ✅ SET DURATION (default 120)
+    setDurationMinutes(receivedData.durationMinutes || 120);
     setVisitedQuestions(new Set());
 
     const initialMap = new Map();
@@ -179,6 +215,24 @@ function TestQuestion() {
       );
     };
   }, []);
+
+  const handleAutoExamSubmit = async (reason) => {
+    const answeredCount = Object.keys(answers).length;
+    
+    const token = localStorage.getItem("userToken");
+    try {
+      await post("/api/exam/submit", { examId: testid }, {
+        Authorization: `Bearer ${token}`,
+      });
+    } catch (error) {
+      console.error("Auto-submit error:", error);
+    }
+
+    navigate(`/test/thankyou/${testid}`, { 
+      state: { answered: answeredCount, reason },
+      replace: true 
+    });
+  };
 
   const getQuestionGridData = () => {
     const allQuestions = Array.from({ length: totalQuestions }, (_, index) => {
@@ -358,7 +412,7 @@ function TestQuestion() {
 
   return (
     <div className={`flex flex-col w-full h-full poppins`}>
-      {/* 🎥 Hidden Camera Video - COMPLETELY HIDDEN */}
+      {/* 🎥 Hidden Video Proctoring */}
       <video
         ref={videoRef}
         autoPlay
@@ -375,10 +429,19 @@ function TestQuestion() {
         }}
       />
 
-      {/* ⚠️ Warning Counter Display - ONLY SHOW WHEN WARNING EXISTS */}
-      {warningCount > 0 && (
-        <div className="fixed top-20 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse">
-          <p className="font-bold">⚠️ Warnings: {warningCount}/3</p>
+      {/* ⚠️ Warning Counters Display */}
+      {(warningCount > 0 || hardWarnings > 0) && (
+        <div className="fixed top-20 right-4 space-y-2 z-50">
+          {warningCount > 0 && (
+            <div className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
+              <p className="font-bold">⚠️ Warnings: {warningCount}/3</p>
+            </div>
+          )}
+          {hardWarnings > 0 && (
+            <div className="bg-orange-600 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
+              <p className="font-bold">🚨 Hard Warnings: {hardWarnings}/3</p>
+            </div>
+          )}
         </div>
       )}
 

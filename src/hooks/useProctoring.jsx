@@ -6,281 +6,265 @@ import * as blazeface from "@tensorflow-models/blazeface";
 import "@tensorflow/tfjs";
 import { initTF } from "../components/user/SetupTensorflow";
 
-export function useProctoring(testid, isEnabled = true, startMonitoring = true) {
+export function useProctoring(testid, isEnabled = true, autoStart = true) {
   const navigate = useNavigate();
+
   const [warningCount, setWarningCount] = useState(0);
   const [isExamActive, setIsExamActive] = useState(true);
   const [isProctoringReady, setIsProctoringReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  
+
   const videoRef = useRef(null);
   const faceModelRef = useRef(null);
   const objectModelRef = useRef(null);
-  const monitoringIntervalRef = useRef(null);
+  const intervalRef = useRef(null);
   const streamRef = useRef(null);
-  const lastWarningRef = useRef({});  // Track last warning time for each type
+  const lastWarn = useRef({});
 
-  // 🎥 Initialize TensorFlow and Camera
+  const PHONE_CLASSES = ["cell phone", "mobile phone", "smartphone"];
+  const PHONE_MIN_CONF = 0.50;
+
   useEffect(() => {
-    if (!isEnabled) {
-      setIsInitializing(false);
-      return;
-    }
+    if (!isEnabled) return setIsInitializing(false);
+    let alive = true;
 
-    let mounted = true;
-
-    async function initializeProctoring() {
+    async function initProctoring() {
       try {
-        // Initialize TensorFlow silently
-        const tfReady = await initTF();
-        if (!tfReady || !mounted) {
-          setIsInitializing(false);
-          return;
+        // ✅ Create hidden video element if not attached
+        if (!videoRef.current) {
+          const video = document.createElement("video");
+          video.id = "proctor-video-hidden";
+          video.width = 1280;
+          video.height = 720;
+          video.style.cssText = `
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            pointer-events: none;
+          `;
+          document.body.appendChild(video);
+          videoRef.current = video;
+          console.log("✅ Created hidden video element");
         }
 
-        // Request camera access
-        streamRef.current = await navigator.mediaDevices.getUserMedia({
-          video: { width: 640, height: 480 },
+        await initTF();
+
+        // ✅ Check if permission was already granted in SystemCompatibility
+        const cachedPermission = sessionStorage.getItem(`mediaStream_${testid}`);
+        if (!cachedPermission) {
+          console.warn("⚠️ No cached permission found. Requesting fresh stream...");
+        } else {
+          console.log("✅ Using cached camera/mic permission");
+        }
+
+        // Request camera + mic (will succeed quickly if already allowed)
+        try {
+          streamRef.current = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: 1280, height: 720 },
+            audio: true
+          });
+          console.log("✅ Stream acquired successfully");
+        } catch (permErr) {
+          console.error("❌ Permission still blocked:", permErr.name);
+          throw permErr;
+        }
+
+        // ✅ Verify videoRef exists before setting srcObject
+        if (!videoRef.current) {
+          throw new Error("Video element is null");
+        }
+
+        // VIDEO SETUP (mobile safe)
+        if (!alive) return;
+        videoRef.current.srcObject = streamRef.current;
+        videoRef.current.setAttribute("playsinline", "true");
+        videoRef.current.muted = true;
+        console.log("✅ Stream attached to video element");
+
+        await new Promise((res, rej) => {
+          const timeout = setTimeout(
+            () => rej(new Error("Video metadata timeout")),
+            5000
+          );
+          videoRef.current.onloadedmetadata = () => {
+            clearTimeout(timeout);
+            res();
+          };
         });
 
-        if (videoRef.current && mounted) {
-          videoRef.current.srcObject = streamRef.current;
-          await videoRef.current.play();
+        const playPromise = videoRef.current.play();
+        if (playPromise) {
+          await playPromise.catch((e) => {
+            console.warn("⚠ Video play warning:", e);
+          });
         }
 
-        // Load AI models silently in background
+        console.log("✅ Video playing successfully");
+
+        // Load models
+        if (!alive) return;
         faceModelRef.current = await blazeface.load();
+        console.log("✅ Face model loaded");
+        
         objectModelRef.current = await cocoSsd.load();
+        console.log("✅ Object model loaded");
 
-        if (mounted) {
-          setIsProctoringReady(true);
-          setIsInitializing(false);
-          
-          // Dispatch event to start timer
-          window.dispatchEvent(new CustomEvent("proctoringReady"));
-          
-          // Only start monitoring if explicitly enabled
-          if (startMonitoring) {
-            startMonitoringLoop();
-          }
-        }
-      } catch (error) {
-        console.error("Proctoring initialization error:", error);
-        if (mounted) {
-          toast.error("⚠️ Please allow camera access to continue the exam", {
+        if (!alive) return;
+        setIsProctoringReady(true);
+        setIsInitializing(false);
+
+        window.dispatchEvent(new Event("proctoringReady"));
+
+        if (autoStart) startMonitoring();
+      } catch (err) {
+        console.error("Proctoring Init Error:", err.message || err);
+
+        // Better error message
+        if (
+          err.name === "NotAllowedError" ||
+          err.name === "PermissionDeniedError"
+        ) {
+          toast.error(
+            "❌ Camera/Mic permission required. Please enable in browser settings.",
+            { duration: 5000 }
+          );
+        } else if (
+          err.name === "NotFoundError" ||
+          err.name === "DevicesNotFoundError"
+        ) {
+          toast.error("❌ No camera/microphone found on this device.", {
             duration: 5000,
           });
-          setIsInitializing(false);
-          setTimeout(() => {
-            navigate(`/instruction/${testid}`);
-          }, 2000);
+        } else {
+          toast.error("⚠ Failed to initialize proctoring. Check device.", {
+            duration: 5000,
+          });
         }
+
+        setIsInitializing(false);
+
+        setTimeout(() => {
+          navigate(`/instruction/${testid}`, { replace: true });
+        }, 2500);
       }
     }
 
-    initializeProctoring();
+    initProctoring();
 
-    // Cleanup
     return () => {
-      mounted = false;
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
-      if (monitoringIntervalRef.current) {
-        clearInterval(monitoringIntervalRef.current);
+      alive = false;
+      stopMonitoring();
+      stopCamera();
+      
+      // ✅ Cleanup: Remove hidden video element
+      if (videoRef.current && videoRef.current.parentNode) {
+        videoRef.current.parentNode.removeChild(videoRef.current);
+        videoRef.current = null;
       }
     };
-  }, [testid, navigate, isEnabled, startMonitoring]);
+  }, [testid, navigate, isEnabled, autoStart]);
 
-  // ⚠️ Warning System with Debouncing
-  const raiseWarning = (msg, warningType) => {
+  const warn = (msg, key) => {
     const now = Date.now();
-    const lastWarning = lastWarningRef.current[warningType];
+    if (lastWarn.current[key] && now - lastWarn.current[key] < 4000) return;
+    lastWarn.current[key] = now;
 
-    // Prevent duplicate warnings within 5 seconds
-    if (lastWarning && now - lastWarning < 5000) {
-      return;
-    }
+    toast.error(msg, { duration: 3500 });
 
-    lastWarningRef.current[warningType] = now;
-
-    toast.error(msg, { duration: 4000 });
     setWarningCount((prev) => {
-      const count = prev + 1;
-      console.log(`⚠️ Warning ${count}/3: ${msg}`);
-
-      if (count >= 3) {
-        autoSubmitExam("Multiple violations detected - Exam terminated");
-      }
-      return count;
+      const c = prev + 1;
+      if (c >= 3) autoSubmit("🚫 Multiple Malpractice Violations!");
+      return c;
     });
   };
 
-  // 🔍 AI Monitoring Function
-  const monitorCheating = async () => {
-    if (!videoRef.current || !isExamActive || !isProctoringReady) return;
+  const detectCheating = async () => {
+    if (!isProctoringReady || !videoRef.current) return;
 
     try {
       // Face Detection
-      const facePredictions = await faceModelRef.current.estimateFaces(
+      const faces = await faceModelRef.current.estimateFaces(
         videoRef.current,
         false
       );
 
-      if (facePredictions.length === 0) {
-        raiseWarning("⚠️ Face not visible! Please stay in front of camera.", "face_missing");
-      } else if (facePredictions.length > 1) {
-        raiseWarning("🚫 Multiple faces detected! Only you should be visible.", "multiple_faces");
-      }
+      if (!faces.length) return warn("⚠ Face not visible!", "no_face");
 
-      // Object Detection
-      const objectPredictions = await objectModelRef.current.detect(
-        videoRef.current
-      );
-  
-      const bannedItems = ["cell phone", "book", "laptop", "mouse", "keyboard"];
-      const detectedBannedItems = objectPredictions.filter((obj) =>
-        bannedItems.some((item) => obj.class.toLowerCase().includes(item))
+      if (faces.length > 1) return warn("🚫 Multiple faces detected!", "multi_face");
+
+      // Suspicious Object Detection
+      const objects = await objectModelRef.current.detect(videoRef.current);
+
+      const foundPhone = objects.some(
+        (d) => PHONE_CLASSES.includes(d.class) && d.score >= PHONE_MIN_CONF
       );
 
-      if (detectedBannedItems.length > 0) {
-        const items = detectedBannedItems.map((o) => o.class).join(", ");
-        raiseWarning(`🚫 Suspicious item detected: ${items}`, "banned_item");
-      }
-    } catch (error) {
-      console.error("Monitoring error:", error);
+      if (foundPhone) return warn("🚫 Phone detected!", "phone");
+    } catch (e) {
+      console.warn("Detection Error:", e);
     }
   };
 
-  // ⏰ Start Monitoring Loop
-  const startMonitoringLoop = () => {
-    if (monitoringIntervalRef.current) {
-      clearInterval(monitoringIntervalRef.current);
-    }
-    monitoringIntervalRef.current = setInterval(monitorCheating, 3000);
+  const startMonitoring = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(detectCheating, 1800);
+    console.log("🔍 Monitoring started");
   };
 
-  // 🚫 Auto Submit on Violations
-  const autoSubmitExam = async (reason) => {
-    setIsExamActive(false);
-    
-    // Clear monitoring interval
-    if (monitoringIntervalRef.current) {
-      clearInterval(monitoringIntervalRef.current);
-    }
+  const stopMonitoring = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = null;
+  };
 
-    // Stop camera
+  const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     }
-
-    toast.error(`🚫 ${reason}`, { duration: 5000 });
-    
-    // Trigger final submission event
-    window.dispatchEvent(new CustomEvent("autoSubmitExam", { 
-      detail: { reason, warningCount: 3 } 
-    }));
   };
 
-  // 🖱️ Tab Switch Detection
+  const autoSubmit = (reason) => {
+    setIsExamActive(false);
+    stopMonitoring();
+    stopCamera();
+
+    window.dispatchEvent(
+      new CustomEvent("autoSubmitExam", {
+        detail: { reason, warnings: 3 },
+      })
+    );
+  };
+
+  // Tab + Focus
   useEffect(() => {
-    if (!isEnabled || !isProctoringReady || !startMonitoring) return;
+    if (!isProctoringReady) return;
+    const onBlur = () => warn("⚠ Tab switch detected!", "blur");
+    const onHide = () =>
+      document.hidden && warn("⚠ Focus lost!", "visibility");
 
-    const handleBlur = () => {
-      if (isExamActive) {
-        raiseWarning("⚠️ Tab/Window switched detected!", "tab_switch");
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden && isExamActive) {
-        raiseWarning("⚠️ Tab switched detected!", "visibility_change");
-      }
-    };
-
-    window.addEventListener("blur", handleBlur);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("visibilitychange", onHide);
 
     return () => {
-      window.removeEventListener("blur", handleBlur);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("visibilitychange", onHide);
     };
-  }, [isExamActive, isProctoringReady, isEnabled, startMonitoring]);
+  }, [isProctoringReady]);
 
-  // 🖥️ Fullscreen Detection
+  // Fullscreen
   useEffect(() => {
-    if (!isEnabled || !isProctoringReady || !startMonitoring) return;
+    if (!isProctoringReady) return;
+    const exitFS = () =>
+      !document.fullscreenElement &&
+      warn("⚠ Fullscreen exited!", "fs_exit");
 
-    const handleFullscreenChange = () => {
-      if (!document.fullscreenElement && isExamActive) {
-        raiseWarning("⚠️ Fullscreen mode exited!", "fullscreen_exit");
-      }
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-    };
-  }, [isExamActive, isProctoringReady, isEnabled, startMonitoring]);
-
-  // ⌨️ Keyboard Restrictions
-  useEffect(() => {
-    if (!isEnabled || !isProctoringReady || !startMonitoring) return;
-
-    const handleKeyDown = (e) => {
-      // Prevent Escape
-      if (e.key === "Escape") {
-        e.preventDefault();
-        raiseWarning("⚠️ Escape key is disabled during exam", "escape_key");
-      }
-
-      // Prevent F5 Refresh
-      if (e.key === "F5") {
-        e.preventDefault();
-        raiseWarning("⚠️ Page refresh is disabled during exam", "f5_key");
-      }
-
-      // Prevent Ctrl+R (Refresh)
-      if ((e.ctrlKey || e.metaKey) && e.key === "r") {
-        e.preventDefault();
-        raiseWarning("⚠️ Page refresh is disabled during exam", "ctrl_r");
-      }
-
-      // Prevent Ctrl+C, Ctrl+V, Ctrl+X
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        ["c", "v", "x"].includes(e.key.toLowerCase())
-      ) {
-        e.preventDefault();
-        raiseWarning("⚠️ Copy/Paste operations are disabled", "copy_paste");
-      }
-
-      // Prevent F12, Ctrl+Shift+I (DevTools)
-      if (
-        e.key === "F12" ||
-        ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "I")
-      ) {
-        e.preventDefault();
-        raiseWarning("⚠️ Developer tools are disabled", "devtools");
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isExamActive, isProctoringReady, isEnabled, startMonitoring]);
-
-  // 🖱️ Right Click Prevention
-  useEffect(() => {
-    if (!isEnabled || !isProctoringReady || !startMonitoring) return;
-
-    const handleContextMenu = (e) => {
-      e.preventDefault();
-      toast.error("Right-click is disabled", { duration: 1000 });
-    };
-
-    document.addEventListener("contextmenu", handleContextMenu);
-    return () => document.removeEventListener("contextmenu", handleContextMenu);
-  }, [isProctoringReady, isEnabled, startMonitoring]);
+    document.addEventListener("fullscreenchange", exitFS);
+    return () =>
+      document.removeEventListener("fullscreenchange", exitFS);
+  }, [isProctoringReady]);
 
   return {
     videoRef,
@@ -288,6 +272,6 @@ export function useProctoring(testid, isEnabled = true, startMonitoring = true) 
     isProctoringReady,
     isInitializing,
     isExamActive,
-    startMonitoringLoop,
+    startMonitoring,
   };
 }
