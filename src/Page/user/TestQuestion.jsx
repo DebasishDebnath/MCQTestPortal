@@ -7,14 +7,14 @@ import FinalSubmission from "../../components/user/FinalSubmission";
 import { useHttp } from "../../hooks/useHttp";
 import { toast } from "react-hot-toast";
 import { useQuestionAttempt } from "../../context/QuestionAttemptContext";
+import { useProctoring } from "../../hooks/useProctoring";
 
 function TestQuestion() {
   const location = useLocation();
   const navigate = useNavigate();
   const { testid } = useParams();
   const { get, post } = useHttp();
-  
-  // Get attempt context
+
   const {
     attempts,
     saveAnswer: saveAttempt,
@@ -26,6 +26,10 @@ function TestQuestion() {
     initializeQuestions,
   } = useQuestionAttempt();
 
+  // 🚨 AI Proctoring Hook - start immediately when component mounts (SILENT)
+  const { videoRef, warningCount, isProctoringReady, isInitializing, isExamActive } =
+    useProctoring(testid, true, true);
+
   const [showFinalSubmission, setShowFinalSubmission] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -33,11 +37,54 @@ function TestQuestion() {
   const [markedForReview, setMarkedForReview] = useState({});
   const [visitedQuestions, setVisitedQuestions] = useState(new Set());
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [durationMinutes, setDurationMinutes] = useState(0); // ✅ ADD THIS STATE
   const [loadedPages, setLoadedPages] = useState(new Set([1]));
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [questionMap, setQuestionMap] = useState(new Map());
   const QUESTIONS_PER_PAGE = 10;
 
+  // Only block browser navigation (beforeunload) - F5 is already handled in useProctoring
+  useEffect(() => {
+    const blockBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = ""; // Required for Chrome
+      return "Are you sure you want to leave? Your exam progress may be lost.";
+    };
+
+    window.addEventListener("beforeunload", blockBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", blockBeforeUnload);
+    };
+  }, []);
+
+  // Handle auto-submit from proctoring with answered count
+  useEffect(() => {
+    const handleAutoSubmit = async (event) => {
+      const answeredCount = Object.keys(answers).length;
+      
+      // Save final state before redirect
+      const token = localStorage.getItem("userToken");
+      try {
+        await post("/api/exam/submit", { examId: testid }, {
+          Authorization: `Bearer ${token}`,
+        });
+      } catch (error) {
+        console.error("Auto-submit error:", error);
+      }
+
+      // Navigate with answered count
+      navigate(`/test/thankyou/${testid}`, { 
+        state: { answered: answeredCount },
+        replace: true 
+      });
+    };
+
+    window.addEventListener("autoSubmitExam", handleAutoSubmit);
+    return () => window.removeEventListener("autoSubmitExam", handleAutoSubmit);
+  }, [answers, testid, navigate, post]);
+
+  // Load initial questions
   useEffect(() => {
     const receivedData = location.state;
 
@@ -55,6 +102,7 @@ function TestQuestion() {
 
     setQuestions(questionsList);
     setTotalQuestions(receivedData.totalQuestions);
+    setDurationMinutes(receivedData.durationMinutes || 120); // ✅ SET DURATION (default 120)
     setVisitedQuestions(new Set());
 
     const initialMap = new Map();
@@ -62,12 +110,10 @@ function TestQuestion() {
       initialMap.set(index, q);
     });
     setQuestionMap(initialMap);
-    
-    // Initialize attempt tracking for loaded questions
-    const questionIds = questionsList.map(q => q._id);
+
+    const questionIds = questionsList.map((q) => q._id);
     initializeQuestions(questionIds);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.state, navigate, testid]); // Remove initializeQuestions from dependencies
+  }, [location.state, navigate, testid, initializeQuestions]);
 
   const loadMoreQuestions = async (pageNumber) => {
     if (loadedPages.has(pageNumber) || isLoadingMore) {
@@ -104,9 +150,8 @@ function TestQuestion() {
       });
 
       setLoadedPages((prev) => new Set([...prev, pageNumber]));
-      
-      // Initialize attempt tracking for newly loaded questions
-      const questionIds = response.data.questions.map(q => q._id);
+
+      const questionIds = response.data.questions.map((q) => q._id);
       initializeQuestions(questionIds);
     } else {
       console.error("❌ Failed to load more questions");
@@ -149,7 +194,8 @@ function TestQuestion() {
 
       const questionId = loadedQuestion._id;
       const attemptStatus = getAttemptStatus(questionId);
-      const hasAnswer = answers[questionId] !== undefined &&
+      const hasAnswer =
+        answers[questionId] !== undefined &&
         (Array.isArray(answers[questionId])
           ? answers[questionId].length > 0
           : answers[questionId] !== null);
@@ -175,7 +221,6 @@ function TestQuestion() {
       };
     });
 
-    // Log first 5
     return allQuestions;
   };
 
@@ -203,7 +248,6 @@ function TestQuestion() {
     }
   };
 
-  // Main save/update logic based on attempt state
   const saveOrUpdateAnswer = async () => {
     if (!currentQuestion) return false;
 
@@ -211,20 +255,23 @@ function TestQuestion() {
     const answerValue = answers[questionId];
     const attemptStatus = getAttemptStatus(questionId);
 
-    // If no answer selected, skip
-    if (answerValue === undefined || 
-        (Array.isArray(answerValue) && answerValue.length === 0)) {
+    const hasAnswer =
+      answerValue !== undefined &&
+      (Array.isArray(answerValue)
+        ? answerValue.length > 0
+        : answerValue !== null && answerValue !== "");
+
+    if (!hasAnswer) {
       return true;
     }
 
-    let selectedIndex = Array.isArray(answerValue) ? answerValue : [answerValue];
+    let selectedIndex = Array.isArray(answerValue)
+      ? answerValue
+      : [answerValue];
 
-    // Decide whether to create or edit based on attempt state
     if (attemptStatus.isNew || attemptStatus.cleared) {
-      // Create new attempt
       return await saveAttempt(testid, questionId, selectedIndex);
     } else if (attemptStatus.answered) {
-      // Update existing attempt
       return await editAttempt(testid, questionId, selectedIndex);
     }
 
@@ -234,14 +281,13 @@ function TestQuestion() {
   const handleNext = async () => {
     const saved = await saveOrUpdateAnswer();
     if (!saved) return;
-    
+
     if (currentQuestionIndex < totalQuestions - 1) {
       const nextIndex = currentQuestionIndex + 1;
       await checkAndLoadQuestions(nextIndex);
       setVisitedQuestions((prev) => new Set([...prev, nextIndex]));
       setCurrentQuestionIndex(nextIndex);
-      
-      // Initialize next question if needed
+
       const nextQuestion = questionMap.get(nextIndex);
       if (nextQuestion) {
         initializeQuestion(nextQuestion._id);
@@ -284,26 +330,27 @@ function TestQuestion() {
   };
 
   const handleQuestionClick = async (index) => {
-    // Save current question before navigating
     await saveOrUpdateAnswer();
-    
+
     await checkAndLoadQuestions(index);
     setVisitedQuestions((prev) => new Set([...prev, index]));
     setCurrentQuestionIndex(index);
-    
-    // Initialize clicked question if needed
+
     const clickedQuestion = questionMap.get(index);
     if (clickedQuestion) {
       initializeQuestion(clickedQuestion._id);
     }
   };
 
+  // Only show loading if questions not loaded - DON'T wait for proctoring
   if (!currentQuestion) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-gray-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-700 font-semibold">Loading question...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto mb-6"></div>
+          <p className="text-gray-700 font-semibold text-xl">
+            Loading questions...
+          </p>
         </div>
       </div>
     );
@@ -311,6 +358,30 @@ function TestQuestion() {
 
   return (
     <div className={`flex flex-col w-full h-full poppins`}>
+      {/* 🎥 Hidden Camera Video - COMPLETELY HIDDEN */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        playsInline
+        style={{
+          width: "1px",
+          height: "1px",
+          opacity: 0,
+          position: "absolute",
+          top: "-9999px",
+          left: "-9999px",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ⚠️ Warning Counter Display - ONLY SHOW WHEN WARNING EXISTS */}
+      {warningCount > 0 && (
+        <div className="fixed top-20 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse">
+          <p className="font-bold">⚠️ Warnings: {warningCount}/3</p>
+        </div>
+      )}
+
       {showFinalSubmission && (
         <div className="w-full min-h-screen bg-black/50 backdrop-blur-xs z-20 absolute top-0 left-0 transition-opacity duration-500">
           <FinalSubmission
@@ -333,19 +404,16 @@ function TestQuestion() {
       </div>
       <div className=" flex flex-col w-full poppins">
         <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full px-6 gap-10 py-16">
-          {/* Left section */}
           <div className="w-full">
             <h1 className="text-2xl font-medium text-blue-theme">
               Question {currentQuestionIndex + 1} of {totalQuestions}
             </h1>
             <div className="h-0.5 w-full bg-gray-300 mt-4"></div>
 
-            {/* Question Text */}
             <p className="my-10 text-xl font-semibold">
               {currentQuestion.questionText}
             </p>
 
-            {/* Question Image if exists */}
             {currentQuestion.questionImageUrl && (
               <img
                 src={currentQuestion.questionImageUrl}
@@ -354,7 +422,6 @@ function TestQuestion() {
               />
             )}
 
-            {/* Question Details */}
             <div className="flex gap-4 text-sm text-gray-600 mb-6">
               <span>Marks: {currentQuestion.marks}</span>
               <span>Negative Marks: {currentQuestion.negativeMarks}</span>
@@ -366,7 +433,6 @@ function TestQuestion() {
               )}
             </div>
 
-            {/* Options */}
             <div className="flex flex-col gap-4">
               {currentQuestion.options?.map((optionObj, index) => (
                 <div
@@ -420,7 +486,6 @@ function TestQuestion() {
             </div>
           </div>
 
-          {/* Right section - Question Grid */}
           <div className="max-w-1/4 w-fit">
             <QuestionsGrid
               questions={getQuestionGridData()}
@@ -429,7 +494,6 @@ function TestQuestion() {
           </div>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex justify-center items-center max-w-[1440px] mx-auto w-full px-6 gap-6 p-6 text-sm">
           <button
             onClick={handlePrevious}
