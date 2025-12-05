@@ -1,4 +1,5 @@
 import React from 'react'
+import StudentPerformance from '../../components/Admin/StudentPerformance.jsx'
 
 function StudentAnalytics() {
   return (
@@ -8,7 +9,7 @@ function StudentAnalytics() {
           backgroundImage: "url(/regbg.png)",
         }}
       >
-        
+            <StudentPerformance />
     </div>
   )
 }
