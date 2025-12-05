@@ -33,31 +33,23 @@ function TestDetailComponent() {
     e.preventDefault();
     const token = localStorage.getItem("userToken");
 
-    const data = new FormData();
-    data.append("title", formData.testName);
-    data.append("semester", formData.semester);
-    data.append("department", formData.department);
-    data.append("totalMarks", formData.totalMarks);
-    data.append("durationMinutes", formData.duration);
-    data.append("testMode", formData.testType);
-    data.append("startDate", formData.startDateTime.toISOString());
-    data.append("endDate", formData.endDateTime.toISOString());
-    if (formData.testType === "Offline") {
-      data.append("supervisorEmail", formData.examSupervisiorEmail);
-    }
-    if (questionsFile) {
-      data.append("questions", questionsFile);
-    }
-    if (studentsFile) {
-      data.append("students", studentsFile);
-    }
+    const payload = {
+      title: formData.testName,
+      semester: formData.semester,
+      department: formData.department,
+      totalMarks: formData.totalMarks,
+      durationMinutes: formData.duration,
+      testMode: formData.testType,
+      startDate: formData.startDateTime.toISOString(),
+      endDate: formData.endDateTime.toISOString(),
+      supervisorEmail: formData.testType === "Offline" ? formData.examSupervisiorEmail : undefined,
+    };
 
     try {
-      const response = await post("/api/exam/create", data, {
+      const response = await post("/api/exam/create", payload, {
         Authorization: `Bearer ${token}`,
       });
       console.log("Exam created successfully:", response);
-      navigate("/admin/all-test"); // Navigate to all tests page on success
       // Navigate to success page with state
       // navigate("/admin/success", {
       //   state: {
@@ -122,7 +114,7 @@ function TestDetailComponent() {
               {/* Department */}
               <TextField
                 required
-                id="department"
+                id="test-name"
                 label="Test Name"
                 fullWidth
                 value={formData.testName}
@@ -178,20 +170,21 @@ function TestDetailComponent() {
                 <MenuItem value="Offline">Offline</MenuItem>
               </TextField>
 
-              <TextField
-                required
-                id="exam-supervisior-email"
-                label="Exam Supervisior Email"
-                fullWidth
-                value={formData.examSupervisiorEmail}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    examSupervisiorEmail: e.target.value,
-                  })
-                }
-                hidden={formData.testType !== "Offline"}
-              />
+              {formData.testType === "Offline" && (
+                <TextField
+                  required
+                  id="exam-supervisior-email"
+                  label="Exam Supervisior Email"
+                  fullWidth
+                  value={formData.examSupervisiorEmail}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      examSupervisiorEmail: e.target.value,
+                    })
+                  }
+                />
+              )}
 
               {/* Total Marks */}
               <TextField

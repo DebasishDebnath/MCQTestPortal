@@ -6,6 +6,7 @@ import { TbEdit } from "react-icons/tb";
 function SeparateTest({ testData }) {
   const [timeLeft, setTimeLeft] = useState(null);
   const [status, setStatus] = useState("");
+  console.log(testData);
 
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -72,13 +73,13 @@ function SeparateTest({ testData }) {
         )}
 
         {status === "upcoming" && (
-          <div className="bg-indigo-400 px-3 text-white flex items-center justify-center rounded-sm py-1">
+          <div className="bg-indigo-400 px-3 text-white flex items-center text-xs justify-center rounded-sm py-1">
             Starts in {timeLeft} min
           </div>
         )}
 
         {status === "ongoing" && (
-          <div className="bg-green-400 px-3 text-white flex items-center justify-center rounded-sm py-1">
+          <div className="bg-green-400 px-3 text-white flex items-center text-xs justify-center rounded-sm py-1">
             Ongoing • {timeLeft} min left
           </div>
         )}
@@ -91,9 +92,7 @@ function SeparateTest({ testData }) {
         </div>
       </div>
 
-      <div className="text-lg font-medium flex flex-col ">
-        {testData.title}
-      </div>
+      <div className="text-lg font-medium flex flex-col ">{testData.title}</div>
 
       <div className="flex flex-col text-gray-500 text-sm h-full">
         <div className="flex gap-3 items-center">
@@ -101,11 +100,11 @@ function SeparateTest({ testData }) {
             {testData.questions.length} Questions
           </div>
           <GoDotFill size={10} />
-          <div className="flex items-center">60 Marks</div>
+          <div className="flex items-center">{testData.totalMarks} Marks</div>
           <GoDotFill size={10} />
           <div className="flex items-center gap-1">
             <IoMdTime className="text-gray-800" size={18} />{" "}
-            {testData.durationMinutes / 60} hour
+            {testData.durationMinutes} Minutes
           </div>
           <GoDotFill size={10} />
           <div className="flex items-center gap-1">
@@ -114,8 +113,8 @@ function SeparateTest({ testData }) {
           </div>
         </div>
 
-        <div className="flex gap-3 pt-1">Department: </div>
-        <div className="flex gap-3 pt-1">Semester: </div>
+        <div className="flex gap-3 pt-1">Department: {testData.department}</div>
+        <div className="flex gap-3 pt-1">Semester: {testData.semester}</div>
       </div>
 
       <div className="flex border-indigo-400 border text-indigo-400 w-fit items-center justify-center rounded-md py-1 px-4 shadow-md shadow-indigo-200 mt-2 cursor-pointer">
