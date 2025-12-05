@@ -19,7 +19,7 @@ import AdminAuthLayout from "./Layout/AdminAuthLayout";
 import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Dashboard from "./Page/admin/Dashboard";
-
+import Settings from "./Page/admin/Settings";
 // User Components
 import Instruction from "./Page/user/Instruction";
 import SystemCompatibility from "./Page/user/SystemCompatibility";
@@ -35,7 +35,6 @@ import RouteErrorPopup from "./components/error/RouteErrorPopup";
 import UserDashboard from "./Page/user/UserDashboard";
 import UserResults from "./Page/user/UserCompletedTests";
 import ScheduleSuccess from "./Page/admin/ScheduleSuccess";
-import Settings from "./Page/Admin/Settings";
 
 // ---------------- AUTH HELPERS ----------------
 
