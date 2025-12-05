@@ -6,6 +6,7 @@ import { TbEdit } from "react-icons/tb";
 function SeparateTest({ testData }) {
   const [timeLeft, setTimeLeft] = useState(null);
   const [status, setStatus] = useState("");
+  console.log(testData);
 
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -74,13 +75,13 @@ function SeparateTest({ testData }) {
         )}
 
         {status === "upcoming" && (
-          <div className="bg-indigo-400 px-3 text-white flex items-center justify-center rounded-sm py-1">
+          <div className="bg-indigo-400 px-3 text-white flex items-center text-xs justify-center rounded-sm py-1">
             Starts in {timeLeft} min
           </div>
         )}
 
         {status === "ongoing" && (
-          <div className="bg-green-400 px-3 text-white flex items-center justify-center rounded-sm py-1">
+          <div className="bg-green-400 px-3 text-white flex items-center text-xs justify-center rounded-sm py-1">
             Ongoing • {timeLeft} min left
           </div>
         )}
@@ -104,7 +105,7 @@ function SeparateTest({ testData }) {
             {testData.questions.length} Questions
           </div>
           <GoDotFill size={10} />
-          <div className="flex items-center">60 Marks</div>
+          <div className="flex items-center">{testData.totalMarks} Marks</div>
           <GoDotFill size={10} />
           <div className="flex items-center gap-1">
             <IoMdTime className="text-gray-800" size={18} />{" "}
