@@ -8,11 +8,11 @@ import { toast } from "react-hot-toast";
 
 // ⭐ TESTING BYPASS - COMMENT OUT WHEN NOT NEEDED ⭐
 // comment out
-const TESTING_MODE = true; // Set to false to disable bypass
-const TEST_CONFIG = {
-  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTMxNjdhYTNjZThlODI5MDBmYzM2NjkiLCJlbWFpbCI6ImRleWFua2FuMTU0QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiZXhhbUlkIjoiNjkzMTY3YWEzY2U4ZTgyOTAwZmMzNjViIiwiaWF0IjoxNzY0ODQ1NTQwLCJleHAiOjE3NjQ5MzE5NDB9.4j1VyzhiouSSrVhMEGryOJjqDnt4FyL_YNbjGA78BJY", // Replace with your actual test token
-  testId: "693167aa3ce8e82900fc365b", // Replace with your actual test ID
-};
+// const TESTING_MODE = true; // Set to false to disable bypass
+// const TEST_CONFIG = {
+//   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTMxNjdhYTNjZThlODI5MDBmYzM2NjkiLCJlbWFpbCI6ImRleWFua2FuMTU0QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiZXhhbUlkIjoiNjkzMTY3YWEzY2U4ZTgyOTAwZmMzNjViIiwiaWF0IjoxNzY0ODQ1NTQwLCJleHAiOjE3NjQ5MzE5NDB9.4j1VyzhiouSSrVhMEGryOJjqDnt4FyL_YNbjGA78BJY", // Replace with your actual test token
+//   testId: "693167aa3ce8e82900fc365b", // Replace with your actual test ID
+// };
 // ⭐ END TESTING BYPASS ⭐
 
 export default function LoginPage() {
@@ -27,52 +27,52 @@ export default function LoginPage() {
 
   // Handle token from URL (backend link) OR testing bypass
   // comment out
-  useEffect(() => {
-    // ⭐ TESTING BYPASS ⭐
-    if (TESTING_MODE && TEST_CONFIG.token && TEST_CONFIG.testId) {
-      console.log('🧪 TESTING MODE ACTIVE - Bypassing authentication');
-      localStorage.setItem('userToken', TEST_CONFIG.token);
+  // useEffect(() => {
+  //   // ⭐ TESTING BYPASS ⭐
+  //   if (TESTING_MODE && TEST_CONFIG.token && TEST_CONFIG.testId) {
+  //     console.log('🧪 TESTING MODE ACTIVE - Bypassing authentication');
+  //     localStorage.setItem('userToken', TEST_CONFIG.token);
       
-      navigate(`/system-compatibility/${TEST_CONFIG.testId}`, { replace: true });
-      return;
-    }
-    // ⭐ END TESTING BYPASS ⭐
+  //     navigate(`/system-compatibility/${TEST_CONFIG.testId}`, { replace: true });
+  //     return;
+  //   }
+  //   // ⭐ END TESTING BYPASS ⭐
 
-    const urlParams = new URLSearchParams(location.search);
-    const token = urlParams.get('token');
+  //   const urlParams = new URLSearchParams(location.search);
+  //   const token = urlParams.get('token');
     
-    const pathParts = location.pathname.split('/').filter(Boolean);
-    let testId = null;
+  //   const pathParts = location.pathname.split('/').filter(Boolean);
+  //   let testId = null;
     
-    if (pathParts.length >= 2) {
-      testId = pathParts[pathParts.length - 1];
-    }
+  //   if (pathParts.length >= 2) {
+  //     testId = pathParts[pathParts.length - 1];
+  //   }
     
-    console.log('🔍 URL Analysis:', { 
-      pathname: location.pathname, 
-      token: !!token, 
-      testId,
-      pathParts 
-    });
+  //   console.log('🔍 URL Analysis:', { 
+  //     pathname: location.pathname, 
+  //     token: !!token, 
+  //     testId,
+  //     pathParts 
+  //   });
     
-    if (token && testId) {
-      localStorage.setItem('userToken', token);
-      toast.success("Access granted!");
-      navigate(`/system-compatibility/${testId}`, { replace: true });
-      return;
-    } 
+  //   if (token && testId) {
+  //     localStorage.setItem('userToken', token);
+  //     toast.success("Access granted!");
+  //     navigate(`/system-compatibility/${testId}`, { replace: true });
+  //     return;
+  //   } 
     
-    if (localStorage.getItem("userToken")) {
-      const currentPath = location.pathname;
-      const isTestRoute = currentPath.includes('/system-compatibility/') || 
-                          currentPath.includes('/instruction/') || 
-                          currentPath.includes('/test/');
+  //   if (localStorage.getItem("userToken")) {
+  //     const currentPath = location.pathname;
+  //     const isTestRoute = currentPath.includes('/system-compatibility/') || 
+  //                         currentPath.includes('/instruction/') || 
+  //                         currentPath.includes('/test/');
 
-      if (!isTestRoute && currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
-        navigate("/dashboard");
-      }
-    }
-  }, [navigate, location]);
+  //     if (!isTestRoute && currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
+  //       navigate("/dashboard");
+  //     }
+  //   }
+  // }, [navigate, location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -117,11 +117,11 @@ export default function LoginPage() {
           
           {/* ⭐ Testing Mode Indicator ⭐ */}
           {/* Comment */}
-          {TESTING_MODE && (
+          {/* {TESTING_MODE && (
             <div className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold">
               🧪 TESTING MODE ACTIVE
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Right Section */}
