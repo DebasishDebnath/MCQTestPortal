@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 // ⭐ TESTING BYPASS - COMMENT OUT WHEN NOT NEEDED ⭐
+// comment out
 const TESTING_MODE = true; // Set to false to disable bypass
 const TEST_CONFIG = {
   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTMxNjdhYTNjZThlODI5MDBmYzM2NjkiLCJlbWFpbCI6ImRleWFua2FuMTU0QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiZXhhbUlkIjoiNjkzMTY3YWEzY2U4ZTgyOTAwZmMzNjViIiwiaWF0IjoxNzY0ODQ1NTQwLCJleHAiOjE3NjQ5MzE5NDB9.4j1VyzhiouSSrVhMEGryOJjqDnt4FyL_YNbjGA78BJY", // Replace with your actual test token
@@ -25,12 +26,13 @@ export default function LoginPage() {
   const location = useLocation();
 
   // Handle token from URL (backend link) OR testing bypass
+  // comment out
   useEffect(() => {
     // ⭐ TESTING BYPASS ⭐
     if (TESTING_MODE && TEST_CONFIG.token && TEST_CONFIG.testId) {
       console.log('🧪 TESTING MODE ACTIVE - Bypassing authentication');
       localStorage.setItem('userToken', TEST_CONFIG.token);
-      toast.success("Test mode activated!");
+      
       navigate(`/system-compatibility/${TEST_CONFIG.testId}`, { replace: true });
       return;
     }
@@ -114,6 +116,7 @@ export default function LoginPage() {
           <p className="text-lg">with Proctoring and full screen mode</p>
           
           {/* ⭐ Testing Mode Indicator ⭐ */}
+          {/* Comment */}
           {TESTING_MODE && (
             <div className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold">
               🧪 TESTING MODE ACTIVE
