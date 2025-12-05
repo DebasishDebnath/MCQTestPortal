@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 function AllTestShow() {
   const { get } = useHttp();
   const [tests, setTests] = useState([]);
+  const [examNumber, setExamNumber] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ function AllTestShow() {
       const response = await get("/api/exam/getAllExams", {
         Authorization: `Bearer ${token}`,
       });
-
+      setExamNumber(response.data.length);
       console.log(response);
       setTests(response.data || response);
     } catch (err) {
@@ -36,10 +37,13 @@ function AllTestShow() {
     <div className="bg-white rounded-2xl px-10 py-10 w-full">
       <div className="flex justify-between items-center mb-6">
         <div className="text-blue-theme font-semibold text-[24px]">
-          All Tests
+          All Tests({examNumber})
         </div>
         <div className="flex gap-6 items-center text-sm">
-          <button className="border rounded-full px-10 py-2 border-indigo-400 font-semibold text-indigo-400 cursor-pointer hover:bg-indigo-400 hover:text-white transition-colors" onClick={() => navigate("/admin/create-test")}>
+          <button
+            className="border rounded-full px-10 py-2 border-indigo-400 font-semibold text-indigo-400 cursor-pointer hover:bg-indigo-400 hover:text-white transition-colors"
+            onClick={() => navigate("/admin/create-test")}
+          >
             Create Test
           </button>
           <div

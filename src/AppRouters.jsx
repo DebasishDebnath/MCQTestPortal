@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 // User Pages
-import LoginPage from "./Page/user/LoginPage"; 
+import LoginPage from "./Page/user/LoginPage";
 import RegisterPage from "./Page/user/RegisterPage";
 import UserLayout from "./Layout/UserLayout";
 
@@ -35,6 +35,7 @@ import RouteErrorPopup from "./components/error/RouteErrorPopup";
 import UserDashboard from "./Page/user/UserDashboard";
 import UserResults from "./Page/user/UserCompletedTests";
 import ScheduleSuccess from "./Page/admin/ScheduleSuccess";
+import Settings from "./Page/Admin/Settings";
 
 // ---------------- AUTH HELPERS ----------------
 
@@ -61,11 +62,7 @@ function UserRouteGuard({ children }) {
 
 // Prevent logged-in admin from re-accessing login page
 function AdminAuthGuard({ children }) {
-  return isLoggedIn() ? (
-    <Navigate to="/admin/dashboard" replace />
-  ) : (
-    children
-  );
+  return isLoggedIn() ? <Navigate to="/admin/dashboard" replace /> : children;
 }
 
 // Protect admin routes
@@ -104,8 +101,11 @@ const router = createBrowserRouter(
         <Route element={<ProtectedRoute />}>
           <Route path="dashboard" element={<UserDashboard />} />
           <Route path="completed-tests" element={<UserResults />} />
-          
-          <Route path="system-compatibility/:testid" element={<SystemCompatibility />} />
+
+          <Route
+            path="system-compatibility/:testid"
+            element={<SystemCompatibility />}
+          />
           <Route path="instruction/:testid" element={<Instruction />} />
           {/* ✅ Keep this protected route for actual test taking */}
           <Route path="test-page/:testid" element={<TestQuestion />} />
@@ -124,22 +124,29 @@ const router = createBrowserRouter(
           path="login"
           element={
             <AdminAuthGuard>
-              <AdminLogin /> 
+              <AdminLogin />
             </AdminAuthGuard>
           }
         />
         <Route
           path="register"
           element={
-            <AdminAuthGuard> 
+            <AdminAuthGuard>
               <AdminRegister />
             </AdminAuthGuard>
           }
         />
-        <Route element={<SuperAdminGuard><AdminLayout /></SuperAdminGuard>}>
+        <Route
+          element={
+            <SuperAdminGuard>
+              <AdminLayout />
+            </SuperAdminGuard>
+          }
+        >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="create-test" element={<CreateTest />} />
           <Route path="all-test" element={<AllTest />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="success" element={<ScheduleSuccess />} />
       </Route>

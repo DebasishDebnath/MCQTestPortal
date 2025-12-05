@@ -91,32 +91,32 @@ function SeparateTest({ testData }) {
         </div>
       </div>
 
-      <div className="text-lg font-medium flex flex-col gap-4">
+      <div className="text-lg font-medium flex flex-col ">
         {testData.title}
       </div>
 
-      <div className="flex flex-col text-gray-500 text-sm">
-      <div className="flex gap-3 items-center">
-        <div className="flex items-center">
-          {testData.questions.length} Questions
-        </div>
+      <div className="flex flex-col text-gray-500 text-sm h-full">
+        <div className="flex gap-3 items-center">
+          <div className="flex items-center">
+            {testData.questions.length} Questions
+          </div>
           <GoDotFill size={10} />
-        <div className="flex items-center">
-          60 Marks
-        </div>
+          <div className="flex items-center">60 Marks</div>
           <GoDotFill size={10} />
-        <div className="flex items-center gap-1">
-          <IoMdTime className="text-gray-800" size={18}/> {testData.durationMinutes / 60} hour
-        </div>
+          <div className="flex items-center gap-1">
+            <IoMdTime className="text-gray-800" size={18} />{" "}
+            {testData.durationMinutes / 60} hour
+          </div>
           <GoDotFill size={10} />
-        <div className="flex items-center gap-1">
-          <FaUser className="text-gray-800" size={14}/> {testData.users.length}
+          <div className="flex items-center gap-1">
+            <FaUser className="text-gray-800" size={14} />{" "}
+            {testData.users.length}
+          </div>
         </div>
+
+        <div className="flex gap-3 pt-1">Department: </div>
+        <div className="flex gap-3 pt-1">Semester: </div>
       </div>
-
-      <div className="flex gap-3 pt-1">Department: </div>
-      <div className="flex gap-3 pt-1">Semester: </div></div>
-
 
       <div className="flex border-indigo-400 border text-indigo-400 w-fit items-center justify-center rounded-md py-1 px-4 shadow-md shadow-indigo-200 mt-2 cursor-pointer">
         Student Performance
