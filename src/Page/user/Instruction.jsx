@@ -10,80 +10,80 @@ export default function Instruction() {
   const { get, loading } = useHttp();
 
   const handleStart = async () => {
-
-    
     if (!checked) {
-
       toast.error("Please agree to the instructions before starting the test.");
       return;
     }
 
-
     const token = localStorage.getItem("userToken");
-
+    console.log("🔑 Token exists:", !!token);
+    console.log("🔑 Token preview:", token ? token.substring(0, 20) + "..." : "null");
 
     if (!token) {
-
       toast.error("Authentication required. Please login again.");
       navigate("/login");
       return;
     }
 
-    // ✅ Load first page (10 questions)
-    console.log(`📡 Calling API: /api/questions/all/${testid}?page=1&limit=10`);
-    const response = await get(`/api/questions/all/${testid}?page=1&limit=10`, {
-      Authorization: `Bearer ${token}`,
-    });
+    try {
+      console.log(`📡 Calling API: /api/questions/all/${testid}?page=1&limit=10`);
+      console.log("📋 Test ID:", testid);
 
-    console.log("API Response:", response);
-
-    if (!response || !response.data) {
-
-      toast.error("Failed to load questions. Please try again.");
-      return;
-    }
-    
-
-    // ✅ FIX: Use totalQuestions from response (backend sends it as totalQuestions)
-
-
-
-    const elem = document.documentElement;
-    if (elem.requestFullscreen && !document.fullscreenElement) {
-      elem.requestFullscreen()
-        .then(() => {
-
-          navigate(`/test-page/${testid}`, { 
-            state: { 
-              initialQuestions: response.data.questions,
-              // ✅ FIX: Backend sends totalQuestions field
-              totalQuestions: response.data.totalQuestions,
-              currentPage: 1
-            } 
-          });
-        })
-        .catch((err) => {
-          console.error("❌ Fullscreen error:", err);
-
-          navigate(`/test-page/${testid}`, { 
-            state: { 
-              initialQuestions: response.data.questions,
-              // ✅ FIX: Backend sends totalQuestions field
-              totalQuestions: response.data.totalQuestions,
-              currentPage: 1
-            } 
-          });
-        });
-    } else {
-
-      navigate(`/test-page/${testid}`, { 
-        state: { 
-          initialQuestions: response.data.questions,
-          // ✅ FIX: Backend sends totalQuestions field
-          totalQuestions: response.data.totalQuestions,
-          currentPage: 1
-        } 
+      const response = await get(`/api/questions/all/${testid}?page=1&limit=10`, {
+        Authorization: `Bearer ${token}`,
       });
+
+      console.log("✅ API Response:", response);
+      console.log("📊 Response data:", response?.data);
+
+      if (!response || !response.data) {
+        toast.error("Failed to load questions. Please try again.");
+        return;
+      }
+
+      // ✅ STORE DURATION IN LOCALSTORAGE
+      const durationMinutes = response.data.durationMinutes || 120;
+      localStorage.setItem(`examDuration_${testid}`, durationMinutes.toString());
+      console.log("💾 Stored duration:", durationMinutes);
+
+      const elem = document.documentElement;
+      if (elem.requestFullscreen && !document.fullscreenElement) {
+        elem.requestFullscreen()
+          .then(() => {
+            navigate(`/test-page/${testid}`, {
+              state: {
+                initialQuestions: response.data.questions,
+                totalQuestions: response.data.totalQuestions,
+                durationMinutes: durationMinutes,
+                currentPage: 1,
+              },
+            });
+          })
+          .catch((err) => {
+            console.error("❌ Fullscreen error:", err);
+
+            navigate(`/test-page/${testid}`, {
+              state: {
+                initialQuestions: response.data.questions,
+                totalQuestions: response.data.totalQuestions,
+                durationMinutes: durationMinutes,
+                currentPage: 1,
+              },
+            });
+          });
+      } else {
+        navigate(`/test-page/${testid}`, {
+          state: {
+            initialQuestions: response.data.questions,
+            totalQuestions: response.data.totalQuestions,
+            durationMinutes: durationMinutes,
+            currentPage: 1,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("❌ API Error:", error);
+      toast.error(`Error: ${error.message || "Failed to load questions"}`);
     }
   };
 

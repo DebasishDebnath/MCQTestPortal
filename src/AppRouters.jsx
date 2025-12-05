@@ -113,6 +113,7 @@ const router = createBrowserRouter(
         </Route>
 
         <Route path="success" element={<SubmissionSuccess />} />
+        <Route path="test/thankyou/:testid" element={<SubmissionSuccess />} />
       </Route>
 
       {/* ADMIN ROUTES */}

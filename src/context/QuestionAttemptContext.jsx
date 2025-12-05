@@ -42,12 +42,16 @@ export function QuestionAttemptProvider({ children }) {
 
     const body = {
       examId,
-      answer: { questionId, selectedIndex }, // <-- use selectedIndex
+      answer: { questionId, selectedIndex },
     };
+
+    console.log("📤 CREATE API Call:", body);
 
     const res = await post("/api/attempts/create", body, {
       Authorization: `Bearer ${token}`,
     });
+
+    console.log("📥 CREATE API Response:", res);
 
     if (res && res.success) {
       setAttempts((prev) => ({
@@ -59,9 +63,10 @@ export function QuestionAttemptProvider({ children }) {
           isNew: false,
         },
       }));
+
       return true;
     }
-    toast.error("Failed to save answer");
+
     return false;
   };
 
@@ -71,12 +76,16 @@ export function QuestionAttemptProvider({ children }) {
 
     const body = {
       examId,
-      answer: { questionId, selectedIndex }, // <-- use selectedIndex
+      answer: { questionId, selectedIndex },
     };
+
+    console.log("📤 EDIT API Call:", body);
 
     const res = await post("/api/attempts/edit", body, {
       Authorization: `Bearer ${token}`,
     });
+
+    console.log("📥 EDIT API Response:", res);
 
     if (res && res.success) {
       setAttempts((prev) => ({
@@ -88,9 +97,10 @@ export function QuestionAttemptProvider({ children }) {
           isNew: false,
         },
       }));
+
       return true;
     }
-    toast.error("Failed to update answer");
+
     return false;
   };
 

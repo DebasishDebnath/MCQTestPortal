@@ -6,22 +6,51 @@ import { useNavigate } from "react-router-dom";
 import { useHttp } from "../../hooks/useHttp";
 import { IoIosSearch } from "react-icons/io";
 import { Search, SlidersHorizontal, X } from "lucide-react";
+
 function AllTestComponent({ allTests }) {
   const { get } = useHttp();
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState(null); // null, 'upcoming', 'completed', 'ongoing'
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Fetch when debounced search or filter changes
   useEffect(() => {
     fetchAllExams();
-  }, []);
+  }, [debouncedSearch, activeFilter]);
 
   const fetchAllExams = async () => {
     try {
       setLoading(true);
       setError(null);
       const token = localStorage.getItem("userToken");
-      console.log(token, "token");
-      const response = await get("/api/exam/getAllExams", {
+
+      // Build URL with query parameters
+      let url = "/api/exam/getAllExams?";
+      const params = [];
+
+      if (debouncedSearch) {
+        params.push(`search=${encodeURIComponent(debouncedSearch)}`);
+      }
+
+      if (activeFilter) {
+        params.push(`status=${activeFilter}`);
+      }
+
+      url += params.join("&");
+
+      const response = await get(url, {
         Authorization: `Bearer ${token}`,
       });
 
@@ -33,6 +62,18 @@ function AllTestComponent({ allTests }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
+
+  const handleFilterClick = (filterType) => {
+    setActiveFilter(activeFilter === filterType ? null : filterType);
   };
 
   return (
@@ -48,8 +89,18 @@ function AllTestComponent({ allTests }) {
             <input
               type="text"
               placeholder="Search by Test Name"
-              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+            {searchTerm && (
+              <button
+                onClick={clearSearch}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -57,55 +108,82 @@ function AllTestComponent({ allTests }) {
         <div className="flex items-center justify-between">
           {/* Filter Pills */}
           <div className="flex items-center gap-3 pb-10">
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-[#160024] text-white rounded-full font-medium hover:bg-[#29083d] cursor-pointer transition-colors">
+            <button
+              onClick={() => handleFilterClick("draft")}
+              className={`px-5 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+                activeFilter === "draft"
+                  ? "bg-[#160024] text-white"
+                  : "bg-blue-50 text-blue-700"
+              }`}
+            >
               Upcoming
-              <X className="w-4 h-4" />
             </button>
 
-            <button className="px-5 py-2.5 bg-blue-50 text-blue-700 rounded-full font-medium hover:bg-blue-100 transition-colors cursor-pointer">
+            <button
+              onClick={() => handleFilterClick("closed")}
+              className={`px-5 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+                activeFilter === "closed"
+                  ? "bg-[#160024] text-white hover:bg-[#29083d]"
+                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+              }`}
+            >
               Completed
             </button>
 
-            <button className="px-5 py-2.5 bg-blue-50 text-blue-700 rounded-full font-medium hover:bg-blue-100 transition-colors cursor-pointer">
+            <button
+              onClick={() => handleFilterClick("live")}
+              className={`px-5 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+                activeFilter === "live"
+                  ? "bg-[#160024] text-white hover:bg-[#29083d]"
+                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+              }`}
+            >
               Ongoing
             </button>
 
-            <button className="px-5 py-2.5 bg-blue-50 text-blue-700 rounded-full font-medium hover:bg-blue-100 transition-colors cursor-pointer">
+            <button
+              onClick={() => setActiveFilter(null)}
+              className={`px-5 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+                activeFilter === null
+                  ? "bg-[#160024] text-white hover:bg-[#29083d]"
+                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+              }`}
+            >
               View All
             </button>
           </div>
-
-          {/* Filters Button */}
-          <button className="flex items-center gap-2 px-6 py-2.5 bg-[#160024] text-white rounded-lg font-medium hover:bg-[#29083d] cursor-pointer transition-colors">
-            <SlidersHorizontal className="w-5 h-5" />
-            Filters
-          </button>
         </div>
       </div>
 
-      <div className="space-y-4 flex min-h-[32%] gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[32%]">
         {loading && (
-          <div className="text-center py-8 text-gray-500">Loading tests...</div>
-        )}
-
-        {error && (
-          <div className="text-center py-8 text-red-500">Error: {error}</div>
-        )}
-
-        {!loading && !error && tests.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No tests available
+          <div className="col-span-full text-center py-8 text-gray-500">
+            Loading tests...
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[32%]">
-          {!loading &&
-            !error &&
-            tests.length > 0 &&
-            tests.map((test) => (
-              <SeparateTest key={test.id || test._id} testData={test} />
-            ))}
-        </div>
+        {error && (
+          <div className="col-span-full text-center py-8 text-red-500">
+            Error: {error}
+          </div>
+        )}
+
+        {!loading && !error && tests.length === 0 && (
+          <div className="col-span-full text-center py-8 text-gray-500">
+            {searchTerm || activeFilter
+              ? `No tests found ${searchTerm ? `for "${searchTerm}"` : ""} ${
+                  activeFilter ? `in ${activeFilter}` : ""
+                }`
+              : "No tests available"}
+          </div>
+        )}
+
+        {!loading &&
+          !error &&
+          tests.length > 0 &&
+          tests.map((test) => (
+            <SeparateTest key={test.id || test._id} testData={test} />
+          ))}
       </div>
     </div>
   );

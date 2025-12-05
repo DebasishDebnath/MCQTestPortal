@@ -52,12 +52,18 @@ function FinalSubmission({ onClose, questions, answers, markedForReview, questio
 
   const handleFinishTest = async () => {
     const token = localStorage.getItem("userToken");
+    const answeredCount = Object.keys(answers || {}).length;
+    
     const res = await post("/api/exam/submit", { examId: testid }, {
       Authorization: `Bearer ${token}`,
     });
+    
     if (res && res.success) {
       toast.success("Test submitted successfully!");
-      navigate(`/test/thankyou/${testid}`); // or wherever you want to redirect
+      navigate(`/test/thankyou/${testid}`, { 
+        state: { answered: answeredCount },
+        replace: true 
+      });
     } else {
       toast.error(res?.message || "Failed to submit test");
     }
