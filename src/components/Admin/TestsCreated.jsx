@@ -9,7 +9,7 @@ function TestsCreated() {
           <div className="text-gray-700 text-2xl font-semibold">0</div>
         </div>
         {/* <div>0</div> */}
-        <div className="bg-indigo-100 h-[44px] w-[50px] rounded-2xl flex items-center justify-center p-2">
+        <div className="bg-indigo-100 h-11 w-[50px] rounded-2xl flex items-center justify-center p-2">
           <img src={test} alt="" />
         </div>
       </div>
