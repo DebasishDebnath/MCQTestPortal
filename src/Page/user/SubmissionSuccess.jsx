@@ -1,17 +1,31 @@
 import React, { useEffect, useState } from "react";
-import Lottie from "lottie-react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Success from "../../components/common/Success";
+import moment from "moment";
 
-export default function SubmissionSuccess({ answered = 0, total = 0 }) {
-  const [data, setData] = useState(null);
+export default function SubmissionSuccess() {
+  const [secondsLeft, setSecondsLeft] = useState(10);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get answered from navigation state, fallback to 0
+  const answered = location.state?.answered ?? 0;
 
   useEffect(() => {
-    fetch("/Success.json")
-      .then((res) => res.json())
-      .then((json) => setData(json));
-  }, []);
+    const end = moment().add(10, "seconds");
+    const interval = setInterval(() => {
+      const diff = end.diff(moment(), "seconds");
+      setSecondsLeft(diff >= 0 ? diff : 0);
+      if (diff <= 0) {
+        clearInterval(interval);
+        localStorage.clear();
+        navigate("/login", { replace: true });
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [navigate]);
 
-  const subTitle = `You have answered ${answered} out of ${total} questions`;
+  const subTitle = `You have answered ${answered} questions`;
 
   return (
     <div
@@ -21,7 +35,14 @@ export default function SubmissionSuccess({ answered = 0, total = 0 }) {
       <Success
         title="You have submitted the exam successfully!"
         subTitle={subTitle}
-        note="You may now close the window"
+        note={
+          <>
+            You may now close the window. You will be redirected to login in{" "}
+            <span className="text-red-600 font-bold">
+              {secondsLeft} second{secondsLeft !== 1 ? "s" : ""}
+            </span>.
+          </>
+        }
       />
     </div>
   );
