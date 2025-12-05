@@ -19,7 +19,6 @@ import AdminAuthLayout from "./Layout/AdminAuthLayout";
 import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Dashboard from "./Page/admin/Dashboard";
-import Settings from "./Page/admin/Settings";
 // User Components
 import Instruction from "./Page/user/Instruction";
 import SystemCompatibility from "./Page/user/SystemCompatibility";
@@ -146,7 +145,6 @@ const router = createBrowserRouter(
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="create-test" element={<CreateTest />} />
           <Route path="all-test" element={<AllTest />} />
-          <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="success" element={<ScheduleSuccess />} />
       </Route>
