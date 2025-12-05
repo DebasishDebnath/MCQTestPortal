@@ -83,7 +83,7 @@ function AllTestComponent({ allTests }) {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 flex min-h-[32%] gap-2">
         {loading && (
           <div className="text-center py-8 text-gray-500">Loading tests...</div>
         )}
