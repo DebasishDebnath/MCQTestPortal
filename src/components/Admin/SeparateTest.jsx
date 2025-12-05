@@ -57,6 +57,8 @@ function SeparateTest({ testData }) {
     return () => clearInterval(interval);
   }, [testData.startDate]);
 
+  const handleExamDetailsEdit = () => {};
+
   return (
     <div className="border border-gray-200 rounded-2xl px-5 py-4 flex flex-col gap-2 w-full">
       <div className="flex gap-5 relative">
@@ -82,7 +84,10 @@ function SeparateTest({ testData }) {
             Ongoing • {timeLeft} min left
           </div>
         )}
-        <div className="flex items-end justify-end absolute right-0 top-0 cursor-pointer">
+        <div
+          className="flex items-end justify-end absolute right-0 top-0 cursor-pointer"
+          onClick={handleExamDetailsEdit}
+        >
           {(status === "future" || status === "upcoming") && (
             <button className="text-indigo-400 cursor-pointer">
               <TbEdit size={25} />
@@ -91,11 +96,9 @@ function SeparateTest({ testData }) {
         </div>
       </div>
 
-      <div className="text-lg font-medium flex flex-col ">
-        {testData.title}
-      </div>
+      <div className="text-lg font-medium flex flex-col ">{testData.title}</div>
 
-      <div className="flex flex-col text-gray-500 text-sm h-full">
+      <div className="flex flex-col text-gray-500 text-sm h-full w-full">
         <div className="flex gap-3 items-center">
           <div className="flex items-center">
             {testData.questions.length} Questions
@@ -105,7 +108,7 @@ function SeparateTest({ testData }) {
           <GoDotFill size={10} />
           <div className="flex items-center gap-1">
             <IoMdTime className="text-gray-800" size={18} />{" "}
-            {testData.durationMinutes / 60} hour
+            {testData.durationMinutes} minutes
           </div>
           <GoDotFill size={10} />
           <div className="flex items-center gap-1">
@@ -113,7 +116,7 @@ function SeparateTest({ testData }) {
             {testData.users.length}
           </div>
         </div>
-
+        <div className="pt-2">Exam Mode: {testData.type}</div>
         <div className="flex gap-3 pt-1">Department: </div>
         <div className="flex gap-3 pt-1">Semester: </div>
       </div>
