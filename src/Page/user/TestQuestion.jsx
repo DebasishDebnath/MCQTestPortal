@@ -33,7 +33,7 @@ function TestQuestion() {
   const [hardWarnings, setHardWarnings] = useState(0);
 
   const handleProctoringHardWarning = (reason, count) => {
-    toast.error(`⚠️ Hard Warning (${count}/3): ${reason}`, { duration: 3000, position: "top-right" });
+    toast.error(`⚠️ Hard  (${count}/3): ${reason}`, { duration: 3000, position: "top-right" });
     setHardWarnings(count);
 
     if (count >= 3) {
@@ -450,18 +450,11 @@ function TestQuestion() {
       />
 
       {/* ⚠️ Warning Counters Display */}
-      {(warningCount > 0 || hardWarnings > 0) && (
+      {hardWarnings > 0 && (
         <div className="fixed top-20 right-4 space-y-2 z-50">
-          {warningCount > 0 && (
-            <div className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
-              <p className="font-bold">⚠️ Warnings: {warningCount}/3</p>
-            </div>
-          )}
-          {hardWarnings > 0 && (
-            <div className="bg-orange-600 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
-              <p className="font-bold">🚨 Hard Warnings: {hardWarnings}/3</p>
-            </div>
-          )}
+          <div className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
+            <p className="font-bold">🚨 Warnings: {hardWarnings}/3</p>
+          </div>
         </div>
       )}
 
