@@ -25,54 +25,43 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle token from URL (backend link) OR testing bypass
-  // comment out
-  // useEffect(() => {
-  //   // ⭐ TESTING BYPASS ⭐
-  //   if (TESTING_MODE && TEST_CONFIG.token && TEST_CONFIG.testId) {
-  //     console.log('🧪 TESTING MODE ACTIVE - Bypassing authentication');
-  //     localStorage.setItem('userToken', TEST_CONFIG.token);
-      
-  //     navigate(`/system-compatibility/${TEST_CONFIG.testId}`, { replace: true });
-  //     return;
-  //   }
-  //   // ⭐ END TESTING BYPASS ⭐
+  // Handle token from URL (backend link)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+    
+    const pathParts = location.pathname.split('/').filter(Boolean);
+    let testId = null;
+    
+    if (pathParts.length >= 2) {
+      testId = pathParts[pathParts.length - 1];
+    }
+    
+    console.log('🔍 URL Analysis:', { 
+      pathname: location.pathname, 
+      token: !!token, 
+      testId,
+      pathParts 
+    });
+    
+    if (token && testId) {
+      localStorage.setItem('userToken', token);
+      toast.success("Access granted!");
+      navigate(`/system-compatibility/${testId}`, { replace: true });
+      return;
+    } 
+    
+    if (localStorage.getItem("userToken")) {
+      const currentPath = location.pathname;
+      const isTestRoute = currentPath.includes('/system-compatibility/') || 
+                          currentPath.includes('/instruction/') || 
+                          currentPath.includes('/test/');
 
-  //   const urlParams = new URLSearchParams(location.search);
-  //   const token = urlParams.get('token');
-    
-  //   const pathParts = location.pathname.split('/').filter(Boolean);
-  //   let testId = null;
-    
-  //   if (pathParts.length >= 2) {
-  //     testId = pathParts[pathParts.length - 1];
-  //   }
-    
-  //   console.log('🔍 URL Analysis:', { 
-  //     pathname: location.pathname, 
-  //     token: !!token, 
-  //     testId,
-  //     pathParts 
-  //   });
-    
-  //   if (token && testId) {
-  //     localStorage.setItem('userToken', token);
-  //     toast.success("Access granted!");
-  //     navigate(`/system-compatibility/${testId}`, { replace: true });
-  //     return;
-  //   } 
-    
-  //   if (localStorage.getItem("userToken")) {
-  //     const currentPath = location.pathname;
-  //     const isTestRoute = currentPath.includes('/system-compatibility/') || 
-  //                         currentPath.includes('/instruction/') || 
-  //                         currentPath.includes('/test/');
-
-  //     if (!isTestRoute && currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
-  //       navigate("/dashboard");
-  //     }
-  //   }
-  // }, [navigate, location]);
+      if (!isTestRoute && currentPath !== '/login' && currentPath !== '/register' && currentPath !== '/') {
+        navigate("/dashboard");
+      }
+    }
+  }, [navigate, location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
