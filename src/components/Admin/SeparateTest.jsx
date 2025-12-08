@@ -3,10 +3,14 @@ import { IoMdTime } from "react-icons/io";
 import { FaUser } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
 import { TbEdit } from "react-icons/tb";
+import { useNavigate } from "react-router-dom";
 function SeparateTest({ testData }) {
   const [timeLeft, setTimeLeft] = useState(null);
   const [status, setStatus] = useState("");
-  console.log(testData);
+  const navigate = useNavigate();
+  const handleNavigate = () => {
+    navigate("/admin/123/student-analytics");
+  };
 
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -62,7 +66,7 @@ function SeparateTest({ testData }) {
 
   return (
     <div className="border border-gray-200 rounded-2xl px-5 py-4 flex flex-col gap-2 w-full">
-      <div className="flex gap-5 relative">
+      <div className="flex gap-3 relative">
         <div className="bg-indigo-100 text-indigo-400 rounded-sm px-2 py-1 flex items-center text-xs">
           {formatDateTime(testData.startDate)}
         </div>
@@ -118,11 +122,11 @@ function SeparateTest({ testData }) {
           </div>
         </div>
         <div className="pt-2">Exam Mode: {testData.type}</div>
-        <div className="flex gap-3 pt-1">Department: </div>
-        <div className="flex gap-3 pt-1">Semester: </div>
+        <div className="flex gap-3 pt-1">Department: {testData.department}</div>
+        <div className="flex gap-3 pt-1">Semester: {testData.semester}</div>
       </div>
 
-      <div className="flex border-indigo-400 border text-indigo-400 w-fit items-center justify-center rounded-md py-1 px-4 shadow-md shadow-indigo-200 mt-2 cursor-pointer">
+      <div className="flex border-indigo-400 border text-indigo-400 w-fit items-center justify-center rounded-md py-1 px-4 shadow-md shadow-indigo-200 mt-2 cursor-pointer" onClick={handleNavigate}>
         Student Performance
       </div>
     </div>

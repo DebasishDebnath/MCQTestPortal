@@ -146,7 +146,7 @@ const router = createBrowserRouter(
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="create-test" element={<CreateTest />} />
           <Route path="all-test" element={<AllTest />} />
-          <Route path="student-analytics" element={<StudentAnalytics />} />
+          <Route path=":testid/student-analytics" element={<StudentAnalytics replace />} />
           <Route path="success" element={<ScheduleSuccess />} />
         </Route>
       </Route>

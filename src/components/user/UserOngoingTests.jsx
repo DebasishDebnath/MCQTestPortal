@@ -34,7 +34,7 @@ function UserAllTests() {
   return (
     <div className="bg-white rounded-3xl px-10 py-10">
       <div className="flex justify-between items-center mb-6">
-        <div className="text-blue-theme font-semibold text-[24px]">
+        <div className="text-blue-theme font-semibold text-2xl">
           Completed Tests
         </div>
         <div className="flex gap-6 items-center text-sm">
