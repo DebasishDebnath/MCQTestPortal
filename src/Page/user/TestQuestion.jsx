@@ -33,7 +33,9 @@ function TestQuestion() {
   const [hardWarnings, setHardWarnings] = useState(0);
 
   const handleProctoringHardWarning = (reason, count) => {
-    toast.error(`⚠️ Hard Warning (${count}/3): ${reason}`, { duration: 3000 });
+    toast.error(`⚠️ Hard Warning (${count}/3): ${reason}`, { duration: 3000, position: "top-right" } 
+
+    );
     setHardWarnings(count);
 
     if (count >= 3) {
@@ -99,6 +101,21 @@ function TestQuestion() {
     return () => {
       window.removeEventListener("beforeunload", blockBeforeUnload);
     };
+  }, []);
+
+  // Block F5, F12, and all function keys
+  useEffect(() => {
+    const blockFunctionKeys = (e) => {
+      // F1-F12: keyCode 112-123, F5=116, F12=123
+      if ((e.keyCode >= 112 && e.keyCode <= 123) || e.key === "F5" || e.key === "F12") {
+        e.preventDefault();
+        e.stopPropagation();
+        toast.error("Function keys are disabled during the test.");
+        return false;
+      }
+    };
+    window.addEventListener("keydown", blockFunctionKeys, true);
+    return () => window.removeEventListener("keydown", blockFunctionKeys, true);
   }, []);
 
   // Handle auto-submit from proctoring with answered count

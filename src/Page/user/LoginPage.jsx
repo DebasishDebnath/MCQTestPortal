@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast";
 // comment out
 const TESTING_MODE = true; // Set to false to disable bypass
 const TEST_CONFIG = {
-  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTMxNjdhYTNjZThlODI5MDBmYzM2NjkiLCJlbWFpbCI6ImRleWFua2FuMTU0QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiZXhhbUlkIjoiNjkzMTY3YWEzY2U4ZTgyOTAwZmMzNjViIiwiaWF0IjoxNzY0OTMyNjM2LCJleHAiOjE3NjUwMTkwMzZ9.EiMF096PbbMiT9NO2vmWDU6PFtRn1kf0loQZX6K7Tds", // Replace with your actual test token
+  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTMxNjdhYjNjZThlODI5MDBmYzM2NzIiLCJlbWFpbCI6InJhaHVscGFsMjAyM2llbUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc2NTE3NjA1NywiZXhwIjoxNzY1MjYyNDU3fQ.P6zepRt5ywOmtVOP2K42l3QvCYAsYVNxsa_Wv-klzyw", // Replace with your actual test token
   testId: "693167aa3ce8e82900fc365b", // Replace with your actual test ID
 };
 // ⭐ END TESTING BYPASS ⭐
