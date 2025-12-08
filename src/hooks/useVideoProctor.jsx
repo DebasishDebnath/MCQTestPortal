@@ -1,22 +1,24 @@
 import { useRef, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as blazeface from "@tensorflow-models/blazeface";
-import { useHttp } from "./useHttp"; // Add this import
-import { toast } from "react-hot-toast"; // Add if missing
+import { useHttp } from "./useHttp";
 
 export default function useVideoProctor(videoRef, onHard, onLog, testid) {
-  const { post } = useHttp(); // Add this line
+  const { post } = useHttp();
   const faceModelRef = useRef(null);
   const objModelRef = useRef(null);
   const detectIntervalRef = useRef(null);
+  const micStreamRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
 
   const detectionActive = useRef(false);
   const hardWarnings = useRef(0);
-  const warningCounts = useRef({}); // Track per-event warnings
+  const warningCounts = useRef({});
+  const lastWarn = useRef({}); // Debounce warnings
 
   const HARD_LIMIT = 3;
   const PHONE_CONFIDENCE = 0.40;
-
   const phoneClasses = ["cell phone", "mobile phone", "phone", "smartphone"];
 
   function log(msg) {
@@ -24,7 +26,6 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     onLog && onLog(msg);
   }
 
-  // --- Add this helper ---
   async function reportProctorEvent(type, severity) {
     if (!testid) return;
     try {
@@ -44,19 +45,29 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
   }
 
   function hard(reason) {
-    hardWarnings.current++;
-    log(`⚠️ Hard warning (${hardWarnings.current}): ${reason}`);
+    // Debounce - prevent duplicate warnings within 3s
+    const now = Date.now();
+    if (lastWarn.current[reason] && now - lastWarn.current[reason] < 3000) return;
+    lastWarn.current[reason] = now;
 
-    // Escalate severity
+    hardWarnings.current++;
+    log(`⚠️ Hard warning (${hardWarnings.current}/3): ${reason}`);
+
     warningCounts.current[reason] = (warningCounts.current[reason] || 0) + 1;
     const count = warningCounts.current[reason];
     const severity = count < 3 ? "warning" : "critical";
     reportProctorEvent(reason, severity);
 
     onHard && onHard(reason, hardWarnings.current);
+    
     if (hardWarnings.current >= HARD_LIMIT) {
       stop();
-      log("🚫 Exam cancelled");
+      log("🚫 Exam cancelled - triggering auto-submit");
+      window.dispatchEvent(
+        new CustomEvent("autoSubmitExam", {
+          detail: { reason: "Multiple proctoring violations detected!", warnings: 3 }
+        })
+      );
     }
   }
 
@@ -131,11 +142,6 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     log("Face OK");
   }
 
-  // --- Microphone test ---
-  const micStreamRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-
   async function startMicrophoneTest() {
     try {
       micStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -145,7 +151,6 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
       analyserRef.current.fftSize = 2048;
       source.connect(analyserRef.current);
 
-      // Start monitoring volume
       monitorMicVolume();
       log("Microphone test ON");
     } catch (e) {
@@ -158,20 +163,14 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     const buffer = new Uint8Array(analyserRef.current.fftSize);
     analyserRef.current.getByteTimeDomainData(buffer);
 
-    // Calculate RMS (root mean square) amplitude
     let sum = 0;
     for (let i = 0; i < buffer.length; i++) {
       const val = (buffer[i] - 128) / 128;
       sum += val * val;
     }
     const rms = Math.sqrt(sum / buffer.length);
-
-    // Convert RMS to dB SPL (approximate, not calibrated)
-    // 0.1 RMS ~ normal conversation, 0.3+ ~ shout
     const db = 20 * Math.log10(rms);
-    // Map to dB SPL range (approximate)
-    const dbSpl = Math.round(60 + db * 20); // 60dB base for normal speech
-
+    const dbSpl = Math.round(60 + db * 20);
     return dbSpl;
   }
 
@@ -179,7 +178,6 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     let loudCount = 0;
     const check = () => {
       const db = getVolumeDb();
-      // log(`Mic dB: ${db}`);
       if (db >= 80) {
         loudCount++;
         if (loudCount >= 3) {
@@ -193,11 +191,29 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
         loudCount = 0;
       }
     };
-    // Check every 1.2s
     detectIntervalRef.current = setInterval(check, 1200);
   }
 
-  // --- Update start() to include mic test ---
+  // ✅ ADD TAB SWITCH & FULLSCREEN MONITORING
+  function setupBrowserMonitoring() {
+    const onBlur = () => hard("Tab switch detected");
+    const onHide = () => document.hidden && hard("Focus lost");
+    const exitFS = () => !document.fullscreenElement && hard("Fullscreen exited");
+
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("visibilitychange", onHide);
+    document.addEventListener("fullscreenchange", exitFS);
+
+    log("Browser monitoring ON");
+
+    // Return cleanup function
+    return () => {
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("visibilitychange", onHide);
+      document.removeEventListener("fullscreenchange", exitFS);
+    };
+  }
+
   async function start(videoConstraints = { width: 1280, height: 720 }) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -212,10 +228,15 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
       detectionActive.current = true;
       detectIntervalRef.current = setInterval(detect, 1200);
 
-      // Start microphone test
       await startMicrophoneTest();
 
-      log("Camera + Detection ON");
+      // ✅ Start browser monitoring
+      const cleanupBrowser = setupBrowserMonitoring();
+      
+      // Store cleanup function
+      videoRef.cleanupBrowser = cleanupBrowser;
+
+      log("Camera + Detection + Browser Monitoring ON");
       return true;
     } catch (e) {
       log("Camera failed");
@@ -223,7 +244,6 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     }
   }
 
-  // --- Cleanup mic stream ---
   function stop() {
     detectionActive.current = false;
     if (detectIntervalRef.current) clearInterval(detectIntervalRef.current);
@@ -233,7 +253,6 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
       video.srcObject.getTracks().forEach(t => t.stop());
       video.srcObject = null;
     }
-    // Stop mic
     if (micStreamRef.current) {
       micStreamRef.current.getTracks().forEach(t => t.stop());
       micStreamRef.current = null;
@@ -242,6 +261,13 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
+    
+    // ✅ Cleanup browser monitoring
+    if (videoRef.cleanupBrowser) {
+      videoRef.cleanupBrowser();
+      videoRef.cleanupBrowser = null;
+    }
+
     log("Stopped");
   }
 
