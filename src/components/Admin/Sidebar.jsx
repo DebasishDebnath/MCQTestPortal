@@ -23,7 +23,11 @@ function Sidebar() {
       <nav className="flex-1 px-4 mt-6">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activePath.startsWith(item.path);
+          const isActive =
+            item.path === "/admin/all-test"
+              ? activePath.startsWith(item.path) ||
+                activePath.includes("/student-analytics")
+              : activePath.startsWith(item.path);
           return (
             <button
               key={item.path}
