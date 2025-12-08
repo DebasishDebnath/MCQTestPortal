@@ -200,7 +200,8 @@ export function useProctoring(testid, isEnabled = true, autoStart = true) {
     const severity = count < 3 ? "warning" : "critical";
     reportProctorEvent(key, severity);
 
-    toast.error(msg, { duration: 3500 });
+    // Show toast on top-right
+    toast.error(msg, { duration: 3500, position: "top-right" });
 
     setWarningCount((prev) => {
       const c = prev + 1;

@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as blazeface from "@tensorflow-models/blazeface";
 import { useHttp } from "./useHttp"; // Add this import
+import { toast } from "react-hot-toast"; // Add if missing
 
 export default function useVideoProctor(videoRef, onHard, onLog, testid) {
   const { post } = useHttp(); // Add this line
@@ -130,6 +131,73 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     log("Face OK");
   }
 
+  // --- Microphone test ---
+  const micStreamRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+
+  async function startMicrophoneTest() {
+    try {
+      micStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContextRef.current.createMediaStreamSource(micStreamRef.current);
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 2048;
+      source.connect(analyserRef.current);
+
+      // Start monitoring volume
+      monitorMicVolume();
+      log("Microphone test ON");
+    } catch (e) {
+      log("Microphone access failed");
+    }
+  }
+
+  function getVolumeDb() {
+    if (!analyserRef.current) return 0;
+    const buffer = new Uint8Array(analyserRef.current.fftSize);
+    analyserRef.current.getByteTimeDomainData(buffer);
+
+    // Calculate RMS (root mean square) amplitude
+    let sum = 0;
+    for (let i = 0; i < buffer.length; i++) {
+      const val = (buffer[i] - 128) / 128;
+      sum += val * val;
+    }
+    const rms = Math.sqrt(sum / buffer.length);
+
+    // Convert RMS to dB SPL (approximate, not calibrated)
+    // 0.1 RMS ~ normal conversation, 0.3+ ~ shout
+    const db = 20 * Math.log10(rms);
+    // Map to dB SPL range (approximate)
+    const dbSpl = Math.round(60 + db * 20); // 60dB base for normal speech
+
+    return dbSpl;
+  }
+
+  function monitorMicVolume() {
+    let loudCount = 0;
+    const check = () => {
+      const db = getVolumeDb();
+      // log(`Mic dB: ${db}`);
+      if (db >= 80) {
+        loudCount++;
+        if (loudCount >= 3) {
+          hard("Microphone: Shouting detected");
+          loudCount = 0;
+        }
+      } else if (db >= 66) {
+        hard("Microphone: Loud talking detected");
+        loudCount = 0;
+      } else {
+        loudCount = 0;
+      }
+    };
+    // Check every 1.2s
+    detectIntervalRef.current = setInterval(check, 1200);
+  }
+
+  // --- Update start() to include mic test ---
   async function start(videoConstraints = { width: 1280, height: 720 }) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -144,6 +212,9 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
       detectionActive.current = true;
       detectIntervalRef.current = setInterval(detect, 1200);
 
+      // Start microphone test
+      await startMicrophoneTest();
+
       log("Camera + Detection ON");
       return true;
     } catch (e) {
@@ -152,6 +223,7 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     }
   }
 
+  // --- Cleanup mic stream ---
   function stop() {
     detectionActive.current = false;
     if (detectIntervalRef.current) clearInterval(detectIntervalRef.current);
@@ -160,6 +232,15 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     if (video?.srcObject) {
       video.srcObject.getTracks().forEach(t => t.stop());
       video.srcObject = null;
+    }
+    // Stop mic
+    if (micStreamRef.current) {
+      micStreamRef.current.getTracks().forEach(t => t.stop());
+      micStreamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
     }
     log("Stopped");
   }
