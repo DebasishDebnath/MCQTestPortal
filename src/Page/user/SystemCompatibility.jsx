@@ -291,6 +291,37 @@ function SystemCompatibility() {
                 {cameraError && (
                   <p className="text-red-500 text-sm mt-1 ml-8">{cameraError}</p>
                 )}
+                {/* Camera Preview Dialog */}
+            {cameraOk && (
+              <div className="mt-8 flex flex-col items-center justify-center">
+                <div className="bg-gray-100 rounded-lg shadow-lg p-4 w-full max-w-xs">
+                  <h3 className="text-lg font-semibold text-blue-theme mb-2 text-center">
+                    Camera Preview
+                  </h3>
+                  <video
+                    id="camera-preview"
+                    autoPlay
+                    muted
+                    playsInline
+                    style={{
+                      width: "100%",
+                      height: "180px",
+                      objectFit: "cover",
+                      borderRadius: "0.75rem",
+                      background: "#222",
+                    }}
+                    ref={el => {
+                      if (el && streamRef) {
+                        el.srcObject = streamRef;
+                      }
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    If you see yourself, camera is working!
+                  </p>
+                </div>
+              </div>
+            )}
               </div>
 
               <div className="flex flex-col">
@@ -314,6 +345,8 @@ function SystemCompatibility() {
                 <StatusIcon status={networkOk} />
               </div>
             </div>
+
+            
 
             {/* Proceed Button */}
             <button
