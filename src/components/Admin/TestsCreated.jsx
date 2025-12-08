@@ -2,7 +2,7 @@ import React from "react";
 import test from "/test.png";
 function TestsCreated() {
   return (
-    <div className="bg-white rounded-2xl w-full p-6 poppins flex flex-col gap-2 h-full">
+    <div className="bg-white rounded-2xl w-full p-6 poppins flex flex-col gap-2 h-full shadow-md">
       <div className="flex justify-between gap-4">
         <div className="text-gray-700 text-md flex flex-col gap-2">
           Tests Created{" "}

@@ -207,7 +207,7 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
       {/* Questions and Answers Section */}
       {currentQuestion && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-blue-theme font-semibold text-[24px]">
+          <h2 className="text-blue-theme font-semibold text-2xl">
             Questions and Answers
           </h2>
           <div className="flex flex-col gap-2">

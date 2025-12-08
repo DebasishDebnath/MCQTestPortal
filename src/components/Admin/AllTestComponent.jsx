@@ -4,7 +4,6 @@ import AllTestShow from "./AllTestShow";
 import SeparateTest from "./SeparateTest";
 import { useNavigate } from "react-router-dom";
 import { useHttp } from "../../hooks/useHttp";
-import { IoIosSearch } from "react-icons/io";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
 function AllTestComponent({ allTests }) {
@@ -77,21 +76,23 @@ function AllTestComponent({ allTests }) {
   };
 
   return (
-    <div className="bg-white rounded-3xl px-10 py-10 w-full">
-      <div className="max-w-full mx-auto">
+    <div className="w-full max-w-7xl bg-white rounded-3xl shadow-xl p-10 flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-4xl font-bold text-gray-900">All Tests</h1>
+        <div className="flex items-center justify-between">
+          <div className="text-blue-theme font-semibold text-2xl">
+          All Tests
+        </div>
 
           {/* Search Bar */}
-          <div className="relative w-[40%]">
+          <div className="relative w-1/3">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search by Test Name"
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-12 py-3 border border-gray-200 rounded-xl text-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             {searchTerm && (
               <button
@@ -107,13 +108,13 @@ function AllTestComponent({ allTests }) {
         {/* Filters Section */}
         <div className="flex items-center justify-between">
           {/* Filter Pills */}
-          <div className="flex items-center gap-3 pb-10">
+          <div className="flex items-center gap-4 text-sm font-medium">
             <button
               onClick={() => handleFilterClick("draft")}
-              className={`px-5 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+              className={`px-4 py-1.5 rounded-xl transition-colors cursor-pointer ${
                 activeFilter === "draft"
-                  ? "bg-[#160024] text-white"
-                  : "bg-blue-50 text-blue-700"
+                  ? "bg-black text-white"
+                  : "bg-indigo-100 text-blue-theme"
               }`}
             >
               Upcoming
@@ -121,10 +122,10 @@ function AllTestComponent({ allTests }) {
 
             <button
               onClick={() => handleFilterClick("closed")}
-              className={`px-5 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+              className={`px-4 py-1.5 rounded-xl transition-colors cursor-pointer ${
                 activeFilter === "closed"
-                  ? "bg-[#160024] text-white hover:bg-[#29083d]"
-                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                  ? "bg-black text-white"
+                  : "bg-indigo-100 text-blue-theme"
               }`}
             >
               Completed
@@ -132,10 +133,10 @@ function AllTestComponent({ allTests }) {
 
             <button
               onClick={() => handleFilterClick("live")}
-              className={`px-5 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+              className={`px-4 py-1.5 rounded-xl transition-colors cursor-pointer ${
                 activeFilter === "live"
-                  ? "bg-[#160024] text-white hover:bg-[#29083d]"
-                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                  ? "bg-black text-white"
+                  : "bg-indigo-100 text-blue-theme"
               }`}
             >
               Ongoing
@@ -143,10 +144,10 @@ function AllTestComponent({ allTests }) {
 
             <button
               onClick={() => setActiveFilter(null)}
-              className={`px-5 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+              className={`px-4 py-1.5 rounded-xl transition-colors cursor-pointer ${
                 activeFilter === null
-                  ? "bg-[#160024] text-white hover:bg-[#29083d]"
-                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                  ? "bg-black text-white"
+                  : "bg-indigo-100 text-blue-theme"
               }`}
             >
               View All
@@ -155,7 +156,7 @@ function AllTestComponent({ allTests }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[32%]">
+      <div className="grid grid-cols-2 gap-4">
         {loading && (
           <div className="col-span-full text-center py-8 text-gray-500">
             Loading tests...

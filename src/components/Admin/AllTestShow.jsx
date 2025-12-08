@@ -34,9 +34,9 @@ function AllTestShow() {
     }
   };
   return (
-    <div className="bg-white rounded-2xl px-10 py-10 w-full">
+    <div className="bg-white rounded-2xl p-10 w-full shadow-md poppins">
       <div className="flex justify-between items-center mb-6">
-        <div className="text-blue-theme font-semibold text-[24px]">
+        <div className="text-blue-theme font-semibold text-2xl">
           All Tests({examNumber})
         </div>
         <div className="flex gap-6 items-center text-sm">
