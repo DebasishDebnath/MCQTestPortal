@@ -7,7 +7,8 @@ import FinalSubmission from "../../components/user/FinalSubmission";
 import { useHttp } from "../../hooks/useHttp";
 import { toast } from "react-hot-toast";
 import { useQuestionAttempt } from "../../context/QuestionAttemptContext";
-import { useProctoring } from "../../hooks/useProctoring";
+// ❌ REMOVE THIS LINE - Delete legacy proctoring
+// import { useProctoring } from "../../hooks/useProctoring";
 import useVideoProctor from "../../hooks/useVideoProctor";
 
 function TestQuestion() {
@@ -33,12 +34,8 @@ function TestQuestion() {
   const [hardWarnings, setHardWarnings] = useState(0);
 
   const handleProctoringHardWarning = (reason, count) => {
-    toast.error(`⚠️ Hard  (${count}/3): ${reason}`, { duration: 3000, position: "top-right" });
+    toast.error(`⚠️ Warning (${count}/3): ${reason}`, { duration: 3000, position: "top-right" });
     setHardWarnings(count);
-
-    if (count >= 3) {
-      handleAutoExamSubmit("Multiple proctoring violations detected!");
-    }
   };
 
   const handleProctoringLog = (msg) => {
@@ -50,12 +47,12 @@ function TestQuestion() {
     videoRef,
     handleProctoringHardWarning,
     handleProctoringLog,
-    testid // Pass testid here
+    testid
   );
 
-  // 🚨 Legacy AI Proctoring Hook - start immediately when component mounts (SILENT)
-  const { warningCount, isProctoringReady, isInitializing, isExamActive } =
-    useProctoring(testid, true, true);
+  // ❌ REMOVE THIS LINE - Delete legacy proctoring hook
+  // const { warningCount, isProctoringReady, isInitializing, isExamActive } =
+  //   useProctoring(testid, true, true);
 
   const [showFinalSubmission, setShowFinalSubmission] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -86,7 +83,7 @@ function TestQuestion() {
     };
   }, []);
 
-  // Only block browser navigation (beforeunload) - F5 is already handled in useProctoring
+  // Only block browser navigation (beforeunload)
   useEffect(() => {
     const blockBeforeUnload = (e) => {
       e.preventDefault();
@@ -104,7 +101,6 @@ function TestQuestion() {
   // Block F5, F12, and all function keys
   useEffect(() => {
     const blockFunctionKeys = (e) => {
-      // F1-F12: keyCode 112-123, F5=116, F12=123
       if ((e.keyCode >= 112 && e.keyCode <= 123) || e.key === "F5" || e.key === "F12") {
         e.preventDefault();
         e.stopPropagation();
@@ -116,28 +112,35 @@ function TestQuestion() {
     return () => window.removeEventListener("keydown", blockFunctionKeys, true);
   }, []);
 
-  // Handle auto-submit from proctoring with answered count
+  // ✅ FIX: Ensure auto-submit handler is properly registered
   useEffect(() => {
     const handleAutoSubmit = async (event) => {
+      console.log("🚨 AUTO-SUBMIT TRIGGERED", event.detail);
+      
       const answeredCount = Object.keys(answers).length;
+      const reason = event.detail?.reason || "Proctoring violations";
       
       const token = localStorage.getItem("userToken");
       try {
         await post("/api/exam/submit", { examId: testid }, {
           Authorization: `Bearer ${token}`,
         });
+        console.log("✅ Exam submitted successfully");
       } catch (error) {
-        console.error("Auto-submit error:", error);
+        console.error("❌ Auto-submit error:", error);
       }
 
       navigate(`/test/thankyou/${testid}`, { 
-        state: { answered: answeredCount },
+        state: { answered: answeredCount, reason },
         replace: true 
       });
     };
 
     window.addEventListener("autoSubmitExam", handleAutoSubmit);
-    return () => window.removeEventListener("autoSubmitExam", handleAutoSubmit);
+    
+    return () => {
+      window.removeEventListener("autoSubmitExam", handleAutoSubmit);
+    };
   }, [answers, testid, navigate, post]);
 
   // Load initial questions
@@ -237,6 +240,8 @@ function TestQuestion() {
   }, []);
 
   const handleAutoExamSubmit = async (reason) => {
+    console.log("🚨 MANUAL AUTO-SUBMIT", reason);
+    
     const answeredCount = Object.keys(answers).length;
     
     const token = localStorage.getItem("userToken");
@@ -449,11 +454,12 @@ function TestQuestion() {
         }}
       />
 
-      {/* ⚠️ Warning Counters Display */}
+      {/* ⚠️ Single Warning Counter Display */}
       {hardWarnings > 0 && (
         <div className="fixed top-20 right-4 space-y-2 z-50">
           <div className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
             <p className="font-bold">🚨 Warnings: {hardWarnings}/3</p>
+            <p className="text-xs mt-1">Auto-submit at 3 warnings</p>
           </div>
         </div>
       )}
