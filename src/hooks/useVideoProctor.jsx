@@ -1,14 +1,17 @@
 import { useRef, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as blazeface from "@tensorflow-models/blazeface";
+import { useHttp } from "./useHttp"; // Add this import
 
-export default function useVideoProctor(videoRef, onHard, onLog) {
+export default function useVideoProctor(videoRef, onHard, onLog, testid) {
+  const { post } = useHttp(); // Add this line
   const faceModelRef = useRef(null);
   const objModelRef = useRef(null);
   const detectIntervalRef = useRef(null);
 
   const detectionActive = useRef(false);
   const hardWarnings = useRef(0);
+  const warningCounts = useRef({}); // Track per-event warnings
 
   const HARD_LIMIT = 3;
   const PHONE_CONFIDENCE = 0.40;
@@ -20,9 +23,35 @@ export default function useVideoProctor(videoRef, onHard, onLog) {
     onLog && onLog(msg);
   }
 
+  // --- Add this helper ---
+  async function reportProctorEvent(type, severity) {
+    if (!testid) return;
+    try {
+      await post(
+        "/api/attempts/proctor",
+        {
+          examId: testid,
+          proctorEvent: { type, severity }
+        },
+        {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        }
+      );
+    } catch (e) {
+      log("Failed to report proctor event: " + e);
+    }
+  }
+
   function hard(reason) {
     hardWarnings.current++;
     log(`⚠️ Hard warning (${hardWarnings.current}): ${reason}`);
+
+    // Escalate severity
+    warningCounts.current[reason] = (warningCounts.current[reason] || 0) + 1;
+    const count = warningCounts.current[reason];
+    const severity = count < 3 ? "warning" : "critical";
+    reportProctorEvent(reason, severity);
+
     onHard && onHard(reason, hardWarnings.current);
     if (hardWarnings.current >= HARD_LIMIT) {
       stop();

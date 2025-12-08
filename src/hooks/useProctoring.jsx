@@ -5,9 +5,11 @@ import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as blazeface from "@tensorflow-models/blazeface";
 import "@tensorflow/tfjs";
 import { initTF } from "../components/user/SetupTensorflow";
+import { useHttp } from "./useHttp";
 
 export function useProctoring(testid, isEnabled = true, autoStart = true) {
   const navigate = useNavigate();
+  const { post } = useHttp();
 
   const [warningCount, setWarningCount] = useState(0);
   const [isExamActive, setIsExamActive] = useState(true);
@@ -20,9 +22,29 @@ export function useProctoring(testid, isEnabled = true, autoStart = true) {
   const intervalRef = useRef(null);
   const streamRef = useRef(null);
   const lastWarn = useRef({});
+  const warningCounts = useRef({}); // Track per-event warnings
 
   const PHONE_CLASSES = ["cell phone", "mobile phone", "smartphone"];
   const PHONE_MIN_CONF = 0.50;
+
+  // --- Add this helper ---
+  const reportProctorEvent = async (type, severity) => {
+    if (!testid) return;
+    try {
+      await post(
+        "/api/attempts/proctor",
+        {
+          examId: testid,
+          proctorEvent: { type, severity },
+        },
+        {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        }
+      );
+    } catch (e) {
+      // Silent fail
+    }
+  };
 
   useEffect(() => {
     if (!isEnabled) return setIsInitializing(false);
@@ -64,7 +86,7 @@ export function useProctoring(testid, isEnabled = true, autoStart = true) {
         try {
           streamRef.current = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: "user", width: 1280, height: 720 },
-            audio: true
+            audio: true,
           });
           console.log("✅ Stream acquired successfully");
         } catch (permErr) {
@@ -108,7 +130,7 @@ export function useProctoring(testid, isEnabled = true, autoStart = true) {
         if (!alive) return;
         faceModelRef.current = await blazeface.load();
         console.log("✅ Face model loaded");
-        
+
         objectModelRef.current = await cocoSsd.load();
         console.log("✅ Object model loaded");
 
@@ -158,7 +180,7 @@ export function useProctoring(testid, isEnabled = true, autoStart = true) {
       alive = false;
       stopMonitoring();
       stopCamera();
-      
+
       // ✅ Cleanup: Remove hidden video element
       if (videoRef.current && videoRef.current.parentNode) {
         videoRef.current.parentNode.removeChild(videoRef.current);
@@ -171,6 +193,12 @@ export function useProctoring(testid, isEnabled = true, autoStart = true) {
     const now = Date.now();
     if (lastWarn.current[key] && now - lastWarn.current[key] < 4000) return;
     lastWarn.current[key] = now;
+
+    // Escalate severity
+    warningCounts.current[key] = (warningCounts.current[key] || 0) + 1;
+    const count = warningCounts.current[key];
+    const severity = count < 3 ? "warning" : "critical";
+    reportProctorEvent(key, severity);
 
     toast.error(msg, { duration: 3500 });
 
