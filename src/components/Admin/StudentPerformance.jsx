@@ -178,7 +178,7 @@ function StudentPerformance() {
           </div>
           <div className="h-[2px] bg-gray-200 w-full mb-4"></div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {leaderboard.map((student, index) => (
               <div
                 key={index}
@@ -186,7 +186,7 @@ function StudentPerformance() {
               >
                 <div className="relative">
                   <img src="/medal.png" alt="medal img" />
-                  <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-blue-900">
+                  <span className="absolute bottom-0 right-2/5 text-xs font-medium text-blue-900">
                     {student.rank}
                   </span>
                 </div>
