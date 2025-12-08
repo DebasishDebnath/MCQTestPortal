@@ -33,9 +33,7 @@ function TestQuestion() {
   const [hardWarnings, setHardWarnings] = useState(0);
 
   const handleProctoringHardWarning = (reason, count) => {
-    toast.error(`⚠️ Hard Warning (${count}/3): ${reason}`, { duration: 3000, position: "top-right" } 
-
-    );
+    toast.error(`⚠️ Hard Warning (${count}/3): ${reason}`, { duration: 3000, position: "top-right" });
     setHardWarnings(count);
 
     if (count >= 3) {
