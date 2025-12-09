@@ -146,7 +146,7 @@ function SeparateTest({ testData }) {
   const [timeLeft, setTimeLeft] = useState(null);
   const [status, setStatus] = useState("");
   const navigate = useNavigate();
-
+  console.log(testData, "separate");
   const handleNavigate = () => {
     navigate("/admin/123/student-analytics");
   };
