@@ -66,6 +66,7 @@ function TestDetailComponent({ onProceed, initialData }) {
           // Convert dayjs objects to strings for JSON serialization
           startDateTime: formData.startDateTime.toISOString(),
           endDateTime: formData.endDateTime.toISOString(),
+          testType: formData.testType.toLowerCase(), // <-- add this line
         },
         questions: json,
         files: {

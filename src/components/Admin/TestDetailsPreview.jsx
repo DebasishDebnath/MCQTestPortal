@@ -90,21 +90,21 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
 
     const formData = new FormData();
     formData.append("title", details.testName);
-    formData.append("semester", details.semester);
-    formData.append("department", details.department);
-    formData.append("totalMarks", details.totalMarks);
+    formData.append("description", details.testName); // If you have a separate description, use it
     formData.append("durationMinutes", details.duration);
-    formData.append("testMode", details.testType);
-    formData.append("startDate", details.startDateTime);
-    formData.append("endDate", details.endDateTime);
+    formData.append("startDate", dayjs(details.startDateTime).toISOString());
+    formData.append("endDate", dayjs(details.endDateTime).toISOString());
+    formData.append("department", details.department);
+    formData.append("semester", details.semester);
+    formData.append("totalMarks", details.totalMarks);
+    formData.append("type", details.testType); // 'online' or 'offline'
 
-    // Debug: Log file types
-    console.log("questionFile type:", typeof files.questionsFile, files.questionsFile instanceof File);
-    console.log("userFile type:", typeof files.studentsFile, files.studentsFile instanceof File);
+    if (details.testType === "offline" && details.examSupervisiorEmail) {
+      formData.append("supervisorMail", details.examSupervisiorEmail);
+    }
 
     formData.append("questionFile", files.questionsFile);
     formData.append("userFile", files.studentsFile);
-
     formData.append("questions", JSON.stringify(questions));
 
     // Debug: Log FormData contents
