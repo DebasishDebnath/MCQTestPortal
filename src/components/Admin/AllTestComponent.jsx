@@ -6,16 +6,16 @@ import { useNavigate } from "react-router-dom";
 import { useHttp } from "../../hooks/useHttp";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
-function AllTestComponent({ allTests }) {
+function AllTestComponent() {
   const { get } = useHttp();
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [activeFilter, setActiveFilter] = useState(null); // null, 'upcoming', 'completed', 'ongoing'
+  const [activeFilter, setActiveFilter] = useState(null);
 
-  // Debounce search term
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
@@ -24,7 +24,6 @@ function AllTestComponent({ allTests }) {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Fetch when debounced search or filter changes
   useEffect(() => {
     fetchAllExams();
   }, [debouncedSearch, activeFilter]);
@@ -34,8 +33,6 @@ function AllTestComponent({ allTests }) {
       setLoading(true);
       setError(null);
       const token = localStorage.getItem("userToken");
-
-      // Build URL with query parameters
       let url = "/api/exam/getAllExams?";
       const params = [];
 
@@ -54,7 +51,7 @@ function AllTestComponent({ allTests }) {
       });
 
       console.log(response);
-      setTests(response.data || response);
+      setTests(response.data.exams || response);
     } catch (err) {
       setError(err.message || "Failed to fetch exams");
       console.error("Error fetching exams:", err);
