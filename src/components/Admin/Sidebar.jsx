@@ -11,7 +11,6 @@ function Sidebar() {
     { path: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { path: "/admin/create-test", label: "Create Test", icon: FilePlus },
     { path: "/admin/all-test", label: "All Tests", icon: FolderOpen },
-    { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   return (
