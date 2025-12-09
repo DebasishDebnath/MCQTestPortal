@@ -23,7 +23,7 @@ function UserAllTests() {
       });
 
       console.log(response);
-      setTests(response.data || response);
+      setTests(response.data.exams || response);
     } catch (err) {
       setError(err.message || "Failed to fetch exams");
       console.error("Error fetching exams:", err);
