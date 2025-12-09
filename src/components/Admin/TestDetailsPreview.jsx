@@ -57,8 +57,9 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
       const worksheet = workbook.Sheets[sheetName];
       const json = XLSX.utils.sheet_to_json(worksheet);
 
-      onUpdateQuestions(json, file.name);
-      setCurrentQuestionIndex(0); // Reset to the first question
+      // Pass both the parsed data and the actual file object
+      onUpdateQuestions(json, file.name, file); // <-- Make sure this sets both file and name in previewData.files
+      setCurrentQuestionIndex(0);
     };
     reader.readAsArrayBuffer(file);
   };
@@ -66,7 +67,8 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
   const handleStudentsFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    onUpdateStudentsFile(file.name);
+    // Pass the actual file object
+    onUpdateStudentsFile(file.name, file); // <-- Make sure this sets both file and name in previewData.files
   };
 
   const handleCreateTest = async () => {
@@ -75,27 +77,47 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
       return;
     }
 
-    const { details, questions } = previewData;
+    const { details, questions, files } = previewData;
 
-    const payload = {
-      title: details.testName,
-      semester: details.semester,
-      department: details.department,
-      totalMarks: details.totalMarks,
-      durationMinutes: details.duration,
-      testMode: details.testType,
-      startDate: details.startDateTime, // Already ISO string from form component
-      endDate: details.endDateTime,     // Already ISO string from form component
-      supervisorEmail:
-        details.testType === "Offline" ? details.examSupervisiorEmail : undefined,
-      questions: questions,
-    };
+    // Debug: Log file objects
+    console.log("questionsFile:", files.questionsFile);
+    console.log("studentsFile:", files.studentsFile);
+
+    if (!files.questionsFile || !files.studentsFile) {
+      alert("Both question file and user file are required.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", details.testName);
+    formData.append("semester", details.semester);
+    formData.append("department", details.department);
+    formData.append("totalMarks", details.totalMarks);
+    formData.append("durationMinutes", details.duration);
+    formData.append("testMode", details.testType);
+    formData.append("startDate", details.startDateTime);
+    formData.append("endDate", details.endDateTime);
+
+    // Debug: Log file types
+    console.log("questionFile type:", typeof files.questionsFile, files.questionsFile instanceof File);
+    console.log("userFile type:", typeof files.studentsFile, files.studentsFile instanceof File);
+
+    formData.append("questionFile", files.questionsFile);
+    formData.append("userFile", files.studentsFile);
+
+    formData.append("questions", JSON.stringify(questions));
+
+    // Debug: Log FormData contents
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
 
     const token = localStorage.getItem("userToken");
 
     try {
-      await post("/api/exam/create", payload, {
+      await post("/api/exam/create", formData, {
         Authorization: `Bearer ${token}`,
+        // Do NOT set Content-Type here!
       });
 
       localStorage.removeItem("testPreviewData");
