@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { useHttp } from "./../../hooks/useHttp.jsx";
 import SeparateTest from "./SeparateTest.jsx";
 import { useNavigate } from "react-router-dom";
-function AllTestShow() {
-  const { get } = useHttp();
+function AllTestShow({response}) {
   const [tests, setTests] = useState([]);
   const [examNumber, setExamNumber] = useState();
   const [loading, setLoading] = useState(true);
@@ -12,20 +10,16 @@ function AllTestShow() {
   const navigate = useNavigate();
   useEffect(() => {
     fetchAllExams();
-  }, []);
-
-  const fetchAllExams = async () => {
+  }, [response]);
+  // console.log("response", response);
+  const fetchAllExams = () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem("userToken");
-      console.log(token, "token");
-      const response = await get("/api/exam/getAllExams", {
-        Authorization: `Bearer ${token}`,
-      });
-      setExamNumber(response.data.length);
-      console.log(response);
-      setTests(response.data || response);
+      
+      setExamNumber(response?.totalCount || 0);
+      
+      setTests(response?.exams);
     } catch (err) {
       setError(err.message || "Failed to fetch exams");
       console.error("Error fetching exams:", err);
@@ -64,7 +58,7 @@ function AllTestShow() {
           <div className="text-center py-8 text-red-500">Error: {error}</div>
         )}
 
-        {!loading && !error && tests.length === 0 && (
+        {!loading && !error && examNumber === 0 && (
           <div className="text-center py-8 text-gray-500">
             No tests available
           </div>
@@ -72,7 +66,7 @@ function AllTestShow() {
 
         {!loading &&
           !error &&
-          tests.length > 0 &&
+          examNumber > 0 &&
           tests.slice(0, 2).map((test) => (
             <SeparateTest key={test.id || test._id} testData={test} />
           ))}

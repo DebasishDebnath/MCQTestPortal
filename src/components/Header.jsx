@@ -112,7 +112,9 @@ function Header() {
 
   useEffect(() => {
     const token = localStorage.getItem("userToken");
-    if (token) {
+    const userRole = localStorage.getItem("userRole");
+
+    if (token && userRole !== "superadmin") {
       get("/api/users/profile", { Authorization: `Bearer ${token}` })
         .then((data) => {
           if (data && data.data) {
@@ -135,9 +137,14 @@ function Header() {
           setProfilePic(localStorage.getItem("Image") || null);
         });
     } else {
-      // No token, use localStorage values
-      setFirstName(localStorage.getItem("firstName") || "User");
-      setProfilePic(localStorage.getItem("Image") || null);
+      // No token, or user is superadmin. Use localStorage or defaults.
+      if (userRole === "superadmin") {
+        setFirstName("Super Admin");
+        setProfilePic(null);
+      } else {
+        setFirstName(localStorage.getItem("firstName") || "User");
+        setProfilePic(localStorage.getItem("Image") || null);
+      }
     }
   }, [get, location.pathname]);
 
