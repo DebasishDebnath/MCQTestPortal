@@ -1,24 +1,52 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Download, ChevronLeft, ChevronRight, Award } from "lucide-react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { useHttp } from "../../hooks/useHttp";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function StudentPerformance() {
-  const students = [
-    { name: "Aniket Sawhney", rollNumber: 22, marks: "55/60", timeTaken: 99 },
-    { name: "Padma Gaikwad", rollNumber: 22, marks: "59/60", timeTaken: 99 },
-    { name: "Sadat Hasan", rollNumber: 22, marks: "60/60", timeTaken: 99 },
-    { name: "AR Rahman", rollNumber: 22, marks: "58/60", timeTaken: 99 },
-  ];
+function StudentPerformance({ testId, title }) {
+  const token = localStorage.getItem("userToken");
+  const { get } = useHttp();
 
-  const leaderboard = [
-    { name: "Narulu P.", score: "64/65", rank: 1 },
-    { name: "Narulu P.", score: "64/65", rank: 2 },
-    { name: "Narulu P.", score: "64/65", rank: 3 },
-    { name: "Narulu P.", score: "64/65", rank: 4 },
-  ];
+  const [students, setStudents] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    if (testId) {
+      get(
+        `/api/exam/getExamScoreDetails/${testId}`,
+        { Authorization: `Bearer ${token}` }
+      ).then((data) => {
+        if (data?.success && data.data?.attemptDetails) {
+          // Map attemptDetails to students array for table
+          setStudents(
+            data.data.attemptDetails.map((attempt, idx) => ({
+              name: attempt.studentId.name,
+              rollNumber: attempt.studentId.enrollmentNumber,
+              marks: `${attempt.score}/${attempt.exam.totalMarks}`,
+              timeTaken: attempt.totalTimeTaken,
+              profileImage: attempt.studentId.profileImage,
+              email: attempt.studentId.email,
+            }))
+          );
+          // Leaderboard: sort by score descending, then map
+          const sorted = [...data.data.attemptDetails].sort(
+            (a, b) => b.score - a.score
+          );
+          setLeaderboard(
+            sorted.map((attempt, idx) => ({
+              name: attempt.studentId.name,
+              score: `${attempt.score}/${attempt.exam.totalMarks}`,
+              rank: idx + 1,
+              profileImage: attempt.studentId.profileImage,
+            }))
+          );
+        }
+      });
+    }
+  }, [testId, get, token]);
 
   const chartData = {
     labels: [">90", "75-90", "50-75", "<50"],
@@ -50,7 +78,7 @@ function StudentPerformance() {
       {/* Student Results Table */}
       <div className="flex flex-col w-full bg-white rounded-2xl shadow-md p-10 gap-2 w-full">
         <div className="text-blue-theme font-semibold text-2xl">
-          Machine Learning Test
+           {title}
         </div>
         <div className="h-[2px] bg-gray-200 w-full mb-4"></div>
 
@@ -71,7 +99,14 @@ function StudentPerformance() {
                   key={index}
                   className="border-b border-gray-100 hover:bg-gray-50 text-gray-700"
                 >
-                  <td className="p-4">{student.name}</td>
+                  <td className="p-4 flex items-center gap-2">
+                    <img
+                      src={student.profileImage}
+                      alt={student.name}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <span>{student.name}</span>
+                  </td>
                   <td className="p-4 text-center">{student.rollNumber}</td>
                   <td className="p-4 text-center">{student.marks}</td>
                   <td className="p-4 text-center">{student.timeTaken}</td>

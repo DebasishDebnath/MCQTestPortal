@@ -148,7 +148,9 @@ function SeparateTest({ testData }) {
   const navigate = useNavigate();
   console.log(testData, "separate");
   const handleNavigate = () => {
-    navigate("/admin/123/student-analytics");
+
+    navigate(`/admin/${testData._id}/student-analytics`, { state: { testId: testData._id,title: testData.title } });
+    //  navigate(`/admin/${testId}/student-analytics`, { state: { testId,title: testData.title } });
   };
 
   const formatDateTime = (dateString) => {
@@ -295,12 +297,22 @@ function SeparateTest({ testData }) {
         <div className="flex gap-3 pt-1">Semester: {testData.semester}</div>
       </div>
 
-      <div
+      {/* <div
         className="flex border-indigo-400 border text-indigo-400 w-fit items-center justify-center rounded-md py-1 px-4 shadow-md shadow-indigo-200 mt-2 cursor-pointer"
         onClick={handleNavigate}
       >
         Student Performance
-      </div>
+      </div> */}
+
+      {/* Student Performance button only for "ongoing" or "closed" */}
+      {(status === "ongoing" || status === "closed" ) && (
+        <div
+          className="flex border-indigo-400 border text-indigo-400 w-fit items-center justify-center rounded-md py-1 px-4 shadow-md shadow-indigo-200 mt-2 cursor-pointer"
+          onClick={handleNavigate}
+        >
+          Student Performance
+        </div>
+      )}
     </div>
   );
 }
