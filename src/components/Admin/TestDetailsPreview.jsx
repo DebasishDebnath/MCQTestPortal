@@ -6,10 +6,12 @@ import { ChevronLeft, ChevronRight, Upload } from "lucide-react";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
+import ConfirmationModal from "../../utils/modal/ConfirmationModal";
 import { useHttp } from "../../hooks/useHttp";
 
 function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateStudentsFile }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const { post, loading: isSubmitting, error } = useHttp();
   const navigate = useNavigate();
 
@@ -115,6 +117,7 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
     const token = localStorage.getItem("userToken");
 
     try {
+      // The useHttp hook already handles FormData content type
       await post("/api/exam/create", formData, {
         Authorization: `Bearer ${token}`,
         // Do NOT set Content-Type here!
@@ -122,6 +125,7 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
 
       localStorage.removeItem("testPreviewData");
       navigate("/admin/success", { state: { ...details } });
+      setIsConfirmModalOpen(false);
     } catch (err) {
       console.error("Failed to create exam:", err);
       alert(`Error: ${error?.message || "Could not create the test."}`);
@@ -176,10 +180,11 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
             </button>
             <button
               type="button"
-              onClick={handleCreateTest}
+              onClick={() => setIsConfirmModalOpen(true)}
               className="bg-blue-theme text-white font-medium py-2 px-8 rounded-lg flex items-center justify-center gap-2 transition-colors min-w-30 disabled:bg-gray-400 cursor-pointer"
               disabled={isSubmitting}
-            > Create
+            >
+              {isSubmitting ? "Creating..." : "Create"}
             </button>
           </div>
           </div>
@@ -225,6 +230,17 @@ function TestDetailsPreview({ previewData, onBack, onUpdateQuestions, onUpdateSt
           </label>
         </div>
       </div>
+
+      {isConfirmModalOpen && (
+        <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={handleCreateTest}
+          title="Confirm Test Creation"
+          confirmButtonText="Yes, Create Test"
+          isLoading={isSubmitting}
+        />
+      )}
 
       {/* Questions and Answers Section */}
       {currentQuestion && (
