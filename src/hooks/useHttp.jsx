@@ -19,13 +19,17 @@ export const useHttp = () => {
         const config = {
           method,
           headers: {
-            "Content-Type": "application/json",
             ...headers,
           },
         };
 
         if (body) {
-          config.body = JSON.stringify(body);
+          if (body instanceof FormData) {
+            config.body = body; // Do NOT set Content-Type for FormData
+          } else {
+            config.headers["Content-Type"] = "application/json";
+            config.body = JSON.stringify(body);
+          }
         }
 
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
