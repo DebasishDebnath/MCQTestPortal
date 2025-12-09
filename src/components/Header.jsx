@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaRegCircleDot, FaRegHourglassHalf } from "react-icons/fa6";
-import iem from "/iem.png";
-import uem from "/uem.png";
 import { User } from "lucide-react";
 import { useHttp } from "../hooks/useHttp.jsx";
 import moment from "moment";
@@ -18,6 +16,8 @@ function Header() {
   // Profile logic...
   const [firstName, setFirstName] = useState("");
   const [profilePic, setProfilePic] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [hasToken, setHasToken] = useState(false);
 
   // Timer logic
   const [timeLeft, setTimeLeft] = useState(null);
@@ -112,7 +112,9 @@ function Header() {
 
   useEffect(() => {
     const token = localStorage.getItem("userToken");
-    const userRole = localStorage.getItem("userRole");
+    const role = localStorage.getItem("userRole");
+    setHasToken(!!token);
+    setUserRole(role);
 
     if (token && userRole !== "superadmin") {
       get("/api/users/profile", { Authorization: `Bearer ${token}` })
@@ -146,14 +148,13 @@ function Header() {
         setProfilePic(localStorage.getItem("Image") || null);
       }
     }
-  }, [get, location.pathname]);
+  }, [get, location.pathname, userRole]);
 
   return (
     <header className="bg-blue-theme w-full poppins">
-      <div className="text-white px-6 flex justify-between items-center max-w-[1440px] mx-auto">
-        <div className="flex items-start">
-          <img src={iem} alt="" className=" w-22" />
-          <img src={uem} alt="" className=" w-22" />
+      <div className="text-white px-6 flex justify-between items-center w-full">
+        <div className="flex items-start px-4 py-2">
+          <img src="/IEM League.png" alt="" className=" w-26" />
         </div>
         {isTestPage ? (
           <div className="flex justify-center items-center gap-6 text-sm">
@@ -173,38 +174,42 @@ function Header() {
               Finish Test
             </button>
           </div>
-        ) : isDashboard ? (
-          <div className="absolute top-4 right-4 flex items-end gap-4">
-            {profilePic ? (
-              <img
-                src={profilePic}
-                alt="Profile"
-                className="w-10 h-10 rounded-full object-cover border"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  e.target.nextSibling.style.display = "flex";
-                }}
-              />
-            ) : null}
-            <div
-              className={`w-10 h-10 rounded-full bg-gray-300 items-center justify-center border ${
-                profilePic ? "hidden" : "flex"
-              }`}
-            >
-              <User size={20} className="text-gray-600" />
-            </div>
-            <span className="font-semibold text-white">
-              {firstName || "User"}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:shadow-lg hover:scale-105 hover:cursor-pointer"
-            >
-              Logout
-            </button>
-          </div>
         ) : (
-          <div></div>
+          hasToken && (
+            <div className=" flex gap-4 items-center justify-center">
+              {userRole !== "superadmin" && (
+                <>
+                  {profilePic ? (
+                    <img
+                      src={profilePic}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-full object-cover border"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "flex";
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`w-10 h-10 rounded-full bg-gray-300 items-center justify-center border ${
+                      profilePic ? "hidden" : "flex"
+                    }`}
+                  >
+                    <User size={20} className="text-gray-600" />
+                  </div>
+                  <span className="font-semibold text-white flex items-center justify-center">
+                    {firstName || "User"}
+                  </span>
+                </>
+              )}
+              <button
+                onClick={handleLogout}
+                className="hover:bg-red-600 hover:text-white text-red-600 border-2 border-red-600 rounded-full px-4 py-2 rounded-full text-sm font-medium transition-colors hover:shadow-lg hover:scale-105 hover:cursor-pointer"
+              >
+                Logout
+              </button>
+            </div>
+          )
         )}
       </div>
     </header>
