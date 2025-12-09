@@ -36,17 +36,20 @@ export function QuestionAttemptProvider({ children }) {
     [setAttempts]
   );
 
-  const saveAnswer = async (examId, questionId, value) => {
-    const token = localStorage.getItem("userToken");
-    const selectedIndex = normalizeSelectedIndex(value);
+// ...existing code...
 
-    const body = {
-      examId,
-      answer: { questionId, selectedIndex },
-    };
+const saveAnswer = async (examId, questionId, value) => {
+  const token = localStorage.getItem("userToken");
+  const selectedIndex = normalizeSelectedIndex(value);
 
-    console.log("📤 CREATE API Call:", body);
+  const body = {
+    examId,
+    answer: { questionId, selectedIndex },
+  };
 
+  console.log("📤 CREATE API Call:", body);
+
+  try {
     const res = await post("/api/attempts/create", body, {
       Authorization: `Bearer ${token}`,
     });
@@ -67,20 +70,27 @@ export function QuestionAttemptProvider({ children }) {
       return true;
     }
 
+    toast.error(res?.message || "Failed to save answer");
     return false;
+  } catch (error) {
+    console.error("❌ Save answer error:", error);
+
+    return false;
+  }
+};
+
+const editAnswer = async (examId, questionId, value) => {
+  const token = localStorage.getItem("userToken");
+  const selectedIndex = normalizeSelectedIndex(value);
+
+  const body = {
+    examId,
+    answer: { questionId, selectedIndex },
   };
 
-  const editAnswer = async (examId, questionId, value) => {
-    const token = localStorage.getItem("userToken");
-    const selectedIndex = normalizeSelectedIndex(value);
+  console.log("📤 EDIT API Call:", body);
 
-    const body = {
-      examId,
-      answer: { questionId, selectedIndex },
-    };
-
-    console.log("📤 EDIT API Call:", body);
-
+  try {
     const res = await post("/api/attempts/edit", body, {
       Authorization: `Bearer ${token}`,
     });
@@ -101,8 +111,16 @@ export function QuestionAttemptProvider({ children }) {
       return true;
     }
 
+    toast.error(res?.message || "Failed to update answer");
     return false;
-  };
+  } catch (error) {
+    console.error("❌ Edit answer error:", error);
+
+    return false;
+  }
+};
+
+
 
   const clearAnswer = async (examId, questionId) => {
     const token = localStorage.getItem("userToken");
@@ -124,7 +142,7 @@ export function QuestionAttemptProvider({ children }) {
       }));
       return true;
     }
-    toast.error("Failed to clear answer");
+
     return false;
   };
 

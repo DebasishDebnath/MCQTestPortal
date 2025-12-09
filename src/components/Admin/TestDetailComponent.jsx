@@ -70,7 +70,9 @@ function TestDetailComponent({ onProceed, initialData }) {
         questions: json,
         files: {
           questionsFileName: questionsFile?.name,
+          questionsFile: questionsFile, 
           studentsFileName: studentsFile?.name,
+          studentsFile: studentsFile,   
         },
       };
 

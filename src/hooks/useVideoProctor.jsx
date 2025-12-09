@@ -7,7 +7,8 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
   const { post } = useHttp();
   const faceModelRef = useRef(null);
   const objModelRef = useRef(null);
-  const detectIntervalRef = useRef(null);
+  const detectIntervalRef = useRef(null); // ✅ For face detection
+  const micIntervalRef = useRef(null); // ✅ Separate interval for mic
   const micStreamRef = useRef(null);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -62,12 +63,15 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     
     if (hardWarnings.current >= HARD_LIMIT) {
       stop();
-      log("🚫 Exam cancelled - triggering auto-submit");
-      window.dispatchEvent(
-        new CustomEvent("autoSubmitExam", {
-          detail: { reason: "Multiple proctoring violations detected!", warnings: 3 }
-        })
-      );
+      console.log("🚫 HARD LIMIT REACHED - Dispatching autoSubmitExam event");
+      
+      const event = new CustomEvent("autoSubmitExam", {
+        detail: { reason: "Multiple proctoring violations detected!", warnings: 3 }
+      });
+      
+      console.log("📤 Event created:", event);
+      window.dispatchEvent(event);
+      console.log("✅ Event dispatched successfully");
     }
   }
 
@@ -109,37 +113,41 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
     const video = videoRef.current;
     if (!video || video.readyState < 2) return;
 
-    const faces = await faceModel.estimateFaces(video, false);
-
-    if (!faces || faces.length === 0) return hard("No face detected");
-    if (faces.length > 1) return hard("Multiple faces detected");
-
-    const p = faces[0];
-    const topLeft = p.topLeft;
-    const bottomRight = p.bottomRight;
-    const bboxW = bottomRight[0] - topLeft[0];
-    const videoW = video.videoWidth;
-
-    if (bboxW < videoW * 0.12) return hard("Face too small / too far");
-
-    const lm = p.landmarks;
-    const nose = lm[2];
-    const centerX = (topLeft[0] + bottomRight[0]) / 2;
-    const dx = Math.abs(nose[0] - centerX);
-    if (dx > bboxW * 0.18) return hard("Looking away");
-
-    let objs = [];
     try {
-      objs = await objModel.detect(video);
-    } catch {
-      return;
-    }
+      const faces = await faceModel.estimateFaces(video, false);
 
-    if (objs.some(o => phoneClasses.includes(o.class) && o.score >= PHONE_CONFIDENCE)) {
-      return hard("Phone detected");
-    }
+      if (!faces || faces.length === 0) return hard("No face detected");
+      if (faces.length > 1) return hard("Multiple faces detected");
 
-    log("Face OK");
+      const p = faces[0];
+      const topLeft = p.topLeft;
+      const bottomRight = p.bottomRight;
+      const bboxW = bottomRight[0] - topLeft[0];
+      const videoW = video.videoWidth;
+
+      if (bboxW < videoW * 0.12) return hard("Face too small / too far");
+
+      const lm = p.landmarks;
+      const nose = lm[2];
+      const centerX = (topLeft[0] + bottomRight[0]) / 2;
+      const dx = Math.abs(nose[0] - centerX);
+      if (dx > bboxW * 0.18) return hard("Looking away");
+
+      let objs = [];
+      try {
+        objs = await objModel.detect(video);
+      } catch {
+        return;
+      }
+
+      if (objs.some(o => phoneClasses.includes(o.class) && o.score >= PHONE_CONFIDENCE)) {
+        return hard("Phone detected");
+      }
+
+      log("Face OK");
+    } catch (e) {
+      console.error("Detection error:", e);
+    }
   }
 
   async function startMicrophoneTest() {
@@ -191,7 +199,8 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
         loudCount = 0;
       }
     };
-    detectIntervalRef.current = setInterval(check, 1200);
+    // ✅ Use separate interval ref
+    micIntervalRef.current = setInterval(check, 1200);
   }
 
   // ✅ ADD TAB SWITCH & FULLSCREEN MONITORING
@@ -226,6 +235,7 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
       await loadModels();
 
       detectionActive.current = true;
+      // ✅ Start face detection interval
       detectIntervalRef.current = setInterval(detect, 1200);
 
       await startMicrophoneTest();
@@ -239,14 +249,23 @@ export default function useVideoProctor(videoRef, onHard, onLog, testid) {
       log("Camera + Detection + Browser Monitoring ON");
       return true;
     } catch (e) {
-      log("Camera failed");
+      log("Camera failed: " + e);
       return false;
     }
   }
 
   function stop() {
     detectionActive.current = false;
-    if (detectIntervalRef.current) clearInterval(detectIntervalRef.current);
+    
+    // ✅ Clear both intervals
+    if (detectIntervalRef.current) {
+      clearInterval(detectIntervalRef.current);
+      detectIntervalRef.current = null;
+    }
+    if (micIntervalRef.current) {
+      clearInterval(micIntervalRef.current);
+      micIntervalRef.current = null;
+    }
 
     const video = videoRef.current;
     if (video?.srcObject) {

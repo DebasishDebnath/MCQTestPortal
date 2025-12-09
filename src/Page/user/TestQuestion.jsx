@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { MdArrowDropDown } from "react-icons/md";
 import QuestionsGrid from "../../components/user/QuestionsGrid";
@@ -112,12 +112,19 @@ function TestQuestion() {
     return () => window.removeEventListener("keydown", blockFunctionKeys, true);
   }, []);
 
-  // ✅ FIX: Ensure auto-submit handler is properly registered
+  // ✅ FIX: Use useRef to access latest answers without re-registering listener
+  const answersRef = useRef(answers);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  // ✅ FIX: Stable auto-submit handler (no dependencies that change frequently)
   useEffect(() => {
     const handleAutoSubmit = async (event) => {
       console.log("🚨 AUTO-SUBMIT TRIGGERED", event.detail);
       
-      const answeredCount = Object.keys(answers).length;
+      const answeredCount = Object.keys(answersRef.current).length;
       const reason = event.detail?.reason || "Proctoring violations";
       
       const token = localStorage.getItem("userToken");
@@ -126,8 +133,10 @@ function TestQuestion() {
           Authorization: `Bearer ${token}`,
         });
         console.log("✅ Exam submitted successfully");
+        toast.success("Test auto-submitted due to violations");
       } catch (error) {
         console.error("❌ Auto-submit error:", error);
+        toast.error("Failed to submit test");
       }
 
       navigate(`/test/thankyou/${testid}`, { 
@@ -136,12 +145,14 @@ function TestQuestion() {
       });
     };
 
+    console.log("✅ Registering autoSubmitExam listener");
     window.addEventListener("autoSubmitExam", handleAutoSubmit);
     
     return () => {
+      console.log("❌ Removing autoSubmitExam listener");
       window.removeEventListener("autoSubmitExam", handleAutoSubmit);
     };
-  }, [answers, testid, navigate, post]);
+  }, [testid, navigate, post]); // Only stable dependencies
 
   // Load initial questions
   useEffect(() => {
@@ -327,13 +338,43 @@ function TestQuestion() {
     }
   };
 
+  // ✅ FIX 1: Sync answers with attempts on component mount and when attempts change
+  useEffect(() => {
+    if (!currentQuestion) return;
+    
+    const questionId = currentQuestion._id;
+    const attemptStatus = getAttemptStatus(questionId);
+    
+    // Load existing answer from attempt if available
+    if (attemptStatus.answered && attemptStatus.value.length > 0) {
+      setAnswers(prev => ({
+        ...prev,
+        [questionId]: currentQuestion.questionType === "multiple" 
+          ? attemptStatus.value 
+          : attemptStatus.value[0]
+      }));
+    }
+  }, [currentQuestion, attempts, getAttemptStatus]);
+
+  // ✅ FIX 2: Improved saveOrUpdateAnswer with better logging
   const saveOrUpdateAnswer = async () => {
-    if (!currentQuestion) return false;
+    if (!currentQuestion) {
+      console.log("❌ No current question");
+      return false;
+    }
 
     const questionId = currentQuestion._id;
     const answerValue = answers[questionId];
     const attemptStatus = getAttemptStatus(questionId);
 
+    console.log("💾 Saving answer:", {
+      questionId,
+      answerValue,
+      attemptStatus,
+      questionType: currentQuestion.questionType
+    });
+
+    // Check if there's an answer to save
     const hasAnswer =
       answerValue !== undefined &&
       (Array.isArray(answerValue)
@@ -341,25 +382,60 @@ function TestQuestion() {
         : answerValue !== null && answerValue !== "");
 
     if (!hasAnswer) {
-      return true;
+      console.log("ℹ️ No answer to save");
+      return true; // Not an error - just no answer
     }
 
+    // Normalize to array format
     let selectedIndex = Array.isArray(answerValue)
       ? answerValue
       : [answerValue];
 
-    if (attemptStatus.isNew || attemptStatus.cleared) {
-      return await saveAttempt(testid, questionId, selectedIndex);
-    } else if (attemptStatus.answered) {
-      return await editAttempt(testid, questionId, selectedIndex);
-    }
+    console.log("📤 Normalized answer:", selectedIndex);
 
-    return true;
+    try {
+      let success = false;
+      
+      // Determine save vs edit based on attempt status
+      if (!attemptStatus.answered || attemptStatus.isNew) {
+        console.log("🆕 Creating new answer");
+        success = await saveAttempt(testid, questionId, selectedIndex);
+      } else {
+        console.log("✏️ Editing existing answer");
+        success = await editAttempt(testid, questionId, selectedIndex);
+      }
+
+      if (success) {
+        console.log("✅ Answer saved successfully");
+        toast.success("Answer saved", { duration: 1000 });
+      } else {
+        console.error("❌ Failed to save answer");
+        toast.error("Failed to save answer");
+      }
+
+      return success;
+    } catch (error) {
+      console.error("❌ Error saving answer:", error);
+      toast.error("Error saving answer");
+      return false;
+    }
   };
 
+  // ✅ FIX 3: Improved handleNext with proper error handling
   const handleNext = async () => {
+    console.log("➡️ Moving to next question");
+    
+    // Mark current question as visited
+    setVisitedQuestions((prev) => new Set([...prev, currentQuestionIndex]));
+    
     const saved = await saveOrUpdateAnswer();
-    if (!saved) return;
+    if (!saved && answers[currentQuestion._id]) {
+      // If save failed and there was an answer, ask user
+      const proceed = window.confirm(
+        "Failed to save answer. Do you want to continue anyway?"
+      );
+      if (!proceed) return;
+    }
 
     if (currentQuestionIndex < totalQuestions - 1) {
       const nextIndex = currentQuestionIndex + 1;
@@ -374,41 +450,94 @@ function TestQuestion() {
     }
   };
 
+  // ✅ FIX 4: Improved handlePrevious
   const handlePrevious = async () => {
+    console.log("⬅️ Moving to previous question");
+    
     const saved = await saveOrUpdateAnswer();
-    if (!saved) return;
+    if (!saved && answers[currentQuestion._id]) {
+      const proceed = window.confirm(
+        "Failed to save answer. Do you want to continue anyway?"
+      );
+      if (!proceed) return;
+    }
 
     if (currentQuestionIndex > 0) {
       const prevIndex = currentQuestionIndex - 1;
       setVisitedQuestions((prev) => new Set([...prev, prevIndex]));
       setCurrentQuestionIndex(prevIndex);
+      
+      const prevQuestion = questionMap.get(prevIndex);
+      if (prevQuestion) {
+        initializeQuestion(prevQuestion._id);
+      }
     }
   };
 
+  // ✅ FIX 5: Improved handleClearResponse with confirmation
   const handleClearResponse = async () => {
+    if (!currentQuestion) return;
+    
     const questionId = currentQuestion._id;
+    const hasAnswer = answers[questionId] !== undefined;
+    
+    if (!hasAnswer) {
+      toast.error("No answer to clear");
+      return;
+    }
 
-    const success = await clearAttempt(testid, questionId);
+    const confirmClear = window.confirm(
+      "Are you sure you want to clear your response?"
+    );
+    
+    if (!confirmClear) return;
 
-    if (success) {
-      const updatedAnswers = { ...answers };
-      delete updatedAnswers[questionId];
-      setAnswers(updatedAnswers);
+    console.log("🗑️ Clearing answer for question:", questionId);
 
-      const updatedMarked = { ...markedForReview };
-      delete updatedMarked[questionId];
-      setMarkedForReview(updatedMarked);
+    try {
+      const success = await clearAttempt(testid, questionId);
+
+      if (success) {
+        // Clear local state
+        const updatedAnswers = { ...answers };
+        delete updatedAnswers[questionId];
+        setAnswers(updatedAnswers);
+
+        const updatedMarked = { ...markedForReview };
+        delete updatedMarked[questionId];
+        setMarkedForReview(updatedMarked);
+
+        toast.success("Response cleared");
+        console.log("✅ Answer cleared successfully");
+      }
+    } catch (error) {
+      console.error("❌ Error clearing answer:", error);
+      toast.error("Failed to clear response");
     }
   };
 
-  const handleMarkForReview = () => {
+  // ✅ FIX 6: Improved handleMarkForReview
+  const handleMarkForReview = async () => {
+    if (!currentQuestion) return;
+    
+    console.log("🔖 Marking for review");
+    
+    // Save current answer first
+    await saveOrUpdateAnswer();
+    
     setMarkedForReview({
       ...markedForReview,
       [currentQuestion._id]: true,
     });
+    
+    toast.success("Marked for review", { duration: 1000 });
   };
 
+  // ✅ FIX 7: Improved handleQuestionClick
   const handleQuestionClick = async (index) => {
+    console.log("🎯 Clicking question:", index + 1);
+    
+    // Save current answer before switching
     await saveOrUpdateAnswer();
 
     await checkAndLoadQuestions(index);
