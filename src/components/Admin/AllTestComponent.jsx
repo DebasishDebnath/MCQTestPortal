@@ -249,7 +249,7 @@ function AllTestComponent() {
         </div>
       </div>
 
-      <div className="relative min-h-[600px]">
+      <div className="relative ">
         {pageLoading && (
           <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
             <div className="flex flex-col items-center gap-3">
@@ -292,12 +292,12 @@ function AllTestComponent() {
       </div>
 
       {!loading && !error && tests.length > 0 && totalTests > limit && (
-        <div className="flex items-center justify-between mt-6 px-4">
+        <div className="flex items-center justify-between">
           
           <button
             onClick={handlePreviousPage}
             disabled={currentPage === 1 || pageLoading}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all ${
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all min-w-36 justify-center ${
               currentPage === 1 || pageLoading
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-blue-theme text-white hover:bg-blue-600 shadow-md"
@@ -333,7 +333,7 @@ function AllTestComponent() {
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages || pageLoading}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all ${
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all min-w-36 justify-center ${
               currentPage === totalPages || pageLoading
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-blue-theme text-white hover:bg-blue-600 shadow-md"
