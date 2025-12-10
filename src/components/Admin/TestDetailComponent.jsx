@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Upload } from "lucide-react";
+import { ArrowRight, Download } from "lucide-react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -71,9 +71,9 @@ function TestDetailComponent({ onProceed, initialData }) {
         questions: json,
         files: {
           questionsFileName: questionsFile?.name,
-          questionsFile: questionsFile, 
+          questionsFile: questionsFile,
           studentsFileName: studentsFile?.name,
-          studentsFile: studentsFile,   
+          studentsFile: studentsFile,
         },
       };
 
@@ -289,13 +289,25 @@ function TestDetailComponent({ onProceed, initialData }) {
           </div>
           <div className="w-1/2 flex flex-col gap-10 h-full">
             <div className="flex flex-col gap-3 h-1/2">
-              <div className="flex flex-col gap-2">
-                <h2 className="text-2xl font-semibold text-blue-theme">
-                  Upload Questions
-                </h2>
-                <p className="text-sm text-gray-400">
-                  Upload Excel files upto 20 kb
-                </p>
+              <div className="flex justify-between items-center">
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-2xl font-semibold text-blue-theme">
+                    Upload Questions
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    Upload Excel files upto 20 kb
+                  </p>
+                </div>
+                <a
+                  href="/Questions_Template.xlsx"
+                  download="Questions_Template.xlsx"
+                  className="hover:bg-blue-900 hover:text-white text-blue-900 border font-medium border-blue-900 text-sm py-2 px-4 h-fit w-fit rounded-lg flex items-center justify-center gap-2 transition-colors disabled:bg-gray-400 cursor-pointer"
+                >
+                  {isSubmitting
+                    ? "Downloading..."
+                    : "Download Question Template"}
+                  <Download size={18} />
+                </a>
               </div>
 
               {/* Upload Area */}
@@ -331,13 +343,25 @@ function TestDetailComponent({ onProceed, initialData }) {
               </div>
             </div>
             <div className="flex flex-col gap-3 h-1/2">
-              <div className="flex flex-col gap-2">
-                <h2 className="text-2xl font-semibold text-blue-theme">
-                  Upload Student Details
-                </h2>
-                <p className="text-sm text-gray-400">
-                  Upload Excel files upto 20 kb
-                </p>
+              <div className="flex justify-between items-center">
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-2xl font-semibold text-blue-theme">
+                    Upload Student Details
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    Upload Excel files upto 20 kb
+                  </p>
+                </div>
+                <a
+                  href="/Users_Template.xlsx"
+                  download="Users_Template.xlsx"
+                  className="hover:bg-blue-900 hover:text-white text-blue-900 border font-medium border-blue-900 text-sm py-2 px-4 h-fit w-fit rounded-lg flex items-center justify-center gap-2 transition-colors disabled:bg-gray-400 cursor-pointer"
+                >
+                  {isSubmitting
+                    ? "Downloading..."
+                    : "Download Student Template"}
+                  <Download size={18} />
+                </a>
               </div>
 
               {/* Upload Area */}
@@ -393,7 +417,11 @@ function TestDetailComponent({ onProceed, initialData }) {
           </button>
         </div>
       </LocalizationProvider>
-      {error && <div className="text-center text-red-500 mt-4">Error: {error.message}</div>}
+      {error && (
+        <div className="text-center text-red-500 mt-4">
+          Error: {error.message}
+        </div>
+      )}
     </form>
   );
 }
