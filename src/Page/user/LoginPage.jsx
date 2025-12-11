@@ -179,12 +179,12 @@ export default function LoginPage() {
             <div className="text-center mt-6">
               <p className="text-slate-600 text-sm">
                 Don't have an account?{" "}
-                <a
-                  href="/register"
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                <span
+                  onClick={() => navigate("/register")}
+                  className="text-blue-600 hover:text-blue-700 font-semibold cursor-pointer"
                 >
                   Register
-                </a>
+                </span>
               </p>
             </div>
           </div>

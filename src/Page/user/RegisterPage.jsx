@@ -5,6 +5,7 @@ import { MdLocalPhone, MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { Eye, EyeOff } from "lucide-react";
 import ErrorPopup from "../../components/error/ErrorPopup.jsx";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast"; // <-- Add this import
 
 export default function RegisterPage() {
@@ -18,6 +19,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { post, loading, error, errorStatus } = useHttp();
   const [showError, setShowError] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -177,12 +179,12 @@ export default function RegisterPage() {
               <div className="text-center mt-6">
                 <p className="text-slate-600 text-sm">
                   Already have an account?{" "}
-                  <a
-                    href="/login"
+                  <span
+                    onClick={() => navigate("/login")}
                     className="text-blue-600 hover:text-blue-700 font-semibold"
                   >
                     Login
-                  </a>
+                  </span>
                 </p>
               </div>
             </div>

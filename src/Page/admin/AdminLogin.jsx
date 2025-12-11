@@ -17,9 +17,11 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
-    if (localStorage.getItem("userToken") && localStorage.getItem("userRole") === "superadmin") {
+    if (
+      localStorage.getItem("userToken") &&
+      localStorage.getItem("userRole") === "superadmin"
+    ) {
       navigate("/admin/dashboard");
     }
   }, [navigate]);
@@ -104,7 +106,7 @@ export default function LoginPage() {
                     Password <RiLockPasswordFill className="w-4 h-4" />
                   </label>
 
-                  <div className="relative">
+                  <div className="relative flex flex-col gap-1 items-end">
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
@@ -119,10 +121,16 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800"
+                      className="absolute right-4 top-1/3 -translate-y-1/2 text-slate-600 hover:text-slate-800"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
+                      <span
+                        onClick={() => navigate("/admin/forget-password")}
+                        className="text-blue-600 hover:text-blue-700 text-md font-medium mr-2 cursor-pointer"
+                      >
+                        Forget Password?
+                      </span>
                   </div>
                 </div>
 
@@ -145,12 +153,12 @@ export default function LoginPage() {
               <div className="text-center mt-6">
                 <p className="text-slate-600 text-sm">
                   Don't have an account?{" "}
-                  <a
-                    href="/admin/register"
-                    className="text-blue-600 hover:text-blue-700 font-semibold"
+                  <span
+                    onClick={() => navigate("/admin/register")}
+                    className="text-blue-600 hover:text-blue-700 font-semibold cursor-pointer"
                   >
                     Register
-                  </a>
+                  </span>
                 </p>
               </div>
             </div>

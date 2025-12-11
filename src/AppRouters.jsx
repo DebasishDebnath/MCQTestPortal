@@ -20,6 +20,8 @@ import AdminLogin from "./Page/admin/AdminLogin";
 import AdminRegister from "./Page/admin/AdminRegister";
 import Dashboard from "./Page/admin/Dashboard";
 import StudentAnalytics from "./Page/admin/StudentAnalytics";
+import ForgetPassword from "./Page/admin/ForgetPassword";
+
 // User Components
 import Instruction from "./Page/user/Instruction";
 import SystemCompatibility from "./Page/user/SystemCompatibility";
@@ -133,6 +135,14 @@ const router = createBrowserRouter(
           element={
             <AdminAuthGuard>
               <AdminRegister />
+            </AdminAuthGuard>
+          }
+        />
+        <Route
+          path="forget-password"
+          element={
+            <AdminAuthGuard>
+              <ForgetPassword />
             </AdminAuthGuard>
           }
         />
