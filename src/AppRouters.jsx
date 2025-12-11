@@ -114,6 +114,7 @@ const router = createBrowserRouter(
 
         <Route path="success" element={<SubmissionSuccess />} />
         <Route path="test/thankyou/:testid" element={<SubmissionSuccess />} />
+        <Route path="*" element={<RouteErrorPopup />} /> {/* Catch-all for user */}
       </Route>
 
       {/* ADMIN ROUTES */}
@@ -122,6 +123,17 @@ const router = createBrowserRouter(
         element={<AdminAuthLayout />}
         errorElement={<RouteErrorPopup />}
       >
+        {/* Protected /admin root */}
+        <Route
+          index
+          element={
+            isLoggedIn() && getUserRole() === "superadmin" ? (
+              <Navigate to="/admin/dashboard" replace />
+            ) : (
+              <Navigate to="/admin/login" replace />
+            )
+          }
+        />
         <Route
           path="login"
           element={
@@ -159,6 +171,7 @@ const router = createBrowserRouter(
           <Route path=":testid/student-analytics" element={<StudentAnalytics replace />} />
           <Route path="success" element={<ScheduleSuccess />} />
         </Route>
+        <Route path="*" element={<RouteErrorPopup />} /> {/* Catch-all for admin */}
       </Route>
     </>
   )

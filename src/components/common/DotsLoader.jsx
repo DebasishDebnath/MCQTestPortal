@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+
 export default function DotsLoader({ color = "hsl(228, 97%, 42%)", size = 24 }) {
   return (
     <svg

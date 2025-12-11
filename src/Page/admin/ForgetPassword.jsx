@@ -5,6 +5,7 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
+import DotLoader from "../../components/common/DotsLoader.jsx"
 
 function ForgetPassword() {
   const [step, setStep] = useState("verifyEmail"); // 'verifyEmail', 'verifyOtp', 'resetPassword'
@@ -135,7 +136,11 @@ function ForgetPassword() {
                       >
                         {step === "verifyEmail"
                           ? loading
-                            ? "Verifying..."
+                            ? (
+                              <span className="flex justify-center items-center w-full">
+                                <DotLoader />
+                              </span>
+                            )
                             : "Verify"
                           : "Verified"}
                       </button>
@@ -172,7 +177,11 @@ function ForgetPassword() {
                     className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-full transition-colors mt-6"
                     disabled={loading || formData.otp.length < 4}
                   >
-                    {loading && step === "verifyOtp" ? "Submitting..." : "Submit"}
+                    {loading && step === "verifyOtp" ? (
+                              <span className="flex justify-center items-center w-full">
+                                <DotLoader />
+                              </span>
+                            ) : "Submit"}
                   </button>
                 </>
               )}
@@ -244,7 +253,11 @@ function ForgetPassword() {
                       formData.newPassword !== formData.confirmPassword
                     }
                   >
-                    {loading ? "Resetting..." : "Reset Password"}
+                    {loading ? (
+                              <span className="flex justify-center items-center w-full">
+                                <DotLoader />
+                              </span>
+                            ) : "Reset Password"}
                   </button>
                 </>
               )}
